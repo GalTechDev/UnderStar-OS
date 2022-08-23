@@ -8,7 +8,7 @@ def __init__(bot_client):
     init_event()
     
 
-classbot_folder = "app/test"
+classbot_folder = "app/welcome"
 plante_verte = f"{classbot_folder}/team_plante_verte.png"
 welcome_message = """
 Bienvenue {}, dans le serveur

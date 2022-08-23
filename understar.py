@@ -7,13 +7,13 @@ import os.path
 import time
 import sys
 import system.installed_app as apps
-
+import asyncio
 
 bot_version = "0.1"
 sys_folder = "system"
 app_folder = "app"
 classbot_token = f"{sys_folder}/classbot_token"
-prefix="!"
+prefix="?"
 
 programmer = os.path.basename(sys.argv[0])
 
@@ -36,16 +36,17 @@ except FileNotFoundError:
 
 intents = discord.Intents.default()
 intents.members = True
+intents.message_content = True
 
 client = commands.Bot(intents=intents, command_prefix=prefix, help_command=None)
 client.remove_command('help')
 
-status = cycle(["Bot Licence Info","UnderStar OS"])
+status = cycle(["UnderStar OS"])
 
 def get_apps() -> dict:
     return apps.all_app
 
-def import_apps():
+async def import_apps():
     import system.installed_app as apps
     for app_name,app in get_apps().items():
         app.__init__(client)
@@ -54,10 +55,10 @@ def import_apps():
             if not new_com in client.all_commands.keys():
                 client.add_command(new_com)
         for task in app.task:
-            new_task=tasks.Loop(task.fonction,seconds=task.seconds, hours=task.hours,minutes=task.minutes, count=task.count, reconnect=task.reconnect, loop=task.loop)
-            new_task.start()
+            new_task=tasks.Loop(task.fonction,seconds=task.seconds, hours=task.hours,minutes=task.minutes, time=task.time, count=task.count, reconnect=task.reconnect)
+            await new_task.start()
             
-import_apps()
+
 
 def get_help(ctx, is_slash: bool = False):
     embed = discord.Embed(title="OS Commands", description=f"Préfix : `{prefix}`", color=discord.Color.red())
@@ -83,7 +84,7 @@ def convert_time(value: int):
 
 
 def is_dev(ctx):
-    if ctx.author.id in []:
+    if ctx.author.id in [608779421683417144]:
         return True
 
     member = ctx.message.author
@@ -96,7 +97,7 @@ def is_dev(ctx):
 
 
 def is_in_staff(ctx, direct_author=False):
-    if ctx.author.id in []:
+    if ctx.author.id in [608779421683417144]:
         return True
     if not direct_author:
         member = ctx.message.author
@@ -111,7 +112,7 @@ def is_in_staff(ctx, direct_author=False):
 
 
 def is_in_maintenance(ctx):
-    if ctx.author.id in []:
+    if ctx.author.id in [366055261930127360, 649532920599543828]:
         return True
 
     member = ctx.message.author
@@ -129,9 +130,8 @@ timer = time.time()
 
 # -------------------------------- COMMANDE -------------------------------
 
-@client.command(name="os-tests")
-@commands.check(is_in_staff)
-async def test(ctx:commands.context.Context):
+@client.command(name="os-test")
+async def test(ctx):
     await ctx.send(":pizza:")
 
 
@@ -190,11 +190,13 @@ async def on_ready():
     maintenance.start()
 
     with open(f'{sys_folder}/icon.png', 'rb') as image:
-        await client.user.edit(avatar=image.read())
+        pass
+        #await client.user.edit(avatar=image.read())
 
     print("version : ", programmer, bot_version)
     print("Logged in as : ", client.user.name)
     print("ID : ", client.user.id)
+    await import_apps()
 
 
 @client.event
@@ -239,7 +241,7 @@ async def update(ctx, *, ipe=programmer):
 
     val = os.system(f"update.pyw {ipe} key=classbot")
 
-    await client.change_presence(activity=discord.Game("UnderStar OS"), status=discord.Status.online)
+    await client.change_presence(activity=discord.Game("Uno Licence info go!"), status=discord.Status.online)
 
     if val:
         await ctx.send("Done")
