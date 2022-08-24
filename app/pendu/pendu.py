@@ -5,7 +5,7 @@ import system.lib as lib
 global client
 client=None
 
-def init(bot_client:commands.Bot):
+def __init__(bot_client:commands.Bot):
     global client
     client=bot_client
 
