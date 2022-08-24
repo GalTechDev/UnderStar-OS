@@ -6,7 +6,7 @@ import json
 langage= "Francais"
 
 class Command:
-    def __init__(self, name:str, command, help_text: str="",aliases: (list[str])=[],checks=[]) -> None:
+    def __init__(self, name:str, command, help_text: str="",aliases: list=[],checks=[]) -> None:
         self.name=name.replace(" ", "-")
         self.command=command
         self.help=help_text
