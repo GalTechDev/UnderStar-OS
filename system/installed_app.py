@@ -1,5 +1,5 @@
+import app.edt.classbot as edt
 import system.app.config as config
-import app.pendu.pendu as pendu
-import app.brillant.brillant as brillant
+import app.aternos.main as aternos
 
-all_app={"config":config, "pendu":pendu, "brillant":brillant}
+all_app={"edt":edt}

@@ -1,12 +1,26 @@
 import discord
-from discord.ext import tasks
+from discord.ext import tasks as discord_tasks
 import json
 
 
 langage= "Francais"
 
+commands = []
+slashs = []
+task = []
+
+
+class Slash:
+    def __init__(self, name: str, description: str, command, guild = discord.utils.MISSING, guilds: list = discord.utils.MISSING) -> None:
+        self.name=name.replace(" ", "-")
+        self.command=command
+        self.description=description
+        self.guild=guild
+        self.guilds=guilds
+        
+
 class Command:
-    def __init__(self, name:str, command, help_text: str="",aliases: list=[],checks=[]) -> None:
+    def __init__(self, name:str, command, help_text: str="",aliases: (list[str])=[],checks=[]) -> None:
         self.name=name.replace(" ", "-")
         self.command=command
         self.help=help_text
@@ -14,7 +28,7 @@ class Command:
         self.checks=checks
 
 class Task:
-    def __init__(self,fonction,seconds: int = tasks.MISSING, minutes: int = tasks.MISSING, hours: int = tasks.MISSING, time=tasks.MISSING, count = None, reconnect: bool = True) -> None:
+    def __init__(self,fonction,seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True) -> None:
         self.fonction=fonction
         self.seconds=seconds
         self.minutes=minutes
@@ -23,13 +37,32 @@ class Task:
         self.reconnect=reconnect
         self.time=time
 
-def is_in_staff(ctx, direct_author=False):
-    if ctx.author.id in [608779421683417144]:
-        return True
+def command(name=None, help_text: str="", aliases: (list[str])=[], checks=[]):
+    def apply(funct):
+        commands.append(Command(name if name != None else funct.__name__ , funct, help_text, aliases, checks))
+        return funct
+    return apply
+
+def slash(description: str, name: str = None, guild = discord.utils.MISSING, guilds: list = discord.utils.MISSING):
+    def apply(funct):
+        slashs.append(Slash(name if name != None else funct.__name__ , description, funct, guild, guilds))
+        return funct
+    return apply
+
+def tasks(seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True):
+    def apply(funct):
+        task.append(Task(funct, seconds, minutes, hours, time, count, reconnect))
+        return funct
+    return apply
+
+
+def is_in_staff(ctx:discord.Interaction, direct_author=False):
     if not direct_author:
-        member = ctx.message.author
-    else:
         member = ctx.author
+    else:
+        member = ctx.user
+    if member.id in [608779421683417144]:
+        return True
     roles = [role.name for role in member.roles]
     admins = ["Admin", "Modo", "Bot Dev"]
 
@@ -57,3 +90,5 @@ def get_lang_ref(ref, lang = langage):
         return [all_ref[one_ref][:-1] for one_ref in ref]
     else:
         raise Exception
+
+

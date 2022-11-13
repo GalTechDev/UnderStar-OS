@@ -1,4 +1,3 @@
-from dis import disco
 import discord
 from discord.ext import commands
 import system.lib as lib
@@ -80,3 +79,4 @@ async def config(ctx:commands.context.Context):
 
 command=[lib.Command(command=config, name="config", aliases=["config"])]
 task=[]
+slash=[]

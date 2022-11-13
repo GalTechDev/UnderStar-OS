@@ -41,6 +41,8 @@ intents.message_content = True
 client = commands.Bot(intents=intents, command_prefix=prefix, help_command=None)
 client.remove_command('help')
 
+
+
 status = cycle(["UnderStar OS"])
 
 def get_apps() -> dict:
@@ -50,13 +52,23 @@ async def import_apps():
     import system.installed_app as apps
     for app_name,app in get_apps().items():
         app.__init__(client)
-        for command in app.command:
+        for command in app.commands:
             new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
             if not new_com in client.all_commands.keys():
                 client.add_command(new_com)
+        
         for task in app.task:
             new_task=tasks.Loop(task.fonction,seconds=task.seconds, hours=task.hours,minutes=task.minutes, time=task.time, count=task.count, reconnect=task.reconnect)
-            await new_task.start()
+            #await new_task.start()
+        
+        for command in app.slashs:
+            #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
+            new_com=discord.app_commands.Command(name=f"{app_name}-{command.name}", description=command.description,callback=command.command)
+            new_com.default_permissions=discord.Permissions(8)
+            if not new_com in client.tree._get_all_commands():
+                client.tree.add_command(new_com, guild=command.guild, guilds=command.guilds)
+                
+        
             
 
 
@@ -128,11 +140,21 @@ def is_in_maintenance(ctx):
 
 timer = time.time()
 
+# -------------------------------- Slash Command (test) -------------------
+
+@client.tree.command(name = "commandtest", description = "Command test", guilds=[discord.Object(id=649021344058441739)]) # Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
+async def first_command(interaction):
+    await interaction.response.send_message("Hello!")
+
+
+
+
 # -------------------------------- COMMANDE -------------------------------
 
 @client.command(name="os-test")
 async def test(ctx):
     await ctx.send(":pizza:")
+   
 
 
 @client.command(name="os-ping", aliases=["os-ver"])
@@ -197,6 +219,8 @@ async def on_ready():
     print("Logged in as : ", client.user.name)
     print("ID : ", client.user.id)
     await import_apps()
+    for guild in client.guilds:
+        await client.tree.sync(guild=discord.Object(id=guild.id))
 
 
 @client.event
@@ -233,22 +257,22 @@ async def stop(ctx:commands.context.Context):
     quit()
 
 
-'''@client.command(aliases=["upt"])
+@client.command(aliases=["upt"])
 @commands.check(is_dev)
-async def update(ctx, *, ipe=programmer):
+async def update(ctx:commands.context.Context, *, ipe=programmer):
     await ctx.send("updating code")
     await client.change_presence(activity=discord.Game("Updating..."), status=discord.Status.idle)
 
     val = os.system(f"update.pyw {ipe} key=classbot")
 
-    await client.change_presence(activity=discord.Game("Uno Licence info go!"), status=discord.Status.online)
+    await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
 
     if val:
         await ctx.send("Done")
         return
 
     await ctx.send("Error!")
-'''
+
 
 # -------------------------------------- TASKS -----------------------------------
 
