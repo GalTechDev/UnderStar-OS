@@ -11,8 +11,9 @@ import asyncio
 
 bot_version = "0.1"
 sys_folder = "system"
+token_folder = "token"
 app_folder = "app"
-classbot_token = f"{sys_folder}/classbot_token"
+classbot_token = f"{token_folder}/classbot_token"
 prefix="?"
 
 programmer = os.path.basename(sys.argv[0])
