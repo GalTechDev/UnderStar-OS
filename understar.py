@@ -66,7 +66,7 @@ async def import_apps():
         for command in app.slashs:
             #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
             new_com=discord.app_commands.Command(name=f"{app_name}-{command.name}", description=command.description,callback=command.command)
-            new_com.default_permissions=discord.Permissions(8)
+            #new_com.default_permissions=discord.Permissions(8)
             if not new_com in client.tree._get_all_commands():
                 client.tree.add_command(new_com, guild=command.guild, guilds=command.guilds)
                 
@@ -144,7 +144,7 @@ timer = time.time()
 
 # -------------------------------- Slash Command (test) -------------------
 
-@client.tree.command(name = "commandtest", description = "Command test", guilds=[discord.Object(id=649021344058441739)]) # Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
+@client.tree.command(name = "commandtest", description = "Command test", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
 async def first_command(interaction):
     await interaction.response.send_message("Hello!")
 

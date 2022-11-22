@@ -11,7 +11,7 @@ task = []
 
 
 class Slash:
-    def __init__(self, name: str, description: str, command, guild = discord.utils.MISSING, guilds: list = discord.utils.MISSING) -> None:
+    def __init__(self, name: str, description: str, command, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING) -> None:
         self.name=name.replace(" ", "-")
         self.command=command
         self.description=description
