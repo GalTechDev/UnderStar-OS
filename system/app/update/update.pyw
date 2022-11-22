@@ -18,9 +18,11 @@ for p in listdir():
 
 for p in listdir(download_folder):
     print(listdir(download_folder))
-    if p in [".git", ".gitignore"]:
+    if p in [".git"]:
         pass
     else:
         move(f"{download_folder}/{p}", curdir)
     
+rmtree(download_folder)
+
 exit(0)
