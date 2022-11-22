@@ -10,7 +10,7 @@ move("app", f"{download_folder}")
 move("token", f"{download_folder}")
 
 for p in listdir():
-    if p not in ["download",".git"]:
+    if p not in ["download",".git", "save"]:
         if path.isdir(p):
             rmtree(p)
         else:
