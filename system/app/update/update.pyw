@@ -25,5 +25,3 @@ for p in listdir(download_folder):
     
 system('rmdir /S /Q "{}"'.format(download_folder))
 system('start understar.py')
-
-exit(1)
