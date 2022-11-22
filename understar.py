@@ -14,7 +14,7 @@ sys_folder = "system"
 token_folder = "token"
 app_folder = "app"
 classbot_token = f"{token_folder}/classbot_token"
-update_file = f"{sys_folder}/app/update/updtae.pyw"
+update_file = f"{sys_folder}/app/update/update.pyw"
 prefix="?"
 
 programmer = os.path.basename(sys.argv[0])
@@ -268,11 +268,11 @@ async def update(ctx:commands.context.Context, *, ipe=programmer):
     val = os.system(f"start {update_file}")
 
     await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
-
+    print(val)
     if val:
         await ctx.send("Done")
         return
-
+    print(val)
     await ctx.send("Error!")
     exit(0)
 
