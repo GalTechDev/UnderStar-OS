@@ -1,6 +1,6 @@
 from git import Repo
 from shutil import move, rmtree
-from os import listdir, remove, path
+from os import listdir, remove, path, curdir
 download_folder = "download/os"
 
 git_url = "https://github.com/GalTechDev/UnderStar-OS.git"
@@ -19,7 +19,7 @@ for p in listdir():
 for p in listdir(download_folder):
     if p in [".git"]:
         continue
-    move(f"{download_folder}/{p}", "")
+    move(f"{download_folder}/{p}", curdir)
     if path.isdir(f"{download_folder}/{p}"):
         rmtree(f"{download_folder}/{p}")
     else:
