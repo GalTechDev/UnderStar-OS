@@ -269,7 +269,7 @@ async def update(ctx:commands.context.Context, *, ipe=programmer):
 
     await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
     print(val)
-    if val==1:
+    if val==0:
         await ctx.send("Done")
         await client.close()
     else:
