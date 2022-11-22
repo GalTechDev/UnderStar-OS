@@ -19,10 +19,7 @@ for p in listdir():
 for p in listdir(download_folder):
     print(listdir(download_folder))
     if p in [".git", ".gitignore"]:
-        if path.isdir(f"{download_folder}/{p}"):
-            rmtree(f"{download_folder}/{p}")
-        else:
-            remove(f"{download_folder}/{p}")
+        pass
     else:
         move(f"{download_folder}/{p}", curdir)
     
