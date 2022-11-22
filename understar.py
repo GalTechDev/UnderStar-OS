@@ -271,10 +271,10 @@ async def update(ctx:commands.context.Context, *, ipe=programmer):
     
     if val:
         await ctx.send("Done")
-        return
-    
-    await ctx.send("Error!")
-    exit(0)
+        exit()
+    else:
+        await ctx.send("Error!")
+        exit(0)
 
 
 # -------------------------------------- TASKS -----------------------------------
