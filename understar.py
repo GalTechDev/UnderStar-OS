@@ -262,14 +262,14 @@ async def stop(ctx:commands.context.Context):
 @client.command(aliases=["upt"])
 @commands.check(is_dev)
 async def update(ctx:commands.context.Context, *, ipe=programmer):
-    await ctx.send("updating code")
+    await ctx.send("updating code !")
     await client.change_presence(activity=discord.Game("Updating..."), status=discord.Status.idle)
 
     val = os.system(f"start {update_file}")
 
     await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
     
-    if val:
+    if val==1:
         await ctx.send("Done")
         exit()
     else:
