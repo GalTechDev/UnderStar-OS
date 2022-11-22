@@ -1,6 +1,6 @@
 from git import Repo
 from shutil import move, rmtree
-from os import listdir, remove, path, curdir
+from os import listdir, remove, path, curdir, system
 download_folder = "download/os"
 
 git_url = "https://github.com/GalTechDev/UnderStar-OS.git"
@@ -23,6 +23,6 @@ for p in listdir(download_folder):
     else:
         move(f"{download_folder}/{p}", curdir)
     
-rmtree(download_folder)
+system('rmdir /S /Q "{}"'.format(download_folder))
 
 exit(0)
