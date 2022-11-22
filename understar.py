@@ -144,9 +144,9 @@ timer = time.time()
 
 # -------------------------------- Slash Command (test) -------------------
 
-@client.tree.command(name = "commandtest", description = "Command test", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
+@client.tree.command(name = "version", description = "Command test", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
 async def first_command(interaction):
-    await interaction.response.send_message("Hello!")
+    await interaction.response.send_message(f"Version : {bot_version}")
 
 
 
@@ -222,7 +222,11 @@ async def on_ready():
     print("ID : ", client.user.id)
     await import_apps()
     for guild in client.guilds:
+        
+        #client.tree.copy_global_to(guild=discord.Object(id=guild.id))
         await client.tree.sync(guild=discord.Object(id=guild.id))
+        await client.tree.sync()
+        
 
 
 @client.event
