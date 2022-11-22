@@ -271,7 +271,7 @@ async def update(ctx:commands.context.Context, *, ipe=programmer):
     
     if val==1:
         await ctx.send("Done")
-        exit()
+        client.close()
     else:
         await ctx.send("Error!")
         exit(0)
