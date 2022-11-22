@@ -24,5 +24,6 @@ for p in listdir(download_folder):
         move(f"{download_folder}/{p}", curdir)
     
 system('rmdir /S /Q "{}"'.format(download_folder))
+system('start understar.py')
 
 exit(0)
