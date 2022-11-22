@@ -19,8 +19,8 @@ for p in listdir():
 for p in listdir(download_folder):
     if p in [".git"]:
         continue
-    move(p, "")
-    if path.isdir(p):
+    move(f"{download_folder}/{p}", "")
+    if path.isdir(f"{download_folder}/{p}"):
         rmtree(f"{download_folder}/{p}")
     else:
         remove(f"{download_folder}/{p}")
