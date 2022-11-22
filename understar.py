@@ -268,11 +268,11 @@ async def update(ctx:commands.context.Context, *, ipe=programmer):
     val = os.system(f"start {update_file}")
 
     await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
-    print(val)
+    
     if val:
         await ctx.send("Done")
         return
-    print(val)
+    
     await ctx.send("Error!")
     exit(0)
 
