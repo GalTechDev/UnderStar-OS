@@ -17,6 +17,7 @@ for p in listdir():
             remove(p)
 
 for p in listdir(download_folder):
+    print(listdir(download_folder))
     if p in [".git"]:
         continue
     move(f"{download_folder}/{p}", curdir)
