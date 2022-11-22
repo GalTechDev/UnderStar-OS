@@ -1,13 +1,13 @@
 from git import Repo
 from shutil import move, rmtree
 from os import listdir, remove, path
-download_folder = "download"
+download_folder = "download/os"
 
 git_url = "https://github.com/GalTechDev/UnderStar-OS.git"
-repo_dir = f"{download_folder}/os"
+repo_dir = f"{download_folder}"
 Repo.clone_from(git_url, repo_dir)
-move("app", f"{download_folder}/os/")
-move("token", f"{download_folder}/os/")
+move("app", f"{download_folder}")
+move("token", f"{download_folder}")
 
 for p in listdir():
     if p not in ["download",".git"]:
