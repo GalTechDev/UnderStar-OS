@@ -1,31 +1,38 @@
 import discord
+from discord.ext import commands as discord_commands
 from discord.ext import tasks as discord_tasks
 import json
 
 
 langage= "Francais"
-
+global client
+client = None
 commands = []
 slashs = []
 task = []
 
+def init_client(bot_client):
+    global client
+    client = bot_client
 
 class Slash:
-    def __init__(self, name: str, description: str, command, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING) -> None:
+    def __init__(self, name: str, description: str, command, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False) -> None:
         self.name=name.replace(" ", "-")
         self.command=command
         self.description=description
         self.guild=guild
         self.guilds=guilds
+        self.force_name = force_name
         
 
 class Command:
-    def __init__(self, name:str, command, help_text: str="",aliases: (list[str])=[],checks=[]) -> None:
+    def __init__(self, name:str, command, help_text: str="",aliases: (list[str])=[],checks=[], force_name: bool = False) -> None:
         self.name=name.replace(" ", "-")
         self.command=command
-        self.help=help_text
+        self.help = help_text if help_text!="" else "Aucune aide disponible"
         self.aliases=aliases
         self.checks=checks
+        self.force_name = force_name
 
 class Task:
     def __init__(self,fonction,seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True) -> None:
@@ -37,15 +44,15 @@ class Task:
         self.reconnect=reconnect
         self.time=time
 
-def command(name=None, help_text: str="", aliases: (list[str])=[], checks=[]):
+def command(name=None, help_text: str="", aliases: (list[str])=[], checks=[], force_name: bool = False):
     def apply(funct):
-        commands.append(Command(name if name != None else funct.__name__ , funct, help_text, aliases, checks))
+        commands.append(Command(name if name != None else funct.__name__ , funct, help_text, aliases, checks, force_name))
         return funct
     return apply
 
-def slash(description: str, name: str = None, guild = discord.utils.MISSING, guilds: list = discord.utils.MISSING):
+def slash(description: str, name: str = None, guild = discord.utils.MISSING, guilds: list = discord.utils.MISSING, force_name: bool = False):
     def apply(funct):
-        slashs.append(Slash(name if name != None else funct.__name__ , description, funct, guild, guilds))
+        slashs.append(Slash(name if name != None else funct.__name__ , description, funct, guild, guilds, force_name))
         return funct
     return apply
 
@@ -57,12 +64,16 @@ def tasks(seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MIS
 
 
 def is_in_staff(ctx:discord.Interaction, direct_author=False):
-    if not direct_author:
-        member = ctx.author
+    if type(ctx)==discord.Interaction:
+        au_id = ctx.user.id
     else:
-        member = ctx.user
-    if member.id in [608779421683417144]:
-        return True
+        au_id = ctx.author.id
+    if au_id in [608779421683417144]:
+        return True 
+    if not direct_author:
+        member = ctx.message.author
+    else:
+        member = ctx.author
     roles = [role.name for role in member.roles]
     admins = ["Admin", "Modo", "Bot Dev"]
 

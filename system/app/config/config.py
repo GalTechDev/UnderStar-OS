@@ -2,19 +2,8 @@ import discord
 from discord.ext import commands
 import system.lib as lib
 
-global client
-client=None
-
-global counter
-counter=0
 
 all_lang_ref = [1,2,3]
-
-
-def __init__(bot_client:commands.Bot):
-    global client
-    client=bot_client
-
 
 class lang_select(discord.ui.Select):
     def __init__(self) -> None:

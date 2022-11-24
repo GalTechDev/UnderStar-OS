@@ -6,12 +6,18 @@ from discord.ext import commands, tasks
 import os.path
 import time
 import sys
-import system.installed_app as apps
+import save.system.installed_app as apps
+import system.sys_app as sys_apps
 import asyncio
+from system.lib import is_in_staff
+
+
+
 
 bot_version = "0.1"
 sys_folder = "system"
 token_folder = "token"
+save_folder = "save"
 app_folder = "app"
 classbot_token = f"{token_folder}/classbot_token"
 update_file = f"{sys_folder}/app/update/update.pyw"
@@ -25,7 +31,7 @@ vals = [sys_folder,app_folder]
 for name in vals:
     Path(name).mkdir(exist_ok=True)
 
-bot_token = ""
+bot_token = "" 
 
 try:
     with open(classbot_token, "r") as f:
@@ -47,41 +53,44 @@ client.remove_command('help')
 
 status = cycle(["UnderStar OS"])
 
-def get_apps() -> dict:
-    return apps.all_app
+def get_apps(sys=False) -> dict:
+    return sys_apps.all_app if sys else apps.all_app
 
-async def import_apps():
-    import system.installed_app as apps
-    for app_name,app in get_apps().items():
-        app.__init__(client)
+async def import_apps(sys=False):
+    for app_name,app in get_apps(sys).items():
+        app.init_client(client)
         for command in app.commands:
-            new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
+            new_com=commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
             if not new_com in client.all_commands.keys():
                 client.add_command(new_com)
-        
+            
         for task in app.task:
             new_task=tasks.Loop(task.fonction,seconds=task.seconds, hours=task.hours,minutes=task.minutes, time=task.time, count=task.count, reconnect=task.reconnect)
             #await new_task.start()
-        
+            
         for command in app.slashs:
             #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
-            new_com=discord.app_commands.Command(name=f"{app_name}-{command.name}", description=command.description,callback=command.command)
+            new_com=discord.app_commands.Command(name=f"{app_name}-{command.name}" if not command.force_name else command.name, description=command.description,callback=command.command)
             #new_com.default_permissions=discord.Permissions(8)
             if not new_com in client.tree._get_all_commands():
                 client.tree.add_command(new_com, guild=command.guild, guilds=command.guilds)
-                
+                    
         
             
 
 
-def get_help(ctx, is_slash: bool = False):
+def get_help(ctx:commands.context.Context, is_slash: bool = False):
     embed = discord.Embed(title="OS Commands", description=f"Préfix : `{prefix}`", color=discord.Color.red())
     embed.set_author(name='Liste des commandes')
-    if is_in_staff(ctx):
-        embed.add_field(name="**help**", value="pour avoir ce message")
-        embed.add_field(name="**reboot**", value="pour restart le bot")
-        embed.add_field(name="**stop**", value="stop le bot")
-        embed.add_field(name="**version**", value="donne la version du bot")
+    try:
+        coms = [com for com in client.all_commands]
+        coms.sort()
+        for com in coms:
+            #print(com)
+            if all([check(ctx) for check in client.all_commands[com].checks]+[True]):
+                embed.add_field(name=f"**{com}**", value=f'{client.all_commands[com].help if client.all_commands[com].help != None else "Aucune aide disponible"}')
+    except Exception as error:
+        print(error)
 
     return embed
 
@@ -110,21 +119,6 @@ def is_dev(ctx):
             return True
 
 
-def is_in_staff(ctx, direct_author=False):
-    if ctx.author.id in [608779421683417144]:
-        return True
-    if not direct_author:
-        member = ctx.message.author
-    else:
-        member = ctx.author
-    roles = [role.name for role in member.roles]
-    admins = ["Admin", "Modo", "Bot Dev"]
-
-    for role in roles:
-        if role in admins:
-            return True
-
-
 def is_in_maintenance(ctx):
     if ctx.author.id in [366055261930127360, 649532920599543828]:
         return True
@@ -144,9 +138,14 @@ timer = time.time()
 
 # -------------------------------- Slash Command (test) -------------------
 
-@client.tree.command(name = "version", description = "Command test", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
-async def first_command(interaction):
-    await interaction.response.send_message(f"Version : {bot_version}")
+@client.tree.command(name = "info", description = "donne des infos sur le bot", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
+@discord.app_commands.check(is_in_staff)
+async def first_command(ctx:discord.Interaction):
+    embed = discord.Embed(title="INFO")
+    embed.add_field(name=f"Version :", value=f"` {bot_version}   `")
+    embed.add_field(name=f"Ping :", value=f"` {round(client.latency * 1000)} `")
+    embed.add_field(name=f"Time up :", value=f"`{convert_time(int(time.time()-timer))}`")
+    await ctx.response.send_message(embed=embed)
 
 
 
@@ -156,7 +155,6 @@ async def first_command(interaction):
 @client.command(name="os-test")
 async def test(ctx):
     await ctx.send(":pizza:")
-   
 
 
 @client.command(name="os-ping", aliases=["os-ver"])
@@ -168,19 +166,7 @@ async def version(ctx:commands.context.Context):
     await ctx.send(final_message)
 
 
-@client.command(name="os-clear", aliases=["clear"])
-@commands.cooldown(1, 300, commands.BucketType.user)
-async def clear(ctx:commands.context.Context, amount=1):
-    if is_in_staff(ctx):
-        await ctx.channel.purge(limit=amount+1)
-        clear.reset_cooldown(ctx)
-    elif amount < 5:
-        await ctx.channel.purge(limit=amount+1)
-    else:
-        await ctx.channel.purge(limit=6)
-
-
-@client.command(name="os-help", aliases=["help"])
+@client.command(name="os-help", aliases=["help"], help="pour avoir ce message")
 async def help(ctx:commands.context.Context,*args):
     print(args)
     if args==():
@@ -211,7 +197,7 @@ async def help(ctx:commands.context.Context,*args):
 @client.event
 async def on_ready():
     change_status.start()
-    maintenance.start()
+    #maintenance.start()
 
     with open(f'{sys_folder}/icon.png', 'rb') as image:
         pass
@@ -220,14 +206,12 @@ async def on_ready():
     print("version : ", programmer, bot_version)
     print("Logged in as : ", client.user.name)
     print("ID : ", client.user.id)
+    await import_apps(True)
     await import_apps()
     for guild in client.guilds:
-        
-        #client.tree.copy_global_to(guild=discord.Object(id=guild.id))
+        client.tree.copy_global_to(guild=discord.Object(id=guild.id))
         await client.tree.sync(guild=discord.Object(id=guild.id))
         await client.tree.sync()
-        
-
 
 @client.event
 async def on_command_error(ctx, error):
@@ -241,11 +225,19 @@ async def on_command_error(ctx, error):
 
         em = discord.Embed(title="Slow it down bro!", description=message)
         await ctx.send(embed=em)
+    print("error h")
+
+@client.tree.error
+async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
+    if isinstance(error, discord.app_commands.CheckFailure):
+        await ctx.response.send_message('Tu ne remplis pas les conditions pour executer cette commande.', ephemeral=True)
+    elif isinstance(error, discord.app_commands.BotMissingPermissions):
+        await ctx.response.send_message('Le bot ne peut pas executer cette commande car il lui manque des autorisations. Merci de contacter le STAFF', ephemeral=True)
 
 # ----------------------------COMMANDE MAINTENANCE----------------------------------
 
 
-@client.command()
+@client.command(name="re", help="Pour restart le bot")
 @commands.check(is_in_staff)
 async def reboot(ctx:commands.context.Context):
     await client.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
@@ -254,7 +246,7 @@ async def reboot(ctx:commands.context.Context):
     os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
 
-@client.command()
+@client.command(help="stop le bot")
 @commands.check(is_in_staff)
 async def stop(ctx:commands.context.Context):
     await ctx.send("Stopping")
@@ -263,7 +255,7 @@ async def stop(ctx:commands.context.Context):
     quit()
 
 
-@client.command(aliases=["upt"])
+@client.command(aliases=["upt"], help="Pour update le bot")
 @commands.check(is_dev)
 async def update(ctx:commands.context.Context, *, ipe=programmer):
     await ctx.send("updating code !")
@@ -288,7 +280,7 @@ async def update(ctx:commands.context.Context, *, ipe=programmer):
 async def change_status():
     await client.change_presence(activity=discord.Game(next(status)))
 
-
+"""
 resetSystem = False
 
 
@@ -300,5 +292,5 @@ async def maintenance():
         os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
     resetSystem = True
-
+"""
 client.run(bot_token)
