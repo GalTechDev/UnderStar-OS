@@ -1,18 +1,16 @@
-import discord
-from discord.ext import commands
-import system.lib as lib
+from system.lib import *
 
-
+app = App()
 all_lang_ref = [1,2,3]
 
 class lang_select(discord.ui.Select):
     def __init__(self) -> None:
-        super().__init__(placeholder=f"{lib.get_lang_ref(10, lib.langage)}",max_values=1,min_values=1,options=[discord.SelectOption(label=lang,description="100%") for lang in lib.get_lang_ref(all_lang_ref, lib.langage)])
+        super().__init__(placeholder=f"{get_lang_ref(10, langage)}",max_values=1,min_values=1,options=[discord.SelectOption(label=lang,description="100%") for lang in get_lang_ref(all_lang_ref, langage)])
 
     async def callback(self, interaction: discord.Interaction):
-        lib.langage = self.values[0]
-        embed = discord.Embed(title=f"{lib.get_lang_ref(11, lib.langage)}", description=f"{lib.get_lang_ref(10, lib.langage)}", color=discord.Color.blue())
-        embed.add_field(name=f"{lib.get_lang_ref(12, lib.langage)} : {lib.get_lang_ref(0, lib.langage)}", value="100%")
+        langage = self.values[0]
+        embed = discord.Embed(title=f"{get_lang_ref(11, langage)}", description=f"{get_lang_ref(10, langage)}", color=discord.Color.blue())
+        embed.add_field(name=f"{get_lang_ref(12, langage)} : {get_lang_ref(0, langage)}", value="100%")
         lang_view=langage_view()
         await interaction.response.edit_message(embed=embed,view=lang_view)
 
@@ -29,8 +27,8 @@ class langage_view(discord.ui.View):
 
     @discord.ui.button(label="Retour",style=discord.ButtonStyle.gray)
     async def back_button(self, interaction:discord.Interaction, button:discord.ui.Button):
-        embed = discord.Embed(title=f"{lib.get_lang_ref(18, lib.langage)}", description=f"{lib.get_lang_ref(19, lib.langage)}", color=discord.Color.blue())
-        embed.add_field(name=f"{lib.get_lang_ref(11, lib.langage)} 🌎", value=f"{lib.get_lang_ref(9, lib.langage)}")
+        embed = discord.Embed(title=f"{get_lang_ref(18, langage)}", description=f"{get_lang_ref(19, langage)}", color=discord.Color.blue())
+        embed.add_field(name=f"{get_lang_ref(11, langage)} 🌎", value=f"{get_lang_ref(9, langage)}")
         conf_view=config_view()
         await interaction.response.edit_message(embed=embed, view=conf_view)
 
@@ -45,8 +43,8 @@ class config_view(discord.ui.View):
     
     @discord.ui.button(label="🌎",style=discord.ButtonStyle.gray)
     async def lang_button(self, interaction:discord.Interaction, button:discord.ui.Button):
-        embed = discord.Embed(title=f"{lib.get_lang_ref(11, lib.langage)}", description=f"{lib.get_lang_ref(10, lib.langage)}", color=discord.Color.blue())
-        embed.add_field(name=f"{lib.get_lang_ref(12, lib.langage)} : {lib.get_lang_ref(0, lib.langage)}", value="100%")
+        embed = discord.Embed(title=f"{get_lang_ref(11, langage)}", description=f"{get_lang_ref(10, langage)}", color=discord.Color.blue())
+        embed.add_field(name=f"{get_lang_ref(12, langage)} : {get_lang_ref(0, langage)}", value="100%")
         lang_view=langage_view()
         await interaction.response.edit_message(embed=embed,view=lang_view)
 
@@ -55,17 +53,17 @@ class start_view(discord.ui.View):
     def __init__(self, *, timeout=180) -> None:
         super().__init__(timeout=timeout)
 
-    @discord.ui.button(label=f"{lib.get_lang_ref(17, lib.langage)}",style=discord.ButtonStyle.gray)
+    @discord.ui.button(label=f"{get_lang_ref(17, langage)}",style=discord.ButtonStyle.gray)
     async def lang_button(self, interaction:discord.Interaction, button:discord.ui.Button):
-        embed = discord.Embed(title=f"{lib.get_lang_ref(18, lib.langage)}", description=f"{lib.get_lang_ref(19, lib.langage)}", color=discord.Color.blue())
-        embed.add_field(name=f"{lib.get_lang_ref(11, lib.langage)} 🌎", value=f"{lib.get_lang_ref(9, lib.langage)}")
+        embed = discord.Embed(title=f"{get_lang_ref(18, langage)}", description=f"{get_lang_ref(19, langage)}", color=discord.Color.blue())
+        embed.add_field(name=f"{get_lang_ref(11, langage)} 🌎", value=f"{get_lang_ref(9, langage)}")
         conf_view=config_view()
         await interaction.response.send_message(embed=embed, view=conf_view, ephemeral=True)
 
-async def config(ctx:commands.context.Context):
-    conf_view=start_view()
-    await ctx.send(view=conf_view)
-
-command=[lib.Command(command=config, name="config", aliases=["config"])]
-task=[]
-slash=[]
+@app.command(name="config", force_name=True)
+async def config(ctx:discord_commands.context.Context):
+    try:
+        conf_view=start_view()
+        await ctx.send(view=conf_view)
+    except Exception as error:
+        print(error)

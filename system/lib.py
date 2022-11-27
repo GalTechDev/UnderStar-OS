@@ -4,16 +4,36 @@ from discord.ext import tasks as discord_tasks
 import json
 
 
-langage= "Francais"
-global client
+langage = "Francais"
 client = None
-commands = []
-slashs = []
-task = []
 
 def init_client(bot_client):
     global client
     client = bot_client
+
+class App:
+    def __init__(self) -> None:
+        self.commands = []
+        self.slashs = []
+        self.task = []
+    
+    def command(self, name=None, help_text: str="", aliases: (list[str])=[], checks=[], force_name: bool = False):
+        def apply(funct):
+            self.commands.append(Command(name if name != None else funct.__name__ , funct, help_text, aliases, checks, force_name))
+            return funct
+        return apply
+
+    def slash(self, description: str, name: str = None, guild = discord.utils.MISSING, guilds: list = discord.utils.MISSING, force_name: bool = False):
+        def apply(funct):
+            self.slashs.append(Slash(name if name != None else funct.__name__ , description, funct, guild, guilds, force_name))
+            return funct
+        return apply
+
+    def tasks(self, seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True):
+        def apply(funct):
+            self.task.append(Task(funct, seconds, minutes, hours, time, count, reconnect))
+            return funct
+        return apply
 
 class Slash:
     def __init__(self, name: str, description: str, command, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False) -> None:
@@ -43,24 +63,6 @@ class Task:
         self.count=count
         self.reconnect=reconnect
         self.time=time
-
-def command(name=None, help_text: str="", aliases: (list[str])=[], checks=[], force_name: bool = False):
-    def apply(funct):
-        commands.append(Command(name if name != None else funct.__name__ , funct, help_text, aliases, checks, force_name))
-        return funct
-    return apply
-
-def slash(description: str, name: str = None, guild = discord.utils.MISSING, guilds: list = discord.utils.MISSING, force_name: bool = False):
-    def apply(funct):
-        slashs.append(Slash(name if name != None else funct.__name__ , description, funct, guild, guilds, force_name))
-        return funct
-    return apply
-
-def tasks(seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True):
-    def apply(funct):
-        task.append(Task(funct, seconds, minutes, hours, time, count, reconnect))
-        return funct
-    return apply
 
 
 def is_in_staff(ctx:discord.Interaction, direct_author=False):
