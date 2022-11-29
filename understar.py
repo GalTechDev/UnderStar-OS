@@ -256,6 +256,7 @@ async def on_ready():
         await client.tree.sync(guild=discord.Object(id=guild.id))
         await client.tree.sync()
     if "sync" in sys.argv:
+        await client.change_presence(activity=discord.Game("Re-Sync..."), status=discord.Status.dnd)
         os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
 @client.event

@@ -1,6 +1,7 @@
 from system.lib import *
 from shutil import rmtree
-
+from sys import executable, argv
+from os import execv, path
 Lib = Lib_UsOS()
 
 @Lib.app.slash(name="uninstall", description="uninstall")
@@ -23,8 +24,10 @@ async def func(ctx:discord.Interaction, ref:str):
                 
         with open("save/system/installed_app.py", "w") as file:
             file.writelines(content)
+        await ctx.response.send_message("Supprimé\nRedémarage...", ephemeral=True)
+        await client.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
+        execv(executable, ["None", path.basename(argv[0]), "sync"])
         
-        await ctx.response.send_message("Supprimé", ephemeral=True)
     else:
         await ctx.response.send_message("Application non trouvé", ephemeral=True)
     
