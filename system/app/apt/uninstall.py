@@ -18,7 +18,7 @@ async def func(ctx:discord.Interaction, ref:str):
                 break
 
         content.pop(i)
-        content[-1].replace(f'"{app_name}":{app_name},', "")
+        content[-1] = content[-1].replace(f'"{app_name}":{app_name},', "")
                 
         with open("save/system/installed_app.py", "w") as file:
             file.writelines(content)
