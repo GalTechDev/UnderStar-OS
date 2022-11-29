@@ -6,7 +6,7 @@ Lib = Lib_UsOS()
 
 @Lib.app.slash(name="uninstall", description="uninstall")
 async def func(ctx:discord.Interaction, ref:str):
-    if App_store.is_installed(ref):
+    if Lib.store.is_installed(ref):
         rmtree(f"app/{ref}")
         app_name = ref
         #app_name=app_name.replace("-", "_")
@@ -25,7 +25,7 @@ async def func(ctx:discord.Interaction, ref:str):
         with open("save/system/installed_app.py", "w") as file:
             file.writelines(content)
         await ctx.response.send_message("Supprimé\nRedémarage...", ephemeral=True)
-        await client.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
+        await Lib.change_presence(discord.Game("Restarting..."), discord.Status.dnd)
         execv(executable, ["None", path.basename(argv[0]), "sync"])
         
     else:

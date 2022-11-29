@@ -58,6 +58,9 @@ class Lib_UsOS:
         else:
             raise Exception
 
+    async def change_presence(self, activity, status):
+        await client.change_presence(activity=activity, status=status)
+
 class App:
     def __init__(self) -> None:
         self.commands = []

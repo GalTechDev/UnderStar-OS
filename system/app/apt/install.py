@@ -47,7 +47,7 @@ async def install(ctx:discord.Interaction, ref:str):
                     file.writelines(content)
 
                 await ctx.response.send_message("Installé\nRedémarage...", ephemeral=True)
-                await client.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
+                await Lib.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
                 execv(executable, ["None", path.basename(argv[0]), "sync"])
 
             else:
