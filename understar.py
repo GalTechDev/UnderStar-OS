@@ -58,25 +58,45 @@ def get_apps(sys=False) -> dict:
 
 async def import_apps(sys=False):
     for app_name,app in get_apps(sys).items():
-        print(app_name, app.app.commands)
+        print(f"\nIMPORT {app_name}: ")
+        loaded = 0
+        errors = 0
+        error_lst=[]
+
         app.init_client(client)
         
         for command in app.app.commands:
-            new_com=commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
-            if not new_com in client.all_commands.keys():
-                client.add_command(new_com)
+            try:
+                new_com=commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
+                if not new_com in client.all_commands.keys():
+                    client.add_command(new_com)
+                    loaded+=1
+            except Exception as error:
+                errors+=1
+                error_lst.append(error)
+        print(f"Command : {loaded} loaded | {errors} error : {error_lst}")
             
         for task in app.app.task:
             new_task=tasks.Loop(task.fonction,seconds=task.seconds, hours=task.hours,minutes=task.minutes, time=task.time, count=task.count, reconnect=task.reconnect)
             #await new_task.start()
-            
+
+        loaded = 0
+        errors = 0
+        error_lst=[] 
+
         for command in app.app.slashs:
-            #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
-            new_com=discord.app_commands.Command(name=f"{app_name}-{command.name}" if not command.force_name else command.name, description=command.description,callback=command.command)
-            #new_com.default_permissions=discord.Permissions(8)
-            if not new_com.name in [com.name for com in client.tree._get_all_commands()]:
-                client.tree.add_command(new_com, guild=command.guild, guilds=command.guilds)
+            try:
+                #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
+                new_com=discord.app_commands.Command(name=f"{app_name.lower()}-{command.name.lower()}" if not command.force_name else command.name, description=command.description,callback=command.command)
+                #new_com.default_permissions=discord.Permissions(8)
+                if not new_com.name in [com.name for com in client.tree._get_all_commands()]:
+                    client.tree.add_command(new_com, guild=command.guild, guilds=command.guilds)
+                    loaded+=1
+            except Exception as error:
+                errors+=1
+                error_lst.append(error)
             
+        print(f"Slash : {loaded} loaded | {errors} error : {error_lst}")
         
                     
         

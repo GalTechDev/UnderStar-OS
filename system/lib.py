@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands as discord_commands
 from discord.ext import tasks as discord_tasks
 import json
-
+import save.system.installed_app as installed_app
 
 langage = "Francais"
 client = None
@@ -34,6 +34,12 @@ class App:
             self.task.append(Task(funct, seconds, minutes, hours, time, count, reconnect))
             return funct
         return apply
+
+    def fusion(self, apps):
+        for app in apps:
+            self.commands+=app.app.commands
+            self.task+=app.app.task
+            self.slashs+=app.app.slashs
 
 class Slash:
     def __init__(self, name: str, description: str, command, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False) -> None:
@@ -104,4 +110,28 @@ def get_lang_ref(ref, lang = langage):
     else:
         raise Exception
 
+class App_store:
+    def __init__(self) -> None:
+        pass
 
+    def get_apps() -> dict:
+        """Give a dict object {"app_name":"app_link",}"""
+        with open("save/system/app_store.json") as file:
+            data = json.load(file)
+        return data
+        
+    def get_installed():
+        return installed_app.all_app
+
+    def is_in_store(app_name):
+        apps = App_store.get_apps()
+        return app_name in list(apps.keys())
+    
+    def is_installed(app_name):
+        apps = App_store.get_installed()
+        return app_name in list(apps.keys())
+
+    def add_link(app_name, app_link):
+        pass
+
+    
