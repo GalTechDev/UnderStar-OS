@@ -7,15 +7,63 @@ import save.system.installed_app as installed_app
 langage = "Francais"
 client = None
 
-def init_client(bot_client):
-    global client
-    client = bot_client
+
+
+class Lib_UsOS:
+    def __init__(self) -> None:
+        self.app = App()
+        self.app_name = None
+        self.store = App_store()
+
+    def init_client(self,bot_client):
+        global client
+        client = bot_client
+
+    def is_in_staff(self, ctx:discord.Interaction, direct_author=False):
+        if type(ctx)==discord.Interaction:
+            au_id = ctx.user.id
+        else:
+            au_id = ctx.author.id
+        if au_id in [608779421683417144]:
+            return True 
+        if not direct_author:
+            member = ctx.message.author
+        else:
+            member = ctx.author
+        roles = [role.name for role in member.roles]
+        admins = ["Admin", "Modo", "Bot Dev"]
+
+        for role in roles:
+            if role in admins:
+                return True
+
+    def get_lang_name(self):
+        with open("system/lang/ref.json") as file:
+            data = json.load(file)
+        return data
+
+    def get_lang(self, lang = langage):
+        ref = self.get_lang_name()
+        lang_txt = ref[lang]
+        with open(f"system/lang/{lang_txt}.txt") as file:
+            all_text = file.readlines()
+        return all_text
+
+    def get_lang_ref(self, ref, lang = langage):
+        all_ref = self.get_lang(lang)
+        if type(ref) == int:
+            return all_ref[ref][:-1]
+        elif type(ref) == list:
+            return [all_ref[one_ref][:-1] for one_ref in ref]
+        else:
+            raise Exception
 
 class App:
     def __init__(self) -> None:
         self.commands = []
         self.slashs = []
         self.task = []
+        self.help_com = None
     
     def command(self, name=None, help_text: str="", aliases: (list[str])=[], checks=[], force_name: bool = False):
         def apply(funct):
@@ -35,11 +83,18 @@ class App:
             return funct
         return apply
 
+    def help(self):
+        def apply(funct):
+            self.help_com = funct
+            return funct
+        return apply
+
     def fusion(self, apps):
         for app in apps:
-            self.commands+=app.app.commands
-            self.task+=app.app.task
-            self.slashs+=app.app.slashs
+            self.commands+=app.Lib.app.commands
+            self.task+=app.Lib.app.task
+            self.slashs+=app.Lib.app.slashs
+            self.help_com = app.Lib.app.help_com
 
 class Slash:
     def __init__(self, name: str, description: str, command, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False) -> None:
@@ -50,7 +105,6 @@ class Slash:
         self.guilds=guilds
         self.force_name = force_name
         
-
 class Command:
     def __init__(self, name:str, command, help_text: str="",aliases: (list[str])=[],checks=[], force_name: bool = False) -> None:
         self.name=name.replace(" ", "-")
@@ -70,68 +124,26 @@ class Task:
         self.reconnect=reconnect
         self.time=time
 
-
-def is_in_staff(ctx:discord.Interaction, direct_author=False):
-    if type(ctx)==discord.Interaction:
-        au_id = ctx.user.id
-    else:
-        au_id = ctx.author.id
-    if au_id in [608779421683417144]:
-        return True 
-    if not direct_author:
-        member = ctx.message.author
-    else:
-        member = ctx.author
-    roles = [role.name for role in member.roles]
-    admins = ["Admin", "Modo", "Bot Dev"]
-
-    for role in roles:
-        if role in admins:
-            return True
-
-def get_lang_name():
-    with open("system/lang/ref.json") as file:
-        data = json.load(file)
-    return data
-
-def get_lang(lang = langage):
-    ref = get_lang_name()
-    lang_txt = ref[lang]
-    with open(f"system/lang/{lang_txt}.txt") as file:
-        all_text = file.readlines()
-    return all_text
-
-def get_lang_ref(ref, lang = langage):
-    all_ref = get_lang(lang)
-    if type(ref) == int:
-        return all_ref[ref][:-1]
-    elif type(ref) == list:
-        return [all_ref[one_ref][:-1] for one_ref in ref]
-    else:
-        raise Exception
-
 class App_store:
     def __init__(self) -> None:
         pass
 
-    def get_apps() -> dict:
+    def get_apps(self) -> dict:
         """Give a dict object {"app_name":"app_link",}"""
         with open("save/system/app_store.json") as file:
             data = json.load(file)
         return data
         
-    def get_installed():
+    def get_installed(self):
         return installed_app.all_app
 
-    def is_in_store(app_name):
-        apps = App_store.get_apps()
+    def is_in_store(self, app_name):
+        apps = self.get_apps()
         return app_name in list(apps.keys())
     
-    def is_installed(app_name):
-        apps = App_store.get_installed()
+    def is_installed(self, app_name):
+        apps = self.get_installed()
         return app_name in list(apps.keys())
 
-    def add_link(app_name, app_link):
+    def add_link(self, app_name, app_link):
         pass
-
-    

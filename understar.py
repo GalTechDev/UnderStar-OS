@@ -9,7 +9,9 @@ import sys
 import save.system.installed_app as apps
 import system.sys_app as sys_apps
 import asyncio
-from system.lib import is_in_staff
+from system.lib import *
+
+Lib = Lib_UsOS()
 
 
 
@@ -63,9 +65,9 @@ async def import_apps(sys=False):
         errors = 0
         error_lst=[]
 
-        app.init_client(client)
+        app.Lib.init_client(client)
         
-        for command in app.app.commands:
+        for command in app.Lib.app.commands:
             try:
                 new_com=commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
                 if not new_com in client.all_commands.keys():
@@ -76,7 +78,7 @@ async def import_apps(sys=False):
                 error_lst.append(error)
         print(f"Command : {loaded} loaded | {errors} error : {error_lst}")
             
-        for task in app.app.task:
+        for task in app.Lib.app.task:
             new_task=tasks.Loop(task.fonction,seconds=task.seconds, hours=task.hours,minutes=task.minutes, time=task.time, count=task.count, reconnect=task.reconnect)
             #await new_task.start()
 
@@ -84,7 +86,7 @@ async def import_apps(sys=False):
         errors = 0
         error_lst=[] 
 
-        for command in app.app.slashs:
+        for command in app.Lib.app.slashs:
             try:
                 #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
                 new_com=discord.app_commands.Command(name=f"{app_name.lower()}-{command.name.lower()}" if not command.force_name else command.name, description=command.description,callback=command.command)
@@ -97,26 +99,33 @@ async def import_apps(sys=False):
                 error_lst.append(error)
             
         print(f"Slash : {loaded} loaded | {errors} error : {error_lst}")
-        
-                    
-        
-            
 
 
-def get_help(ctx:commands.context.Context, is_slash: bool = False):
-    embed = discord.Embed(title="OS Commands", description=f"Préfix : `{prefix}`", color=discord.Color.red())
-    embed.set_author(name='Liste des commandes')
+def get_help(ctx:commands.context.Context):
+    embeds = []
+    embed = discord.Embed(title="OS Commands", description=f"Préfix : `{prefix}` | Version : `{bot_version}`", color=discord.Color.red())
     try:
         coms = [com for com in client.all_commands]
         coms.sort()
+        nb = 0
+        page = 1
+        nb_page = len(coms)//25
+        embed.set_author(name=f'Liste des commandes {(page+"/"+nb_page) if nb_page > 1 else ""}')
         for com in coms:
             #print(com)
             if all([check(ctx) for check in client.all_commands[com].checks]+[True]):
                 embed.add_field(name=f"**{com}**", value=f'{client.all_commands[com].help if client.all_commands[com].help != None else "Aucune aide disponible"}')
+                nb+=1
+            if nb==25:
+                nb=0
+                embeds.append(embed.copy())
+                embed = discord.Embed(title="OS Commands", color=discord.Color.red())
+                embed.set_author(name=f'Liste des commandes {page}/{nb_page}')
+                page+=1
     except Exception as error:
         print(error)
 
-    return embed
+    return embeds
 
 
 def convert_time(value: int):
@@ -160,44 +169,52 @@ def is_in_maintenance(ctx):
 
 timer = time.time()
 
-# -------------------------------- Slash Command (test) -------------------
+# -------------------------------- Slash Command -------------------
 
-@client.tree.command(name = "info", description = "donne des infos sur le bot", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
-@discord.app_commands.check(is_in_staff)
-async def first_command(ctx:discord.Interaction):
+@client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
+@discord.app_commands.check(Lib.is_in_staff)
+async def info(ctx:discord.Interaction):
     embed = discord.Embed(title="INFO")
     embed.add_field(name=f"Version :", value=f"` {bot_version}   `")
     embed.add_field(name=f"Ping :", value=f"` {round(client.latency * 1000)} `")
     embed.add_field(name=f"Time up :", value=f"`{convert_time(int(time.time()-timer))}`")
-    await ctx.response.send_message(embed=embed)
-
-
+    await ctx.response.send_message(embed=embed, ephemeral=True)
 
 
 # -------------------------------- COMMANDE -------------------------------
 
-@client.command(name="os-test")
-async def test(ctx):
+@client.command(name="os-test", help="Envoie une pizza gatuite")
+async def test(ctx:commands.context.Context):
     await ctx.send(":pizza:")
 
 
-@client.command(name="os-ping", aliases=["os-ver"])
-@commands.check(is_in_staff)
+@client.command(name="os-ping", aliases=["os-ver", "ver", "ping"], help="Donne des infos sur le bot")
+@commands.check(Lib.is_in_staff)
 async def version(ctx:commands.context.Context):
-    value = int(time.time()-timer)
-    message = convert_time(value)
-    final_message = f"version : {bot_version}\nping : {round(client.latency * 1000)}ms :ping_pong:\ntime up : {message}"
-    await ctx.send(final_message)
+    embed = discord.Embed(title="INFO")
+    embed.add_field(name=f"Version :", value=f"` {bot_version}   `")
+    embed.add_field(name=f"Ping :", value=f"` {round(client.latency * 1000)} `")
+    embed.add_field(name=f"Time up :", value=f"`{convert_time(int(time.time()-timer))}`")
+    await ctx.send(embed=embed)
 
 
-@client.command(name="os-help", aliases=["help"], help="pour avoir ce message")
+@client.command(name="os-help", aliases=["help"], help="Pour avoir ce message")
 async def help(ctx:commands.context.Context,*args):
-    print(args)
     if args==():
-        await ctx.send(embed=get_help(ctx, False))
-    elif args[0] in get_apps().keys():
+        await ctx.send(embeds=get_help(ctx))
+    else :
+        if args[0] in get_apps().keys():
+            sys_com = False
+        elif args[0] in get_apps(True).keys():
+            sys_com = True
         if len(args)==1:
-            await get_apps()[args[0]].help(ctx)
+            try:
+                await get_apps(sys_com)[args[0]].Lib.help(ctx)
+            except Exception as error:
+                if type(error) == AttributeError:
+                    await ctx.send(content=f"L'application `{args[0]}` n'a pas de fonction d'aide")
+                else:
+                    await ctx.send(content=f"La fonction d'aide de l'application `{args[0]}` ne fonctionne pas. Merci de contacter son développeur.")
         else:
             if f"{args[0]}-{args[1]}" in client.all_commands.keys():
                 embed = discord.Embed(title=f"Aide sur la commande `{args[1]}`", description=f"Commande : `{prefix}{args[0]}-{args[1]}`", color=discord.Color.red())
@@ -233,9 +250,13 @@ async def on_ready():
     await import_apps(True)
     await import_apps()
     for guild in client.guilds:
-        client.tree.copy_global_to(guild=discord.Object(id=guild.id))
+        pass
+        if "sync" in sys.argv:
+            client.tree.copy_global_to(guild=discord.Object(id=guild.id))
         await client.tree.sync(guild=discord.Object(id=guild.id))
         await client.tree.sync()
+    if "sync" in sys.argv:
+        os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
 @client.event
 async def on_command_error(ctx, error):
@@ -262,7 +283,7 @@ async def on_app_command_error(ctx: discord.Interaction, error: discord.app_comm
 
 
 @client.command(name="re", help="Pour restart le bot")
-@commands.check(is_in_staff)
+@commands.check(Lib.is_in_staff)
 async def reboot(ctx:commands.context.Context):
     await client.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
 
@@ -271,7 +292,7 @@ async def reboot(ctx:commands.context.Context):
 
 
 @client.command(help="stop le bot")
-@commands.check(is_in_staff)
+@commands.check(Lib.is_in_staff)
 async def stop(ctx:commands.context.Context):
     await ctx.send("Stopping")
     await client.change_presence(activity=discord.Game("Shutting down..."), status=discord.Status.dnd)

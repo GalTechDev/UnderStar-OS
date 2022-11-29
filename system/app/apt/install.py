@@ -2,20 +2,22 @@ from system.lib import *
 import requests
 import mimetypes
 import uuid
-from os import mkdir, listdir,remove, rename
+from os import mkdir, listdir,remove, rename, execv, path
+from sys import executable, argv
 from shutil import rmtree, move
 import zipfile as zip
-app=App()
 
-@app.slash(name="install", description="install")
+Lib = Lib_UsOS()
+
+@Lib.app.slash(name="install", description="install")
 async def install(ctx:discord.Interaction, ref:str):
-    if App_store.is_installed(ref):
+    if Lib.store.is_installed(ref):
         await ctx.response.send_message("Application déjà installé")
         return
 
     try:
-        if App_store.is_in_store(ref):
-            lien = App_store.get_apps()[ref]
+        if Lib.store.is_in_store(ref):
+            lien = Lib.store.get_apps()[ref]
         else:
             lien = ref
         response = requests.get(lien)
@@ -44,7 +46,8 @@ async def install(ctx:discord.Interaction, ref:str):
                 with open("save/system/installed_app.py", "w") as file:
                     file.writelines(content)
 
-                await ctx.response.send_message("Installé", ephemeral=True)
+                await ctx.response.send_message("Installé\nRedémarage...", ephemeral=True)
+                execv(executable, ["None", path.basename(argv[0]), "sync"])
 
             else:
                 await ctx.response.send_message("Plus d'un élément trouvé dans l'archive, installation ignoré")

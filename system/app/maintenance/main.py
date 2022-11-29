@@ -1,11 +1,11 @@
 from system.lib import *
-app = App()
+Lib = Lib_UsOS()
 
-@app.slash(name="clear", description="supprime des messages", force_name=True)
+@Lib.app.slash(name="clear", description="supprime des messages", force_name=True)
 async def clear(ctx:discord.Interaction, nombre:int = 1):
     await ctx.response.send_message('Netoyage en cour...', ephemeral=True)
     try:
-        if is_in_staff(ctx):
+        if Lib.is_in_staff(ctx):
             await ctx.channel.purge(limit=nombre+1)
             #clear.reset_cooldown(ctx)
         elif nombre < 5:
