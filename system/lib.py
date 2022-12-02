@@ -5,6 +5,7 @@ import json
 import save.system.installed_app as installed_app
 import sys
 import os
+import shutil
 langage = "Francais"
 client = None
 
@@ -183,13 +184,23 @@ class Save:
             return file
 
     def get_files(self, path=""):
-        return os.listdir(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}")
+        return os.listdir(f"{self.save_path}/{self.app_name[0]}/{path}")
 
-    def remove_file(self):
+    def remove_file(self, name, path=""):
+        os.remove(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}{name}")
         pass
 
-    def add_folder(self):
+    def add_folder(self, path=""):
+        os.mkdir(f"{self.save_path}/{self.app_name[0]}/{path}")
         pass
 
-    def remove_folder(self):
+    def remove_folder(self, path=""):
+        shutil.rmtree(f"{self.save_path}/{self.app_name[0]}/{path}")
         pass
+
+    def get_tree(self, path=""):
+        tree={}
+        for folder in os.listdir(f"{self.save_path}/{self.app_name[0]}/{path}"):
+            if os.path.isdir(f"{self.save_path}/{self.app_name[0]}/{path}/{folder}"):
+                tree[folder]=self.get_tree(f"{path}/{folder}")
+        return tree
