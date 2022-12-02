@@ -13,13 +13,15 @@ client = None
 class Lib_UsOS:
     def __init__(self) -> None:
         self.app = App()
-        self.app_name = [""]
+        self.app_name = ""
         self.store = App_store()
         self.save = Save(self.app_name)
 
 
     def set_app_name(self, app_name):
-        self.app_name[0] = app_name
+        self.app_name = app_name
+        self.save.app_name = app_name
+        self.app_path = f"app/{app_name}/"
         if self.app.fusioned:
             for mod in self.app.fusioned_module:
                 mod.Lib.set_app_name(app_name)
@@ -174,7 +176,6 @@ class Save:
         """ajoute un fichier à sauvegarder"""
         with open(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}{name}", "x") as file:
             pass
-
         pass
 
     def open(self, name, path=""):
