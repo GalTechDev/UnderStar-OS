@@ -66,6 +66,7 @@ async def import_apps(sys=False):
         error_lst=[]
 
         app.Lib.init_client(client)
+        app.Lib.set_app_name(app_name)
         
         for command in app.Lib.app.commands:
             try:
@@ -249,8 +250,7 @@ async def on_ready():
     print("ID : ", client.user.id)
     await import_apps(True)
     await import_apps()
-    if "sync" in sys.argv:
-        await client.change_presence(activity=discord.Game("Re-Sync..."), status=discord.Status.dnd)
+    
     for guild in client.guilds:
         pass
         if "sync" in sys.argv:
@@ -325,7 +325,10 @@ async def update(ctx:commands.context.Context, *, ipe=programmer):
 
 @tasks.loop(seconds=127)
 async def change_status():
-    await client.change_presence(activity=discord.Game(next(status)))
+    if "sync" in sys.argv:
+        await client.change_presence(activity=discord.Game("Re-Sync..."), status=discord.Status.dnd)
+    else:
+        await client.change_presence(activity=discord.Game(next(status)))
 
 """
 resetSystem = False

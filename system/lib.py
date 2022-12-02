@@ -3,7 +3,8 @@ from discord.ext import commands as discord_commands
 from discord.ext import tasks as discord_tasks
 import json
 import save.system.installed_app as installed_app
-
+import sys
+import os
 langage = "Francais"
 client = None
 
@@ -12,8 +13,16 @@ client = None
 class Lib_UsOS:
     def __init__(self) -> None:
         self.app = App()
-        self.app_name = None
+        self.app_name = [""]
         self.store = App_store()
+        self.save = Save(self.app_name)
+
+
+    def set_app_name(self, app_name):
+        self.app_name[0] = app_name
+        if self.app.fusioned:
+            for mod in self.app.fusioned_module:
+                mod.Lib.set_app_name(app_name)
 
     def init_client(self,bot_client):
         global client
@@ -67,6 +76,8 @@ class App:
         self.slashs = []
         self.task = []
         self.help_com = None
+        self.fusioned = False
+        self.fusioned_module = []
     
     def command(self, name=None, help_text: str="", aliases: (list[str])=[], checks=[], force_name: bool = False):
         def apply(funct):
@@ -93,6 +104,8 @@ class App:
         return apply
 
     def fusion(self, apps):
+        self.fusioned = True
+        self.fusioned_module+=apps
         for app in apps:
             self.commands+=app.Lib.app.commands
             self.task+=app.Lib.app.task
@@ -149,4 +162,33 @@ class App_store:
         return app_name in list(apps.keys())
 
     def add_link(self, app_name, app_link):
+        pass
+
+class Save:
+    def __init__(self, app_name) -> None:
+        self.path = None
+        self.app_name = app_name
+        self.save_path = "save/app/"
+
+    def add_file(self, name, path="", over_write=False):
+        """ajoute un fichier à sauvegarder"""
+        with open(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}{name}", "x") as file:
+            pass
+
+        pass
+
+    def open(self, name, path=""):
+        with open(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}{name}", "+") as file:
+            return file
+
+    def get_files(self, path=""):
+        return os.listdir(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}")
+
+    def remove_file(self):
+        pass
+
+    def add_folder(self):
+        pass
+
+    def remove_folder(self):
         pass

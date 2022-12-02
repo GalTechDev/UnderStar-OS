@@ -2,7 +2,7 @@ from system.lib import *
 import requests
 import mimetypes
 import uuid
-from os import mkdir, listdir,remove, rename, execv, path
+from os import mkdir, listdir,remove, rename, execv, path,removedirs
 from sys import executable, argv
 from shutil import rmtree, move
 import zipfile as zip
@@ -38,6 +38,7 @@ async def install(ctx:discord.Interaction, ref:str):
                 move(f"{path_folder}/{app_name}", "app")
                 rename(f"app/{app_name}", f'app/{app_name.replace("-", "_")}')
                 app_name=app_name.replace("-", "_")
+                mkdir(f"save/app/{app_name}")
                 with open("save/system/installed_app.py") as file:
                     content = file.readlines()
                 content.insert(0, f"import app.{app_name}.main as {app_name}\n")
@@ -46,14 +47,15 @@ async def install(ctx:discord.Interaction, ref:str):
                 with open("save/system/installed_app.py", "w") as file:
                     file.writelines(content)
 
+                rmtree(path_folder)
+
                 await ctx.response.send_message("Installé\nRedémarage...", ephemeral=True)
                 await Lib.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
                 execv(executable, ["None", path.basename(argv[0]), "sync"])
 
             else:
                 await ctx.response.send_message("Plus d'un élément trouvé dans l'archive, installation ignoré")
-            
-            rmtree(path_folder)
+                rmtree(path_folder)
 
         else:
             await ctx.response.send_message("Type d'archive non pris en charge")

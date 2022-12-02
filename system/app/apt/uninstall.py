@@ -5,7 +5,7 @@ from os import execv, path
 Lib = Lib_UsOS()
 
 @Lib.app.slash(name="uninstall", description="uninstall")
-async def func(ctx:discord.Interaction, ref:str):
+async def func(ctx:discord.Interaction, ref:str, remove_file:bool=False):
     if Lib.store.is_installed(ref):
         rmtree(f"app/{ref}")
         app_name = ref
