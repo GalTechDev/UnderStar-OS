@@ -9,17 +9,19 @@ import zipfile as zip
 
 Lib = Lib_UsOS()
 
-@Lib.app.slash(name="install", description="install")
-async def install(ctx:discord.Interaction, ref:str):
-    if Lib.store.is_installed(ref):
-        await ctx.response.send_message("Application déjà installé")
+@Lib.app.slash(name="download", description="download")
+async def install(ctx:discord.Interaction,app_name:str, link:str):
+    if Lib.store.is_installed(app_name):
+        await ctx.response.send_message("Application déjà téléchargé")
         return
 
     try:
-        if Lib.store.is_in_store(ref):
-            lien = Lib.store.get_apps()[ref]
+        if Lib.store.is_in_store(app_name):
+            lien = Lib.store.get_apps()[app_name]
         else:
-            lien = ref
+            Lib.store.add_link(app_name=app_name, app_link=link)
+            lien = link
+            
         response = requests.get(lien)
         folder = uuid.uuid4()
         content_type = response.headers['content-type']
@@ -34,9 +36,9 @@ async def install(ctx:discord.Interaction, ref:str):
 
             if len(listdir(path_folder))==2:
                 remove(file_path)
-                app_name = listdir(path_folder)[0]
-                move(f"{path_folder}/{app_name}", "app")
-                rename(f"app/{app_name}", f'app/{app_name.replace("-", "_")}')
+                old_name = listdir(path_folder)[0]
+                move(f"{path_folder}/{old_name}", "app")
+                rename(f"app/{old_name}", f'app/{app_name.replace("-", "_")}')
                 app_name=app_name.replace("-", "_")
                 mkdir(f"save/app/{app_name}")
                 with open("save/system/installed_app.py") as file:
@@ -62,5 +64,21 @@ async def install(ctx:discord.Interaction, ref:str):
     except Exception as error:
         await ctx.response.send_message(f"Une erreur c'est produit : {error}")
         print(error)
+
+@Lib.app.slash(name="install", description="install")
+async def install(ctx:discord.Interaction,app_name:str):
+    if Lib.store.is_installed(app_name):
+        with open("save/system/guilds.json") as file:
+            guilds = json.load(file)
+            
+        guilds[str(ctx.guild_id)]["apps"].append(app_name)
+
+        with open("save/system/guilds.json", "w") as file:
+            file.write(json.dumps(guilds))
+        
+        await ctx.response.send_message(f"Application installé", ephemeral=True)
+    else:
+        await ctx.response.send_message(f"Application déjà installé", ephemeral=True)
+
 
 #classbot_UsOS_main

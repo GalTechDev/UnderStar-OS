@@ -91,6 +91,7 @@ async def import_apps(sys=False):
             try:
                 #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
                 new_com=discord.app_commands.Command(name=f"{app_name.lower()}-{command.name.lower()}" if not command.force_name else command.name, description=command.description,callback=command.command)
+                new_com.guild_only = True
                 #new_com.default_permissions=discord.Permissions(8)
                 if not new_com.name in [com.name for com in client.tree._get_all_commands()]:
                     client.tree.add_command(new_com, guild=command.guild, guilds=command.guilds)

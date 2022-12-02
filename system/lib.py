@@ -165,7 +165,14 @@ class App_store:
         return app_name in list(apps.keys())
 
     def add_link(self, app_name, app_link):
-        pass
+        file_path="save/system/app_store.json"
+        with open(file_path) as file:
+            store = json.load(file)
+            
+        store[app_name]=app_link
+
+        with open(file_path, "w") as file:
+            file.write(json.dumps(store))
 
 class Save:
     def __init__(self, app_name) -> None:
