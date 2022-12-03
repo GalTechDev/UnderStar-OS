@@ -10,7 +10,7 @@ import zipfile as zip
 Lib = Lib_UsOS()
 
 @Lib.app.slash(name="download", description="download")
-async def install(ctx:discord.Interaction,app_name:str, link:str):
+async def install(ctx:discord.Interaction,app_name:str, link:str=""):
     if Lib.store.is_installed(app_name):
         await ctx.response.send_message("Application déjà téléchargé")
         return

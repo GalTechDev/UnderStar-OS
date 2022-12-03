@@ -67,6 +67,7 @@ async def import_apps(sys=False):
 
         app.Lib.init_client(client)
         app.Lib.set_app_name(app_name)
+        app.init_event()
         
         for command in app.Lib.app.commands:
             try:

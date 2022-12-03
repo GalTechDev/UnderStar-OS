@@ -9,12 +9,14 @@ import shutil
 langage = "Francais"
 client = None
 
-
+def init_event():
+    pass
 
 class Lib_UsOS:
     def __init__(self) -> None:
         self.app = App()
         self.app_name = ""
+        self.client = None
         self.store = App_store()
         self.save = Save(self.app_name)
 
@@ -28,8 +30,8 @@ class Lib_UsOS:
                 mod.Lib.set_app_name(app_name)
 
     def init_client(self,bot_client):
-        global client
-        client = bot_client
+        self.client = bot_client
+        
 
     def is_in_staff(self, ctx:discord.Interaction, direct_author=False):
         if type(ctx)==discord.Interaction:
@@ -178,36 +180,57 @@ class Save:
     def __init__(self, app_name) -> None:
         self.path = None
         self.app_name = app_name
-        self.save_path = "save/app/"
+        self.save_path = "save/app"
 
     def add_file(self, name, path="", over_write=False):
         """ajoute un fichier à sauvegarder"""
-        with open(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}{name}", "x") as file:
-            pass
+        if path=="":
+            with open(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}", "x"):
+                pass
+        else:
+            with open(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}", "x"):
+                pass
         pass
 
-    def open(self, name, path=""):
-        with open(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}{name}", "+") as file:
-            return file
+    def read(self, name, path=""):
+        if path=="":
+            path = f"{self.save_path}/{self.app_name}/{name}"
+        else:
+            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+            
+        with open(path) as file:
+            return file.read()
+
+    def write(self, name, path="", data=""):
+        if path=="":
+            path = f"{self.save_path}/{self.app_name}/{name}"
+        else:
+            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+
+        with open(path, "w") as file:
+            file.write(data)
 
     def get_files(self, path=""):
-        return os.listdir(f"{self.save_path}/{self.app_name[0]}/{path}")
+        return os.listdir(f"{self.save_path}/{self.app_name}/{path}")
 
     def remove_file(self, name, path=""):
-        os.remove(f"{self.save_path}/{self.app_name[0]}/{path+'/' if path[-1]!='/' else ''}{name}")
+        if path=="":
+            os.remove(f"{self.save_path}/{self.app_name}/{name}")
+        else:
+            os.remove(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}")
         pass
 
     def add_folder(self, path=""):
-        os.mkdir(f"{self.save_path}/{self.app_name[0]}/{path}")
+        os.mkdir(f"{self.save_path}/{self.app_name}/{path}")
         pass
 
     def remove_folder(self, path=""):
-        shutil.rmtree(f"{self.save_path}/{self.app_name[0]}/{path}")
+        shutil.rmtree(f"{self.save_path}/{self.app_name}/{path}")
         pass
 
     def get_tree(self, path=""):
         tree={}
-        for folder in os.listdir(f"{self.save_path}/{self.app_name[0]}/{path}"):
-            if os.path.isdir(f"{self.save_path}/{self.app_name[0]}/{path}/{folder}"):
+        for folder in os.listdir(f"{self.save_path}/{self.app_name}/{path}"):
+            if os.path.isdir(f"{self.save_path}/{self.app_name}/{path}/{folder}"):
                 tree[folder]=self.get_tree(f"{path}/{folder}")
         return tree
