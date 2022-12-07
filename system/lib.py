@@ -6,8 +6,11 @@ import save.system.installed_app as installed_app
 import sys
 import os
 import shutil
-langage = "Francais"
+import googletrans
+langage = "fr"
 client = None
+
+theme = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
 
 def init_event():
     pass
@@ -16,9 +19,11 @@ class Lib_UsOS:
     def __init__(self) -> None:
         self.app = App()
         self.app_name = ""
-        self.client = None
+        self.client: discord_commands.bot = None
         self.store = App_store()
         self.save = Save(self.app_name)
+        self.guilds = Guilds()
+        self.trad = Trad()
 
 
     def set_app_name(self, app_name):
@@ -33,18 +38,15 @@ class Lib_UsOS:
         self.client = bot_client
         
 
-    def is_in_staff(self, ctx:discord.Interaction, direct_author=False):
+    def is_in_staff(self, ctx:discord.Interaction, direct_author=False): 
         if type(ctx)==discord.Interaction:
-            au_id = ctx.user.id
+            user = ctx.user
         else:
-            au_id = ctx.author.id
-        if au_id in [608779421683417144]:
+            user = ctx.author
+        if user.id in self.guilds.get_admin_guilds(guild = ctx.guild_id):
             return True 
-        if not direct_author:
-            member = ctx.message.author
-        else:
-            member = ctx.author
-        roles = [role.name for role in member.roles]
+
+        roles = [role.name for role in user.roles]
         admins = ["Admin", "Modo", "Bot Dev"]
 
         for role in roles:
@@ -90,7 +92,7 @@ class App:
             return funct
         return apply
 
-    def slash(self, description: str, name: str = None, guild = discord.utils.MISSING, guilds: list = discord.utils.MISSING, force_name: bool = False):
+    def slash(self, description: str, name: str = None, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False):
         def apply(funct):
             self.slashs.append(Slash(name if name != None else funct.__name__ , description, funct, guild, guilds, force_name))
             return funct
@@ -162,9 +164,14 @@ class App_store:
         apps = self.get_apps()
         return app_name in list(apps.keys())
     
-    def is_installed(self, app_name):
+    def is_downloaded(self, app_name):
         apps = self.get_installed()
         return app_name in list(apps.keys())
+
+    def is_installed(self, app_name, guild_id):
+        with open("save/system/guilds.json") as file:
+            data = json.load(file)
+        return app_name in data[str(guild_id)]["apps"]
 
     def add_link(self, app_name, app_link):
         file_path="save/system/app_store.json"
@@ -234,3 +241,94 @@ class Save:
             if os.path.isdir(f"{self.save_path}/{self.app_name}/{path}/{folder}"):
                 tree[folder]=self.get_tree(f"{path}/{folder}")
         return tree
+
+class Guilds:
+    def __init__(self) -> None:
+        pass
+        
+    def get_app_guilds(self, app_name=None, guild=None):
+        if not app_name==None and not guild==None:
+            raise Exception("app_name and guild cannot be mixed")
+
+        with open("save/system/guilds.json") as file:
+            data = json.load(file)
+
+        if app_name==None and not guild==None:
+            return data[str(guild)]["apps"]
+
+        apps={}
+        for guild_id in list(data.keys()):
+            for app in data[str(guild_id)]["apps"]:
+                if app not in list(apps.keys()):
+                    apps[app]=[discord.Object(id=int(guild_id))]
+                else:
+                    apps[app].append(guild_id)
+
+        if app_name==None:
+            return apps
+        elif app_name in list(apps.keys()):
+            return apps[app_name]
+        else:
+            return []
+
+    def get_admin_guilds(self, admin_id=None, guild=None):
+        if not admin_id==None and not guild==None:
+            raise Exception("admin_id and guild cannot be mixed")
+
+        with open("save/system/guilds.json") as file:
+            data = json.load(file)
+
+        if admin_id==None and not guild==None:
+            return data[str(guild)]["admin"]
+
+        apps={}
+        for guild_id in list(data.keys()):
+            for app in data[str(guild_id)]["admin"]:
+                if app not in list(apps.keys()):
+                    apps[app]=[discord.Object(id=int(guild_id))]
+                else:
+                    apps[app].append(guild_id)
+
+        if admin_id==None:
+            return apps
+        elif admin_id in list(apps.keys()):
+            return apps[admin_id]
+        else:
+            return []
+
+    def get_theme_guilds(self, theme_color=None, guild=None):
+        if not theme_color==None and not guild==None:
+            raise Exception("theme_color and guild cannot be mixed")
+
+        with open("save/system/guilds.json") as file:
+            data = json.load(file)
+
+        if theme_color==None and not guild==None:
+            return data[str(guild)]["theme"]
+
+        apps={}
+        for guild_id in list(data.keys()):
+            for app in data[str(guild_id)]["theme"]:
+                if app not in list(apps.keys()):
+                    apps[app]=[discord.Object(id=int(guild_id))]
+                else:
+                    apps[app].append(guild_id)
+
+        if theme_color==None:
+            return apps
+        elif theme_color in list(apps.keys()):
+            return apps[theme_color]
+        else:
+            return []
+
+class Trad:
+    def __init__(self) -> None:
+        self.trad = googletrans.Translator()
+
+    def __add__(self, text):
+        try:
+            text = self.trad.translate(text, dest=langage).text
+            print(text)
+        except Exception as error:
+            print(error)
+        return text

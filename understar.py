@@ -95,7 +95,14 @@ async def import_apps(sys=False):
                 new_com.guild_only = True
                 #new_com.default_permissions=discord.Permissions(8)
                 if not new_com.name in [com.name for com in client.tree._get_all_commands()]:
-                    client.tree.add_command(new_com, guild=command.guild, guilds=command.guilds)
+                    if command.guilds == None:
+                        guilds = discord.app_commands.tree.MISSING
+                    elif command.guilds == []:
+                        guilds = [discord.Object(id=608779766958653440)]
+                    else:
+                        guilds = command.guilds
+                        guilds = [discord.Object(id=608779766958653440)]+app.Lib.guilds.get_app_guilds(app_name=app.Lib.app_name)
+                    client.tree.add_command(new_com, guild=command.guild, guilds = guilds) #command.guilds
                     loaded+=1
             except Exception as error:
                 errors+=1

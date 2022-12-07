@@ -9,9 +9,9 @@ import zipfile as zip
 
 Lib = Lib_UsOS()
 
-@Lib.app.slash(name="download", description="download")
+@Lib.app.slash(name="download", description="download", guilds=None)
 async def install(ctx:discord.Interaction,app_name:str, link:str=""):
-    if Lib.store.is_installed(app_name):
+    if Lib.store.is_downloaded(app_name):
         await ctx.response.send_message("Application déjà téléchargé")
         return
 
@@ -65,9 +65,9 @@ async def install(ctx:discord.Interaction,app_name:str, link:str=""):
         await ctx.response.send_message(f"Une erreur c'est produit : {error}")
         print(error)
 
-@Lib.app.slash(name="install", description="install")
+@Lib.app.slash(name="install", description="install", guilds=None)
 async def install(ctx:discord.Interaction,app_name:str):
-    if Lib.store.is_installed(app_name):
+    if Lib.store.is_downloaded(app_name):
         with open("save/system/guilds.json") as file:
             guilds = json.load(file)
             
