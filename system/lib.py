@@ -199,22 +199,31 @@ class Save:
                 pass
         pass
 
-    def read(self, name, path=""):
+    def open(self, name, path=""):
         if path=="":
             path = f"{self.save_path}/{self.app_name}/{name}"
         else:
             path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
             
         with open(path) as file:
+            return file
+
+    def read(self, name, path="", binary_mode=False):
+        if path=="":
+            path = f"{self.save_path}/{self.app_name}/{name}"
+        else:
+            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+            
+        with open(path, f"r{'b' if binary_mode else ''}") as file:
             return file.read()
 
-    def write(self, name, path="", data=""):
+    def write(self, name, path="", data="", binary_mode=False):
         if path=="":
             path = f"{self.save_path}/{self.app_name}/{name}"
         else:
             path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
 
-        with open(path, "w") as file:
+        with open(path, f"w{'b' if binary_mode else ''}") as file:
             file.write(data)
 
     def get_files(self, path=""):
@@ -227,8 +236,14 @@ class Save:
             os.remove(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}")
         pass
 
-    def add_folder(self, path=""):
-        os.mkdir(f"{self.save_path}/{self.app_name}/{path}")
+    def add_folder(self, path="", ignor_exception=True):
+        try:
+            os.mkdir(f"{self.save_path}/{self.app_name}/{path}")
+        except:
+            if not ignor_exception:
+                raise Exception(f"Path: {path} can't be create")
+
+
         pass
 
     def remove_folder(self, path=""):
