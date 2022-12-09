@@ -2,17 +2,18 @@ from system.lib import *
 import requests
 import mimetypes
 import uuid
-from os import mkdir, listdir,remove, rename, execv, path,removedirs
+from os import mkdir, listdir,remove, rename, execv, path, removedirs
 from sys import executable, argv
 from shutil import rmtree, move
 import zipfile as zip
+import save.system.installed_app as apps
 
 Lib = Lib_UsOS()
 
 @Lib.app.slash(name="download", description="download", guilds=None)
 async def install(ctx:discord.Interaction,app_name:str, link:str=""):
     if Lib.store.is_downloaded(app_name):
-        await ctx.response.send_message("Application déjà téléchargé")
+        await ctx.response.send_message("Application déjà téléchargé", ephemeral=True)
         return
 
     try:
@@ -56,13 +57,13 @@ async def install(ctx:discord.Interaction,app_name:str, link:str=""):
                 execv(executable, ["None", path.basename(argv[0]), "sync"])
 
             else:
-                await ctx.response.send_message("Plus d'un élément trouvé dans l'archive, installation ignoré")
+                await ctx.response.send_message("Plus d'un élément trouvé dans l'archive, installation ignoré", ephemeral=True)
                 rmtree(path_folder)
 
         else:
-            await ctx.response.send_message("Type d'archive non pris en charge")
+            await ctx.response.send_message("Type d'archive non pris en charge", ephemeral=True)
     except Exception as error:
-        await ctx.response.send_message(f"Une erreur c'est produit : {error}")
+        await ctx.response.send_message(f"Une erreur c'est produit : {error}", ephemeral=True)
         print(error)
 
 @Lib.app.slash(name="install", description="install", guilds=None)
@@ -77,8 +78,14 @@ async def install(ctx:discord.Interaction,app_name:str):
             file.write(json.dumps(guilds))
         
         await ctx.response.send_message(f"Application installé", ephemeral=True)
+        
+        await Lib.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
+        execv(executable, ["None", path.basename(argv[0]), "sync"])
     else:
-        await ctx.response.send_message(f"Application déjà installé", ephemeral=True)
+        if Lib.store.is_installed(app_name, ctx.guild_id):
+            await ctx.response.send_message(f"Application déjà installé", ephemeral=True)
+        else:
+            await ctx.response.send_message(f"Cette application n'est pas disponible", ephemeral=True)
 
 
 #classbot_UsOS_main

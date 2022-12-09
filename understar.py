@@ -14,8 +14,6 @@ from system.lib import *
 Lib = Lib_UsOS()
 
 
-
-
 bot_version = "0.1"
 sys_folder = "system"
 token_folder = "token"
@@ -52,8 +50,8 @@ client = commands.Bot(intents=intents, command_prefix=prefix, help_command=None)
 client.remove_command('help')
 
 
-
 status = cycle(["UnderStar OS"])
+
 
 def get_apps(sys=False) -> dict:
     return sys_apps.all_app if sys else apps.all_app
@@ -245,6 +243,7 @@ async def help(ctx:commands.context.Context,*args):
                 print(error)
 
 # ---------------------------------- EVENTS ------------------------------------
+
 @client.event
 async def on_ready():
     change_status.start()
@@ -260,14 +259,18 @@ async def on_ready():
     await import_apps(True)
     await import_apps()
     
+    #await sync(client, "sync" in sys.argv)
+    #print(client.guilds)
     for guild in client.guilds:
         pass
         if "sync" in sys.argv:
             client.tree.copy_global_to(guild=discord.Object(id=guild.id))
         await client.tree.sync(guild=discord.Object(id=guild.id))
         await client.tree.sync()
+
     if "sync" in sys.argv:
         os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
+
 
 @client.event
 async def on_command_error(ctx, error):

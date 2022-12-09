@@ -7,6 +7,7 @@ import sys
 import os
 import shutil
 import googletrans
+
 langage = "fr"
 client = None
 
@@ -36,6 +37,9 @@ class Lib_UsOS:
 
     def init_client(self,bot_client):
         self.client = bot_client
+        if self.app.fusioned:
+            for app in self.app.fusioned_module:
+                app.Lib.init_client(bot_client)
         
 
     def is_in_staff(self, ctx:discord.Interaction, direct_author=False): 
@@ -43,7 +47,7 @@ class Lib_UsOS:
             user = ctx.user
         else:
             user = ctx.author
-        if user.id in self.guilds.get_admin_guilds(guild = ctx.guild_id):
+        if user.id in self.guilds.get_admin_guilds(guild = ctx.guild_id if type(ctx)==discord.Interaction else ctx.guild.id):
             return True 
 
         roles = [role.name for role in user.roles]
@@ -75,7 +79,7 @@ class Lib_UsOS:
             raise Exception
 
     async def change_presence(self, activity, status):
-        await client.change_presence(activity=activity, status=status)
+        await self.client.change_presence(activity=activity, status=status)
 
 class App:
     def __init__(self) -> None:
@@ -191,13 +195,20 @@ class Save:
 
     def add_file(self, name, path="", over_write=False):
         """ajoute un fichier à sauvegarder"""
-        if path=="":
-            with open(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}", "x"):
-                pass
-        else:
-            with open(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}", "x"):
-                pass
-        pass
+        try:
+            if path=="":
+                with open(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}", "x"):
+                    pass
+            else:
+                with open(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}", "x"):
+                    pass
+            pass
+        except (FileExistsError):
+            if over_write:
+                os.remove(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}")
+                self.add_file(name,path,over_write)
+            else: 
+                raise FileExistsError
 
     def open(self, name, path=""):
         if path=="":
@@ -243,9 +254,6 @@ class Save:
             if not ignor_exception:
                 raise Exception(f"Path: {path} can't be create")
 
-
-        pass
-
     def remove_folder(self, path=""):
         shutil.rmtree(f"{self.save_path}/{self.app_name}/{path}")
         pass
@@ -256,6 +264,13 @@ class Save:
             if os.path.isdir(f"{self.save_path}/{self.app_name}/{path}/{folder}"):
                 tree[folder]=self.get_tree(f"{path}/{folder}")
         return tree
+
+    def get_full_path(self, name, path=""):
+        if path=="":
+            path=(f"{self.save_path}/{self.app_name}/{name}")
+        else:
+            path=(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}")
+        return path
 
 class Guilds:
     def __init__(self) -> None:

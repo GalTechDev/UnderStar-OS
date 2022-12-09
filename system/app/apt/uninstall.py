@@ -2,9 +2,10 @@ from system.lib import *
 from shutil import rmtree
 from sys import executable, argv
 from os import execv, path
+import save.system.installed_app as apps
 Lib = Lib_UsOS()
 
-@Lib.app.slash(name="uninstall", description="uninstall from this server")
+@Lib.app.slash(name="uninstall", description="uninstall from this server", guilds=None)
 async def install(ctx:discord.Interaction,app_name:str):
     if Lib.store.is_installed(app_name, ctx.guild_id):
         with open("save/system/guilds.json") as file:
@@ -16,10 +17,12 @@ async def install(ctx:discord.Interaction,app_name:str):
             file.write(json.dumps(guilds))
         
         await ctx.response.send_message(f"Application désinstallé", ephemeral=True)
+        await Lib.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
+        execv(executable, ["None", path.basename(argv[0]), "sync"])
     else:
         await ctx.response.send_message(f"Application déjà désinstallé", ephemeral=True)
     
-@Lib.app.slash(name="delete", description="delete from machine")
+@Lib.app.slash(name="delete", description="delete from machine", guilds=None)
 async def func(ctx:discord.Interaction, ref:str, remove_save:bool=False):
     if Lib.store.is_downloaded(ref):
         rmtree(f"app/{ref}")
