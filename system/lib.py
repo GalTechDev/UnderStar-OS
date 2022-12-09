@@ -197,15 +197,20 @@ class Save:
         """ajoute un fichier à sauvegarder"""
         try:
             if path=="":
-                with open(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}", "x"):
-                    pass
+                full_path=f"{self.save_path}/{self.app_name}/{name}"
             else:
-                with open(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}", "x"):
-                    pass
-            pass
+                full_path=f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+                
+            with open(full_path, "x"):
+                pass
+
         except (FileExistsError):
             if over_write:
-                os.remove(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}")
+                if path=="":
+                    full_path=f"{self.save_path}/{self.app_name}/{name}"
+                else:
+                    full_path=f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+                os.remove(full_path)
                 self.add_file(name,path,over_write)
             else: 
                 raise FileExistsError
@@ -225,7 +230,7 @@ class Save:
         else:
             path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
             
-        with open(path, f"r{'b' if binary_mode else ''}") as file:
+        with open(path, 'rb' if binary_mode else 'r') as file:
             return file.read()
 
     def write(self, name, path="", data="", binary_mode=False):
@@ -234,7 +239,7 @@ class Save:
         else:
             path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
 
-        with open(path, f"w{'b' if binary_mode else ''}") as file:
+        with open(path, 'wb' if binary_mode else 'w') as file:
             file.write(data)
 
     def get_files(self, path=""):
@@ -242,10 +247,12 @@ class Save:
 
     def remove_file(self, name, path=""):
         if path=="":
-            os.remove(f"{self.save_path}/{self.app_name}/{name}")
+            path = f"{self.save_path}/{self.app_name}/{name}"
         else:
-            os.remove(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}")
-        pass
+            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+        
+        os.remove(f"{path}/{self.app_name}/{name}")
+        
 
     def add_folder(self, path="", ignor_exception=True):
         try:
