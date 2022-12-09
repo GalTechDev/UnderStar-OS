@@ -6,6 +6,7 @@ import save.system.installed_app as apps
 Lib = Lib_UsOS()
 
 @Lib.app.slash(name="uninstall", description="uninstall from this server", guilds=None)
+@discord.app_commands.check(Lib.is_in_staff)
 async def install(ctx:discord.Interaction,app_name:str):
     if Lib.store.is_installed(app_name, ctx.guild_id):
         with open("save/system/guilds.json") as file:
@@ -23,6 +24,7 @@ async def install(ctx:discord.Interaction,app_name:str):
         await ctx.response.send_message(f"Application déjà désinstallé", ephemeral=True)
     
 @Lib.app.slash(name="delete", description="delete from machine", guilds=None)
+@discord.app_commands.check(Lib.is_in_staff)
 async def func(ctx:discord.Interaction, ref:str, remove_save:bool=False):
     if Lib.store.is_downloaded(ref):
         rmtree(f"app/{ref}")

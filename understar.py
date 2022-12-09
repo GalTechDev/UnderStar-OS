@@ -180,7 +180,6 @@ timer = time.time()
 # -------------------------------- Slash Command -------------------
 
 @client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
-@discord.app_commands.check(Lib.is_in_staff)
 async def info(ctx:discord.Interaction):
     embed = discord.Embed(title="INFO")
     embed.add_field(name=f"Version :", value=f"` {bot_version}   `")
@@ -319,7 +318,7 @@ async def stop(ctx:commands.context.Context):
 async def update(ctx:commands.context.Context, *, ipe=programmer):
     await ctx.send("updating code !")
     await client.change_presence(activity=discord.Game("Updating..."), status=discord.Status.idle)
-
+    
     val = os.system(f"start {update_file}")
 
     await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
