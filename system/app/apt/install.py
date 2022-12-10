@@ -89,5 +89,10 @@ async def install(ctx:discord.Interaction,app_name:str):
         else:
             await ctx.response.send_message(f"Cette application n'est pas disponible", ephemeral=True)
 
+@Lib.app.slash(name="add_product", description="add a app reference in store", guilds=None)
+@discord.app_commands.check(Lib.is_in_staff)
+async def add_link(ctx:discord.Interaction,app_name:str, link:str):
+    Lib.store.add_link(app_name, link)
+    await ctx.response.send_message(f"Application ajouté au store", ephemeral=True)
 
 #classbot_UsOS_main
