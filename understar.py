@@ -13,7 +13,6 @@ from system.lib import *
 
 Lib = Lib_UsOS()
 
-
 bot_version = "0.1"
 sys_folder = "system"
 token_folder = "token"
@@ -284,6 +283,14 @@ async def on_command_error(ctx, error):
         em = discord.Embed(title="Slow it down bro!", description=message)
         await ctx.send(embed=em)
     print("error h", error)
+
+@client.event
+async def on_guild_join(guild:discord.Guild):
+    data = json.load(open(f"{save_folder}/{sys_folder}/guilds.json").read())
+    if str(guild.id) in data.keys():
+        data.update({str(guild.id):{"app":[], "admin":[], "password":None, "theme":"bleu"}})
+
+
 
 @client.tree.error
 async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
