@@ -41,7 +41,6 @@ class Lib_UsOS:
             for app in self.app.fusioned_module:
                 app.Lib.init_client(bot_client)
         
-
     def is_in_staff(self, ctx:discord.Interaction, direct_author=False): 
         if type(ctx)==discord.Interaction:
             user = ctx.user

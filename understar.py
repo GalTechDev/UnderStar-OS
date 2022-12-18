@@ -259,12 +259,19 @@ async def on_ready():
     
     #await sync(client, "sync" in sys.argv)
     #print(client.guilds)
+    with open(f"{save_folder}/{sys_folder}/guilds.json") as f:
+        data = json.load(f)
     for guild in client.guilds:
         pass
         if "sync" in sys.argv:
             client.tree.copy_global_to(guild=discord.Object(id=guild.id))
         await client.tree.sync(guild=discord.Object(id=guild.id))
         await client.tree.sync()
+
+        if str(guild.id) not in data.keys():
+            data.update({str(guild.id):{"app":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
+            with open(f"{save_folder}/{sys_folder}/guilds.json", "w") as f:
+                json.dump(data, fp=f)
 
     if "sync" in sys.argv:
         os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
@@ -286,11 +293,13 @@ async def on_command_error(ctx, error):
 
 @client.event
 async def on_guild_join(guild:discord.Guild):
-    data = json.load(open(f"{save_folder}/{sys_folder}/guilds.json").read())
+    with open(f"{save_folder}/{sys_folder}/guilds.json") as f:
+        data = json.load(f)
     if str(guild.id) in data.keys():
-        data.update({str(guild.id):{"app":[], "admin":[], "password":None, "theme":"bleu"}})
-
-
+        data.update({str(guild.id):{"app":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
+        with open(f"{save_folder}/{sys_folder}/guilds.json", "w") as f:
+            json.dump(data, fp=f)
+    
 
 @client.tree.error
 async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
