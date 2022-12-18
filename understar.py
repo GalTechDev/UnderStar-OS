@@ -146,8 +146,8 @@ def convert_time(value: int):
     return message
 
 
-def is_dev(ctx):
-    if ctx.author.id in [608779421683417144]:
+"""def is_dev(ctx):
+    if ctx.author.id in []:
         return True
 
     member = ctx.message.author
@@ -160,7 +160,7 @@ def is_dev(ctx):
 
 
 def is_in_maintenance(ctx):
-    if ctx.author.id in [366055261930127360, 649532920599543828]:
+    if ctx.author.id in []:
         return True
 
     member = ctx.message.author
@@ -172,13 +172,13 @@ def is_in_maintenance(ctx):
             return True
 
         if "maint." in role:
-            return True
+            return True"""
 
 timer = time.time()
 
 # -------------------------------- Slash Command -------------------
 
-@client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None) #, guilds=[discord.Object(id=649021344058441739)] Add the guild ids in which the slash command will appear. If it should be in all, remove the argument, but note that it will take some time (up to an hour) to register the command if it's for all guilds.
+@client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None)
 async def info(ctx:discord.Interaction):
     embed = discord.Embed(title="INFO")
     embed.add_field(name=f"Version :", value=f"` {bot_version}   `")
@@ -269,7 +269,7 @@ async def on_ready():
         await client.tree.sync()
 
         if str(guild.id) not in data.keys():
-            data.update({str(guild.id):{"app":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
+            data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
             with open(f"{save_folder}/{sys_folder}/guilds.json", "w") as f:
                 json.dump(data, fp=f)
 
@@ -296,7 +296,7 @@ async def on_guild_join(guild:discord.Guild):
     with open(f"{save_folder}/{sys_folder}/guilds.json") as f:
         data = json.load(f)
     if str(guild.id) in data.keys():
-        data.update({str(guild.id):{"app":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
+        data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
         with open(f"{save_folder}/{sys_folder}/guilds.json", "w") as f:
             json.dump(data, fp=f)
     
@@ -330,7 +330,7 @@ async def stop(ctx:commands.context.Context):
 
 
 @client.command(aliases=["upt"], help="Pour update le bot")
-@commands.check(is_dev)
+@commands.check(Lib.is_in_staff)
 async def update(ctx:commands.context.Context, *, ipe=programmer):
     await ctx.send("updating code !")
     await client.change_presence(activity=discord.Game("Updating..."), status=discord.Status.idle)

@@ -29,13 +29,11 @@ async def valide_intaraction(interaction:discord.Interaction):
 class App_select(discord.ui.Select):
     def __init__(self, ctx: discord.Interaction, options) -> None:
         super().__init__(placeholder=f"Choisi une application",max_values=1,min_values=1,options=options)
-    
+        self.ctx = ctx
+
     async def callback(self, interaction: discord.Interaction):
-        langage = self.values[0]
-        embed = discord.Embed(title=f"{Lib.get_lang_ref(11, langage)}", description=f"{Lib.get_lang_ref(10, langage)}", color=discord.Color.blue())
-        embed.add_field(name=f"{Lib.get_lang_ref(12, langage)} : {Lib.get_lang_ref(0, langage)}", value="100%")
-        lang_view=None
-        #await interaction.response.edit_message(embed=embed,view=lang_view)
+        app = self.values[0]
+        await app_config_menu(self.ctx, app)
 
 
 
@@ -48,15 +46,18 @@ class Back_view(discord.ui.View):
         self.back_menu = back_menu
         self.args = args
 
+
     @discord.ui.button(label="Retour",style=discord.ButtonStyle.gray)
     async def back_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         await self.back_menu(self.ctx, *self.args)
         await valide_intaraction(interaction)
 
+
 class Admin_view(Back_view):
     def __init__(self, ctx, back, *, timeout=180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
+
 
 class App_view(Back_view):
     def __init__(self, ctx, back, *, timeout=180):
@@ -74,45 +75,54 @@ class App_view(Back_view):
         if options!=[]:
             self.add_item(App_select(ctx, options))
 
+
 class Langue_view(Back_view):
     def __init__(self, ctx, back, *, timeout=180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
+
 
 class Custom_view(Back_view):
     def __init__(self, ctx, back, *, timeout=180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
 
+
 class Update_view(Back_view):
     def __init__(self, ctx, back, *, timeout=180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
+
 
 class Config_view(discord.ui.View):
     def __init__(self, ctx, *, timeout=180):
         super().__init__(timeout=timeout)
         self.ctx = ctx
     
+
     @discord.ui.button(label="Administation",style=discord.ButtonStyle.gray)
     async def admin_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         await admin_menu(self.ctx)
         await valide_intaraction(interaction)
+
 
     @discord.ui.button(label="Application",style=discord.ButtonStyle.gray)
     async def app_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         await app_menu(self.ctx)
         await valide_intaraction(interaction)
 
+
     @discord.ui.button(label="Langage",style=discord.ButtonStyle.gray)
     async def langue_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         await langue_menu(self.ctx)
         await valide_intaraction(interaction)
 
+
     @discord.ui.button(label="Personnalisation",style=discord.ButtonStyle.gray)
     async def customisation_button(self, interaction:discord.Interaction, button:discord.ui.Button):
         await customisation_menu(self.ctx)
         await valide_intaraction(interaction)    
+
 
     @discord.ui.button(label="Mise à jour",style=discord.ButtonStyle.gray)
     async def update_button(self, interaction:discord.Interaction, button:discord.ui.Button):
@@ -125,34 +135,45 @@ async def admin_menu(ctx:discord.Interaction):
     embed = discord.Embed(title="Paramètre", description="Administation", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Admin_view(ctx, main_menu))
 
+
 async def app_menu(ctx:discord.Interaction):
     embed = discord.Embed(title="Paramètre", description="Application installé", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=App_view(ctx, main_menu))
+
 
 async def langue_menu(ctx:discord.Interaction):
     embed = discord.Embed(title="Paramètre", description="Langage", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
+
 async def customisation_menu(ctx:discord.Interaction):
     embed = discord.Embed(title="Paramètre", description="Personnalisation", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
+
 
 async def update_menu(ctx:discord.Interaction):
     embed = discord.Embed(title="Paramètre", description="Mise à jour", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
+
 async def main_menu(ctx:discord.Interaction):
     embed = discord.Embed(title="Paramètre", description="", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
-    embed.add_field(name="Administation", value="pass")
-    embed.add_field(name="Application", value="pass")
-    embed.add_field(name="Langage", value="pass")
-    embed.add_field(name="Personnalisation", value="pass")
-    embed.add_field(name="Mise à jour", value="pass")
+    embed.add_field(name="Administation", value='\u200b')
+    embed.add_field(name="Application", value='\u200b')
+    embed.add_field(name="Langage", value='\u200b')
+    embed.add_field(name="Personnalisation", value='\u200b')
+    embed.add_field(name="Mise à jour", value='\u200b')
     try:
         await ctx.edit_original_response(embed=embed, view=Config_view(ctx))
     except Exception as error:
         pass
         print(error)
+
+
+async def app_config_menu(ctx:discord.Interaction, app):
+    embed = discord.Embed(title="Paramètre", description=f"Application installé > {app}", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    await ctx.edit_original_response(embed=embed, view=None)
+
 
 async def permission_denied(ctx:discord.Interaction, back, *args):
     embed = discord.Embed(title="Paramètre", description="Vous n'avez pas les permissions.", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
