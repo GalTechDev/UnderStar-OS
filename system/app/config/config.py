@@ -1,5 +1,6 @@
 from system.lib import *
-
+from typing import Optional, Union, Any
+from system.app.apt import install, uninstall
 Lib = Lib_UsOS()
 
 """class lang_select(discord.ui.Select):
@@ -129,30 +130,60 @@ class Config_view(discord.ui.View):
         await update_menu(self.ctx)
         await valide_intaraction(interaction)
 
+class App_config_view(Back_view):
+    def __init__(self, ctx, app, back_menu, args=[], *, timeout=180):
+        super().__init__(ctx, back_menu, args, timeout=timeout)
+        self.downloaded = Lib.store.is_downloaded(app)
+        self.instaled = Lib.store.is_installed(app, ctx.guild_id)
+        label=f"{'Ajouter au serveur' if not self.instaled else 'Retirer du serveur'}"
+        style = discord.ButtonStyle.primary if not self.instaled else discord.ButtonStyle.danger
+        self.app = app
+        self.ctx=ctx
+        self.add_item(self.Add_to_serv(app=app, label=label,style=style, disabled=(not self.downloaded)))
+        if self.instaled:
+            self.add_item(self.Update_app(label="Mettre à jour"))
+
+
+    class Add_to_serv(discord.ui.Button):
+        def __init__(self, *, app, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None): 
+            super().__init__(style=style, label=label, disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
+            self.app = app
+        async def callback(self, interaction: discord.Interaction) -> Any:
+            await install.install(interaction, self.app)
+            await valide_intaraction(interaction)
+
+
+    class Update_app(discord.ui.Button):
+        def __init__(self, *, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None): 
+            super().__init__(style=style, label=label, disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
+
+        async def callback(self, interaction: discord.Interaction) -> Any:
+            await valide_intaraction(interaction)
+
 # -------------------------- menu --------------------------------
 
 async def admin_menu(ctx:discord.Interaction):
-    embed = discord.Embed(title="Paramètre", description="Administation", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Administation", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Admin_view(ctx, main_menu))
 
 
 async def app_menu(ctx:discord.Interaction):
-    embed = discord.Embed(title="Paramètre", description="Application installé", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Application", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=App_view(ctx, main_menu))
 
 
 async def langue_menu(ctx:discord.Interaction):
-    embed = discord.Embed(title="Paramètre", description="Langage", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Langage", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
 async def customisation_menu(ctx:discord.Interaction):
-    embed = discord.Embed(title="Paramètre", description="Personnalisation", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Personnalisation", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
 async def update_menu(ctx:discord.Interaction):
-    embed = discord.Embed(title="Paramètre", description="Mise à jour", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Mise à jour", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
@@ -171,8 +202,11 @@ async def main_menu(ctx:discord.Interaction):
 
 
 async def app_config_menu(ctx:discord.Interaction, app):
-    embed = discord.Embed(title="Paramètre", description=f"Application installé > {app}", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
-    await ctx.edit_original_response(embed=embed, view=None)
+    embed = discord.Embed(title=f"Application > {app}", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    view = App_config_view(ctx,app,app_menu)
+    if not view.downloaded:
+        embed.add_field(name="Application non disponible", value='\u200b')
+    await ctx.edit_original_response(embed=embed, view=view)
 
 
 async def permission_denied(ctx:discord.Interaction, back, *args):
