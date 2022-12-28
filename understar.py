@@ -89,7 +89,7 @@ async def import_apps(sys=False):
             try:
                 #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
                 new_com=discord.app_commands.Command(name=f"{app_name.lower()}-{command.name.lower()}" if not command.force_name else command.name, description=command.description,callback=command.command)
-                new_com.guild_only = True
+                new_com.guild_only = False
                 #new_com.default_permissions=discord.Permissions(8)
                 if not new_com.name in [com.name for com in client.tree._get_all_commands()]:
                     if command.guilds == None:
@@ -259,6 +259,8 @@ async def on_ready():
     
     #await sync(client, "sync" in sys.argv)
     #print(client.guilds)
+    await client.tree.sync()
+
     with open(f"{save_folder}/{sys_folder}/guilds.json") as f:
         data = json.load(f)
     for guild in client.guilds:
@@ -266,7 +268,6 @@ async def on_ready():
         if "sync" in sys.argv:
             client.tree.copy_global_to(guild=discord.Object(id=guild.id))
         await client.tree.sync(guild=discord.Object(id=guild.id))
-        await client.tree.sync()
 
         if str(guild.id) not in data.keys():
             data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
@@ -311,7 +312,7 @@ async def on_app_command_error(ctx: discord.Interaction, error: discord.app_comm
 # ----------------------------COMMANDE MAINTENANCE----------------------------------
 
 
-@client.command(name="re", help="Pour restart le bot")
+@client.command(name="restart", help="Pour restart le bot")
 @commands.check(Lib.is_in_staff)
 async def reboot(ctx:commands.context.Context):
     await client.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
@@ -331,7 +332,7 @@ async def stop(ctx:commands.context.Context):
 
 @client.command(aliases=["upt"], help="Pour update le bot")
 @commands.check(Lib.is_in_staff)
-async def update(ctx:commands.context.Context, *, ipe=programmer):
+async def update(ctx:commands.context.Context):
     await ctx.send("updating code !")
     await client.change_presence(activity=discord.Game("Updating..."), status=discord.Status.idle)
     
