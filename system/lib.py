@@ -8,6 +8,7 @@ import os
 import shutil
 import googletrans
 
+
 langage = "fr"
 client = None
 
@@ -25,6 +26,7 @@ class Lib_UsOS:
         self.save = Save(self.app_name)
         self.guilds = Guilds()
         self.trad = Trad()
+        self.event = Event()
 
 
     def set_app_name(self, app_name):
@@ -368,3 +370,17 @@ class Trad:
         except Exception as error:
             print(error)
         return text
+
+class Event:
+    def __init__(self) -> None:
+        self.func = self.__dict__
+        self.on_ready = self.on_ready
+
+    def event(self):
+        def apply(funct: function) -> function:
+            self.func[funct.__name__] = funct
+            return funct
+        return apply
+
+    def on_ready(self):
+        pass
