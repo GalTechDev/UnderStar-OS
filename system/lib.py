@@ -373,13 +373,98 @@ class Trad:
 
 class Event:
     def __init__(self) -> None:
-        self.func = self.__dict__
+        self.on_raw_app_command_permissions_update = self.on_raw_app_command_permissions_update
+        self.on_app_command_completion = self.on_app_command_completion
+        self.on_automod_rule_create = self.on_automod_rule_create
+        self.on_automod_rule_update = self.on_automod_rule_update
+        self.on_automod_rule_delete = self.on_automod_rule_delete
+        self.on_automod_action = self.on_automod_action
+        self.on_guild_channel_delete = self.on_guild_channel_delete
+        self.on_guild_channel_create = self.on_guild_channel_create
+        self.on_guild_channel_update = self.on_guild_channel_update
+        self.on_guild_channel_pins_update = self.on_guild_channel_pins_update
+        self.on_private_channel_update = self.on_private_channel_update
+        self.on_private_channel_pins_update = self.on_private_channel_pins_update
+        self.on_typing = self.on_typing
+        self.on_raw_typing = self.on_raw_typing
+        self.on_connect = self.on_connect
+        self.on_disconnect = self.on_disconnect
+        self.on_shard_connect = self.on_shard_connect
+        self.on_shard_disconnect = self.on_shard_disconnect
+        self.on_error = self.on_error
+        self.on_socket_event_type = self.on_socket_event_type
+        self.on_socket_raw_receive = self.on_socket_raw_receive
+        self.on_socket_raw_send = self.on_socket_raw_send
         self.on_ready = self.on_ready
+        self.on_resumed = self.on_resumed
+        self.on_shard_ready = self.on_shard_ready
+        self.on_shard_resumed = self.on_shard_resumed
+        self.on_guild_available = self.on_guild_available
+        self.on_guild_unavailable = self.on_guild_unavailable
+        self.on_guild_join = self.on_guild_join
+        self.on_guild_remove = self.on_guild_remove
+        self.on_guild_update = self.on_guild_update
+        self.on_guild_emojis_update = self.on_guild_emojis_update
+        self.on_guild_stickers_update = self.on_guild_stickers_update
+        self.on_invite_create = self.on_invite_create
+        self.on_invite_delete = self.on_invite_delete
+        self.on_integration_create = self.on_integration_create
+        self.on_integration_update = self.on_integration_update
+        self.on_guild_integrations_update = self.on_guild_integrations_update
+        self.on_webhooks_update = self.on_webhooks_update
+        self.on_raw_integration_delete = self.on_raw_integration_delete
+        self.on_interaction = self.on_interaction
+        self.on_member_join = self.on_member_join
+        self.on_member_remove = self.on_member_remove
+        self.on_raw_member_remove = self.on_raw_member_remove
+        self.on_member_update = self.on_member_update
+        self.on_user_update = self.on_user_update
+        self.on_member_ban = self.on_member_ban
+        self.on_member_unban = self.on_member_unban
+        self.on_presence_update = self.on_presence_update
+        self.on_message = self.on_message
+        self.on_message_edit = self.on_message_edit
+        self.on_message_delete = self.on_message_delete
+        self.on_bulk_message_delete = self.on_bulk_message_delete
+        self.on_raw_message_edit = self.on_raw_message_edit
+        self.on_raw_message_delete = self.on_raw_message_delete
+        self.on_raw_bulk_message_delete = self.on_raw_bulk_message_delete
+        self.on_reaction_add = self.on_reaction_add
+        self.on_reaction_remove = self.on_reaction_remove
+        self.on_reaction_clear = self.on_reaction_clear
+        self.on_reaction_clear_emoji = self.on_reaction_clear_emoji
+        self.on_raw_reaction_add = self.on_raw_reaction_add
+        self.on_raw_reaction_remove = self.on_raw_reaction_remove
+        self.on_raw_reaction_clear = self.on_raw_reaction_clear
+        self.on_raw_reaction_clear_emoji = self.on_raw_reaction_clear_emoji
+        self.on_guild_role_create = self.on_guild_role_create
+        self.on_guild_role_delete = self.on_guild_role_delete
+        self.on_guild_role_update = self.on_guild_role_update
+        self.on_scheduled_event_create = self.on_scheduled_event_create
+        self.on_scheduled_event_delete = self.on_scheduled_event_delete
+        self.on_scheduled_event_update = self.on_scheduled_event_update
+        self.on_scheduled_event_user_add = self.on_scheduled_event_user_add
+        self.on_scheduled_event_user_remove = self.on_scheduled_event_user_remove
+        self.on_stage_instance_create = self.on_stage_instance_create
+        self.on_stage_instance_delete = self.on_stage_instance_delete
+        self.on_stage_instance_update = self.on_stage_instance_update
+        self.on_thread_create = self.on_thread_create
+        self.on_thread_join = self.on_thread_join
+        self.on_thread_update = self.on_thread_update
+        self.on_thread_remove = self.on_thread_remove
+        self.on_thread_delete = self.on_thread_delete
+        self.on_raw_thread_update = self.on_raw_thread_update
+        self.on_raw_thread_delete = self.on_raw_thread_delete
+        self.on_thread_member_join = self.on_thread_member_join
+        self.on_thread_member_remove = self.on_thread_member_remove
+        self.on_raw_thread_member_remove = self.on_raw_thread_member_remove
+        self.on_voice_state_update = self.on_voice_state_update
+        
 
     def event(self):
-        def apply(funct: function) -> function:
-            if funct.__name__ in self.func.keys():
-                self.func[funct.__name__] = funct
+        def apply(funct):
+            if funct.__name__ in self.__dict__.keys():
+                self.__dict__[funct.__name__] = funct
                 return funct
             else:
                 raise Exception(f"Event : {funct.__name__} are unknow")
@@ -623,4 +708,57 @@ class Event:
     def on_scheduled_event_update(self, before, after):
         pass
 
+    def on_scheduled_event_user_add(self, event, user):
+        pass
+
+    def on_scheduled_event_user_remove(self, event, user):
+        pass
+
+    #Stages
+
+    def on_stage_instance_create(self, stage_instance):
+        pass
+
+    def on_stage_instance_delete(self, stage_instance):
+        pass
+
+    def on_stage_instance_update(self, before, after):
+        pass
+
+    #Threads
+
+    def on_thread_create(self, thread):
+        pass
+
+    def on_thread_join(self, thread):
+        pass
+
+    def on_thread_update(self, before, after):
+        pass
+
+    def on_thread_remove(self, thread):
+        pass
+
+    def on_thread_delete(self, thread):
+        pass
+
+    def on_raw_thread_update(self, payload):
+        pass
+
+    def on_raw_thread_delete(self, payload):
+        pass
+
+    def on_thread_member_join(self, member):
+        pass
+
+    def on_thread_member_remove(self, member):
+        pass
+
+    def on_raw_thread_member_remove(self, payload):
+        pass
+
+    #Voice
+
+    def on_voice_state_update(self, member, before, after):
+        pass
     
