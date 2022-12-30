@@ -472,293 +472,293 @@ class Event:
 
     #App Commands
 
-    def on_raw_app_command_permissions_update(self, payload):
+    async def on_raw_app_command_permissions_update(self, payload):
         pass
 
-    def on_app_command_completion(self, interaction, command):
+    async def on_app_command_completion(self, interaction, command):
         pass
 
     #AutoMod
 
-    def on_automod_rule_create(self, rule):
+    async def on_automod_rule_create(self, rule):
         pass
 
-    def on_automod_rule_update(self, rule):
+    async def on_automod_rule_update(self, rule):
         pass
 
-    def on_automod_rule_delete(self, rule):
+    async def on_automod_rule_delete(self, rule):
         pass
 
-    def on_automod_action(self, execution):
+    async def on_automod_action(self, execution):
         pass
 
     #Channels
 
-    def on_guild_channel_delete(self, channel):
+    async def on_guild_channel_delete(self, channel):
         pass
 
-    def on_guild_channel_create(self, channel):
+    async def on_guild_channel_create(self, channel):
         pass
 
-    def on_guild_channel_update(self, before, after):
+    async def on_guild_channel_update(self, before, after):
         pass
     
-    def on_guild_channel_pins_update(self, channel, last_pin):
+    async def on_guild_channel_pins_update(self, channel, last_pin):
         pass
 
-    def on_private_channel_update(self, before, after):
+    async def on_private_channel_update(self, before, after):
         pass
 
-    def on_private_channel_pins_update(self, channel, last_pin):
+    async def on_private_channel_pins_update(self, channel, last_pin):
         pass
 
-    def on_typing(self, channel, user, when):
+    async def on_typing(self, channel, user, when):
         pass
 
-    def on_raw_typing(self, payload):
+    async def on_raw_typing(self, payload):
         pass
 
     #Connection
 
-    def on_connect(self):
+    async def on_connect(self):
         pass
 
-    def on_disconnect(self):
+    async def on_disconnect(self):
         pass
 
-    def on_shard_connect(self, shard_id):
+    async def on_shard_connect(self, shard_id):
         pass
 
-    def on_shard_disconnect(self, shard_id):
+    async def on_shard_disconnect(self, shard_id):
         pass
 
     #Debug
 
-    def on_error(self, event, *args, **kwargs):
+    async def on_error(self, event, *args, **kwargs):
         pass
 
-    def on_socket_event_type(self, event_type):
+    async def on_socket_event_type(self, event_type):
         pass
 
-    def on_socket_raw_receive(self, msg):
+    async def on_socket_raw_receive(self, msg):
         pass
 
-    def on_socket_raw_send(self, payload):
+    async def on_socket_raw_send(self, payload):
         pass
 
     #Gateway
 
-    def on_ready(self):
+    async def on_ready(self):
         pass
 
-    def on_resumed(self):
+    async def on_resumed(self):
         pass
 
-    def on_shard_ready(self, shard_id):
+    async def on_shard_ready(self, shard_id):
         pass
 
-    def on_shard_resumed(self, shard_id):
+    async def on_shard_resumed(self, shard_id):
         pass
 
     #Guilds
 
-    def on_guild_available(self, guild):
+    async def on_guild_available(self, guild):
         pass
 
-    def on_guild_unavailable(self, guild):
+    async def on_guild_unavailable(self, guild):
         pass
 
-    def on_guild_join(self, guild):
+    async def on_guild_join(self, guild):
         pass
 
-    def on_guild_remove(self, guild):
+    async def on_guild_remove(self, guild):
         pass
 
-    def on_guild_update(self, before, after):
+    async def on_guild_update(self, before, after):
         pass
 
-    def on_guild_emojis_update(self, guild, before, after):
+    async def on_guild_emojis_update(self, guild, before, after):
         pass
 
-    def on_guild_stickers_update(self, guild, before, after):
+    async def on_guild_stickers_update(self, guild, before, after):
         pass
 
-    def on_invite_create(self, invite):
+    async def on_invite_create(self, invite):
         pass
 
-    def on_invite_delete(self, invite):
+    async def on_invite_delete(self, invite):
         pass
 
     #Integrations
 
-    def on_integration_create(self, integration):
+    async def on_integration_create(self, integration):
         pass
 
-    def on_integration_update(self, integration):
+    async def on_integration_update(self, integration):
         pass
 
-    def on_guild_integrations_update(self, guild):
+    async def on_guild_integrations_update(self, guild):
         pass
 
-    def on_webhooks_update(self, channel):
+    async def on_webhooks_update(self, channel):
         pass
 
-    def on_raw_integration_delete(self, payload):
+    async def on_raw_integration_delete(self, payload):
         pass
 
     #Interactions
 
-    def on_interaction(self, interaction):
+    async def on_interaction(self, interaction):
         pass
 
     #Members
 
-    def on_member_join(self, member):
+    async def on_member_join(self, member):
         pass
 
-    def on_member_remove(self, member):
+    async def on_member_remove(self, member):
         pass
 
-    def on_raw_member_remove(self, payload):
+    async def on_raw_member_remove(self, payload):
         pass
 
-    def on_member_update(self, before, after):
+    async def on_member_update(self, before, after):
         pass
 
-    def on_user_update(self, before, after):
+    async def on_user_update(self, before, after):
         pass
 
-    def on_member_ban(self, guild, user):
+    async def on_member_ban(self, guild, user):
         pass
 
-    def on_member_unban(self, guild, user):
+    async def on_member_unban(self, guild, user):
         pass
 
-    def on_presence_update(self, before, after):
+    async def on_presence_update(self, before, after):
         pass
 
     #Messages
 
-    def on_message(self, message):
+    async def on_message(self, message):
         pass
 
-    def on_message_edit(self, before, after):
+    async def on_message_edit(self, before, after):
         pass
 
-    def on_message_delete(self, message):
+    async def on_message_delete(self, message):
         pass
 
-    def on_bulk_message_delete(self, messages):
+    async def on_bulk_message_delete(self, messages):
         pass
 
-    def on_raw_message_edit(self, payload):
+    async def on_raw_message_edit(self, payload):
         pass
 
-    def on_raw_message_delete(self, payload):
+    async def on_raw_message_delete(self, payload):
         pass
 
-    def on_raw_bulk_message_delete(self, payload):
+    async def on_raw_bulk_message_delete(self, payload):
         pass
 
     #Reactions
 
-    def on_reaction_add(self, reaction, user):
+    async def on_reaction_add(self, reaction, user):
         pass
 
-    def on_reaction_remove(self, reaction, user):
+    async def on_reaction_remove(self, reaction, user):
         pass
 
-    def on_reaction_clear(self, message, reactions):
+    async def on_reaction_clear(self, message, reactions):
         pass
 
-    def on_reaction_clear_emoji(self, reaction):
+    async def on_reaction_clear_emoji(self, reaction):
         pass
 
-    def on_raw_reaction_add(self, payload):
+    async def on_raw_reaction_add(self, payload):
         pass
 
-    def on_raw_reaction_remove(self, payload):
+    async def on_raw_reaction_remove(self, payload):
         pass
 
-    def on_raw_reaction_clear(self, payload):
+    async def on_raw_reaction_clear(self, payload):
         pass
 
-    def on_raw_reaction_clear_emoji(self, payload):
+    async def on_raw_reaction_clear_emoji(self, payload):
         pass
 
     #Roles
 
-    def on_guild_role_create(self, role):
+    async def on_guild_role_create(self, role):
         pass
 
-    def on_guild_role_delete(self, role):
+    async def on_guild_role_delete(self, role):
         pass
 
-    def on_guild_role_update(self, before, after):
+    async def on_guild_role_update(self, before, after):
         pass
 
     #Scheduled Events
 
-    def on_scheduled_event_create(self, event):
+    async def on_scheduled_event_create(self, event):
         pass
 
-    def on_scheduled_event_delete(self, event):
+    async def on_scheduled_event_delete(self, event):
         pass
 
-    def on_scheduled_event_update(self, before, after):
+    async def on_scheduled_event_update(self, before, after):
         pass
 
-    def on_scheduled_event_user_add(self, event, user):
+    async def on_scheduled_event_user_add(self, event, user):
         pass
 
-    def on_scheduled_event_user_remove(self, event, user):
+    async def on_scheduled_event_user_remove(self, event, user):
         pass
 
     #Stages
 
-    def on_stage_instance_create(self, stage_instance):
+    async def on_stage_instance_create(self, stage_instance):
         pass
 
-    def on_stage_instance_delete(self, stage_instance):
+    async def on_stage_instance_delete(self, stage_instance):
         pass
 
-    def on_stage_instance_update(self, before, after):
+    async def on_stage_instance_update(self, before, after):
         pass
 
     #Threads
 
-    def on_thread_create(self, thread):
+    async def on_thread_create(self, thread):
         pass
 
-    def on_thread_join(self, thread):
+    async def on_thread_join(self, thread):
         pass
 
-    def on_thread_update(self, before, after):
+    async def on_thread_update(self, before, after):
         pass
 
-    def on_thread_remove(self, thread):
+    async def on_thread_remove(self, thread):
         pass
 
-    def on_thread_delete(self, thread):
+    async def on_thread_delete(self, thread):
         pass
 
-    def on_raw_thread_update(self, payload):
+    async def on_raw_thread_update(self, payload):
         pass
 
-    def on_raw_thread_delete(self, payload):
+    async def on_raw_thread_delete(self, payload):
         pass
 
-    def on_thread_member_join(self, member):
+    async def on_thread_member_join(self, member):
         pass
 
-    def on_thread_member_remove(self, member):
+    async def on_thread_member_remove(self, member):
         pass
 
-    def on_raw_thread_member_remove(self, payload):
+    async def on_raw_thread_member_remove(self, payload):
         pass
 
     #Voice
 
-    def on_voice_state_update(self, member, before, after):
+    async def on_voice_state_update(self, member, before, after):
         pass
     

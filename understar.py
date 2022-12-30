@@ -242,6 +242,135 @@ async def help(ctx:commands.context.Context,*args):
 
 # ---------------------------------- EVENTS ------------------------------------
 
+#App Commands
+@client.event
+async def on_raw_app_command_permissions_update(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_app_command_permissions_update(payload)
+    pass
+@client.event
+async def on_app_command_completion(interaction, command):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_app_command_completion(interaction, command)
+    pass
+
+@client.tree.error
+async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_app_command_error(ctx, error)
+    pass
+
+    if isinstance(error, discord.app_commands.CheckFailure):
+        await ctx.response.send_message('Tu ne remplis pas les conditions pour executer cette commande.', ephemeral=True)
+    elif isinstance(error, discord.app_commands.BotMissingPermissions):
+        await ctx.response.send_message('Le bot ne peut pas executer cette commande car il lui manque des autorisations. Merci de contacter le STAFF', ephemeral=True)
+
+#AutoMod
+@client.event
+async def on_automod_rule_create(rule):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_automod_rule_create(rule)
+@client.event
+async def on_automod_rule_update(rule):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_automod_rule_update(rule)
+@client.event
+async def on_automod_rule_delete(rule):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_automod_rule_delete(rule)
+@client.event
+async def on_automod_action(execution):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_automod_action(execution)
+
+#Channels
+@client.event
+async def on_guild_channel_delete(channel):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_channel_delete(channel)
+@client.event
+async def on_guild_channel_create(channel):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_channel_create(channel)
+@client.event
+async def on_guild_channel_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_channel_update(before, after)
+@client.event
+async def on_guild_channel_pins_update(channel, last_pin):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_channel_pins_update(channel, last_pin)
+@client.event
+async def on_private_channel_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_private_channel_update(before, after)
+@client.event
+async def on_private_channel_pins_update(channel, last_pin):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_private_channel_pins_update(channel, last_pin)
+@client.event
+async def on_typing(channel, user, when):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_typing(channel, user, when)
+@client.event
+async def on_raw_typing(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_typing(payload)
+
+#Connection
+@client.event
+async def on_connect(self):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_connect(self)
+@client.event
+async def on_disconnect(self):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_disconnect(self)
+@client.event
+async def on_shard_connect(shard_id):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_shard_connect(shard_id)
+@client.event
+async def on_shard_disconnect(shard_id):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_shard_disconnect(shard_id)
+
+#Commande
+
+@client.event
+async def on_command_error(ctx, error):
+    if isinstance(error, commands.MissingRequiredArgument):
+        await ctx.send('Please pass in all required arguments')
+
+    elif isinstance(error, commands.CommandOnCooldown):
+        value = int(f"{error.retry_after:.0f}")
+        message = "Try again in "
+        message += convert_time(value)
+
+        em = discord.Embed(title="Slow it down bro!", description=message)
+        await ctx.send(embed=em)
+    print("error h", error)
+
+#Debug
+@client.event
+async def on_error(event, *args, **kwargs):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_error(event, *args, **kwargs)
+@client.event
+async def on_socket_event_type(event_type):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_socket_event_type(event_type)
+@client.event
+async def on_socket_raw_receive(msg):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_socket_raw_receive(msg)
+@client.event
+async def on_socket_raw_send(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_socket_raw_send(payload)
+
+#Gateway
+
 @client.event
 async def on_ready():
     change_status.start()
@@ -277,37 +406,290 @@ async def on_ready():
     if "sync" in sys.argv:
         os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
-
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_ready()
 @client.event
-async def on_command_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
-        await ctx.send('Please pass in all required arguments')
-
-    elif isinstance(error, commands.CommandOnCooldown):
-        value = int(f"{error.retry_after:.0f}")
-        message = "Try again in "
-        message += convert_time(value)
-
-        em = discord.Embed(title="Slow it down bro!", description=message)
-        await ctx.send(embed=em)
-    print("error h", error)
-
+async def on_resumed():
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_resumed()
 @client.event
-async def on_guild_join(guild:discord.Guild):
+async def on_shard_ready(shard_id):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_shard_ready(shard_id)
+@client.event
+async def on_shard_resumed(shard_id):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_shard_resumed(shard_id)
+
+#Guilds
+@client.event
+async def on_guild_available(guild):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_available(guild)
+@client.event
+async def on_guild_unavailable(guild):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_unavailable(guild)
+@client.event
+async def on_guild_join(guild):
     with open(f"{save_folder}/{sys_folder}/guilds.json") as f:
         data = json.load(f)
     if str(guild.id) in data.keys():
         data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
         with open(f"{save_folder}/{sys_folder}/guilds.json", "w") as f:
             json.dump(data, fp=f)
-    
 
-@client.tree.error
-async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
-    if isinstance(error, discord.app_commands.CheckFailure):
-        await ctx.response.send_message('Tu ne remplis pas les conditions pour executer cette commande.', ephemeral=True)
-    elif isinstance(error, discord.app_commands.BotMissingPermissions):
-        await ctx.response.send_message('Le bot ne peut pas executer cette commande car il lui manque des autorisations. Merci de contacter le STAFF', ephemeral=True)
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_join(guild)
+@client.event
+async def guild_remove(guild):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_remove(guild)
+@client.event
+async def on_guild_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_update(before, after)
+@client.event
+async def on_guild_emojis_update(guild, before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_emojis_update(guild, before, after)
+@client.event
+async def on_guild_stickers_update(guild, before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_stickers_update(guild, before, after)
+@client.event
+async def on_invite_create(invite):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_invite_create(invite)
+@client.event
+async def on_invite_delete(invite):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_invite_delete(invite)
+
+#Integrations
+@client.event
+async def on_integration_create(integration):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_integration_create(integration)
+@client.event
+async def on_integration_update(integration):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_integration_update(integration)
+@client.event
+async def on_guild_integrations_update(guild):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_integrations_update(guild)
+@client.event
+async def on_webhooks_update(channel):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_webhooks_update(channel)
+@client.event
+async def on_raw_integration_delete(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_integration_delete(payload)
+
+#Interactions
+@client.event
+async def on_interaction(interaction):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_interaction(interaction)
+    pass
+
+#Members
+@client.event
+async def on_member_join(member):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_member_join(member)
+@client.event
+async def on_member_remove(member):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_member_remove(member)
+@client.event
+async def on_raw_member_remove(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_member_remove(payload)
+@client.event
+async def on_member_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_member_update(before, after)
+@client.event
+async def on_user_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_user_update(before, after)
+@client.event
+async def on_member_ban(guild, user):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_member_ban(guild, user)
+@client.event
+async def on_member_unban(guild, user):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_member_unban(guild, user)
+@client.event
+async def on_presence_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_presence_update(before, after)
+
+#Messages
+@client.event
+async def on_message(message):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_message(message)
+@client.event
+async def on_message_edit(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_message_edit(before, after)
+@client.event
+async def on_message_delete(message):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_message_delete(message)
+@client.event
+async def on_bulk_message_delete(messages):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_bulk_message_delete(messages)
+@client.event
+async def on_raw_message_edit(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_message_edit(payload)
+@client.event
+async def on_raw_message_delete(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_message_delete(payload)
+@client.event
+async def on_raw_bulk_message_delete(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_bulk_message_delete(payload)
+
+#Reactions
+@client.event
+async def on_reaction_add(reaction, user):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_reaction_add(reaction, user)
+@client.event
+async def on_reaction_remove(reaction, user):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_reaction_remove(reaction, user)
+@client.event
+async def on_reaction_clear(message, reactions):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_reaction_clear(message, reactions)
+@client.event
+async def on_reaction_clear_emoji(reaction):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_reaction_clear_emoji(reaction)
+@client.event
+async def on_raw_reaction_add(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_reaction_add(payload)
+@client.event
+async def on_raw_reaction_remove(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_reaction_remove(payload)
+@client.event
+async def on_raw_reaction_clear(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_reaction_clear(payload)
+@client.event
+async def on_raw_reaction_clear_emoji(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_reaction_clear_emoji(payload)
+
+#Roles
+@client.event
+async def on_guild_role_create(role):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_role_create(role)
+@client.event
+async def on_guild_role_delete(role):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_role_delete(role)
+@client.event
+async def on_guild_role_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_guild_role_update(before, after)
+
+#Scheduled Events
+@client.event
+async def on_scheduled_event_create(event):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_scheduled_event_create(event)
+@client.event
+async def on_scheduled_event_delete(event):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_scheduled_event_delete(event)
+@client.event
+async def on_scheduled_event_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_scheduled_event_update(before, after)
+@client.event
+async def on_scheduled_event_user_add(event, user):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_scheduled_event_user_add(event, user)
+@client.event
+async def on_scheduled_event_user_remove(event, user):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_scheduled_event_user_remove(event, user)
+#Stages
+@client.event
+async def on_stage_instance_create(stage_instance):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_stage_instance_create(stage_instance)
+@client.event
+async def on_stage_instance_delete(stage_instance):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_stage_instance_delete(stage_instance)
+@client.event
+async def on_stage_instance_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_stage_instance_update(before, after)
+
+#Threads
+@client.event
+async def on_thread_create(thread):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_thread_create(thread)
+@client.event
+async def on_thread_join(thread):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_thread_join(thread)
+@client.event
+async def on_thread_update(before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_thread_update(before, after)
+@client.event
+async def on_thread_remove(thread):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_thread_remove(thread)
+@client.event
+async def on_thread_delete(thread):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_thread_delete(thread)
+@client.event
+async def on_raw_thread_update(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_thread_update(payload)
+@client.event
+async def on_raw_thread_delete(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_thread_delete(payload)
+@client.event
+async def on_thread_member_join(member):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_thread_member_join(member)
+@client.event
+async def on_thread_member_remove(member):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_thread_member_remove(member)
+@client.event
+async def on_raw_thread_member_remove(payload):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_raw_thread_member_remove(payload)
+
+#Voice
+@client.event
+async def on_voice_state_update(member, before, after):
+    for app in list(get_apps().values())+list(get_apps(True).values()):
+        await app.Lib.event.on_voice_state_update(member, before, after)
+
 
 # ----------------------------COMMANDE MAINTENANCE----------------------------------
 
