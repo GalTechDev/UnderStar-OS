@@ -243,8 +243,20 @@ class Save:
         with open(path, 'wb' if binary_mode else 'w') as file:
             file.write(data)
 
+    def json_read(self, name, path=""):
+        if path=="":
+            path = f"{self.save_path}/{self.app_name}/{name}"
+        else:
+            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+
+        with open(path, 'r') as file:
+            return json.load(file)
+
     def get_files(self, path=""):
         return os.listdir(f"{self.save_path}/{self.app_name}/{path}")
+
+    def existe(self, name, in_path=""):
+        return name in self.get_files(in_path)
 
     def remove_file(self, name, path=""):
         if path=="":
@@ -476,6 +488,9 @@ class Event:
         pass
 
     async def on_app_command_completion(self, interaction, command):
+        pass
+
+    async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
         pass
 
     #AutoMod
