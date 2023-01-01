@@ -10,8 +10,8 @@ import save.system.installed_app as apps
 
 Lib = Lib_UsOS()
 
-@Lib.app.slash(name="download", description="download", guilds=None)
-@discord.app_commands.check(Lib.is_in_staff)
+#@Lib.app.slash(name="download", description="download", guilds=None)
+#@discord.app_commands.check(Lib.is_in_staff)
 async def download(ctx:discord.Interaction,app_name:str, link:str=""):
     if Lib.store.is_downloaded(app_name):
         await ctx.response.send_message("Application déjà téléchargé", ephemeral=True)
@@ -66,8 +66,8 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
         await ctx.response.send_message(f"Une erreur c'est produit : {error}", ephemeral=True)
         print(error)
 
-@Lib.app.slash(name="install", description="install", guilds=None)
-@discord.app_commands.check(Lib.is_in_staff)
+#@Lib.app.slash(name="install", description="install", guilds=None)
+#@discord.app_commands.check(Lib.is_in_staff)
 async def install(ctx:discord.Interaction,app_name:str):
     if Lib.store.is_downloaded(app_name):
         with open("save/system/guilds.json") as file:
