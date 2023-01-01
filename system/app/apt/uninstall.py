@@ -7,7 +7,7 @@ Lib = Lib_UsOS()
 
 @Lib.app.slash(name="uninstall", description="uninstall from this server", guilds=None)
 @discord.app_commands.check(Lib.is_in_staff)
-async def install(ctx:discord.Interaction,app_name:str):
+async def uninstall(ctx:discord.Interaction,app_name:str):
     if Lib.store.is_installed(app_name, ctx.guild_id):
         with open("save/system/guilds.json") as file:
             guilds = json.load(file)
@@ -18,17 +18,15 @@ async def install(ctx:discord.Interaction,app_name:str):
             file.write(json.dumps(guilds))
         
         await ctx.response.send_message(f"Application désinstallé", ephemeral=True)
-        await Lib.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
-        execv(executable, ["None", path.basename(argv[0]), "sync"])
     else:
         await ctx.response.send_message(f"Application déjà désinstallé", ephemeral=True)
     
 @Lib.app.slash(name="delete", description="delete from machine", guilds=None)
 @discord.app_commands.check(Lib.is_in_staff)
-async def func(ctx:discord.Interaction, ref:str, remove_save:bool=False):
-    if Lib.store.is_downloaded(ref):
-        rmtree(f"app/{ref}")
-        app_name = ref
+async def delete(ctx:discord.Interaction, app_name:str, remove_save:bool=False):
+    if Lib.store.is_downloaded(app_name):
+        rmtree(f"app/{app_name}")
+        app_name = app_name
         #app_name=app_name.replace("-", "_")
         with open("save/system/installed_app.py") as file:
             content = file.readlines()
@@ -44,9 +42,9 @@ async def func(ctx:discord.Interaction, ref:str, remove_save:bool=False):
                 
         with open("save/system/installed_app.py", "w") as file:
             file.writelines(content)
-        await ctx.response.send_message("Supprimé\nRedémarage...", ephemeral=True)
-        await Lib.change_presence(discord.Game("Restarting..."), discord.Status.dnd)
-        execv(executable, ["None", path.basename(argv[0]), "sync"])
+
+        installed_app.all_app.pop(app_name)
+        await ctx.response.send_message("Supprimé.", ephemeral=True)
         
     else:
         await ctx.response.send_message("Application non trouvé", ephemeral=True)

@@ -42,7 +42,8 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
                 move(f"{path_folder}/{old_name}", "app")
                 rename(f"app/{old_name}", f'app/{app_name.replace("-", "_")}')
                 app_name=app_name.replace("-", "_")
-                mkdir(f"save/app/{app_name}")
+                if not app_name in listdir("save/app"):
+                    mkdir(f"save/app/{app_name}")
                 with open("save/system/installed_app.py") as file:
                     content = file.readlines()
                 content.insert(0, f"import app.{app_name}.main as {app_name}\n")
@@ -52,10 +53,8 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
                     file.writelines(content)
 
                 rmtree(path_folder)
-
-                await ctx.response.send_message("Installé\nRedémarage...", ephemeral=True)
-                await Lib.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
-                execv(executable, ["None", path.basename(argv[0]), "sync"])
+                installed_app.all_app.update({app_name:None})
+                await ctx.response.send_message("Installé", ephemeral=True)
 
             else:
                 await ctx.response.send_message("Plus d'un élément trouvé dans l'archive, installation ignoré", ephemeral=True)
@@ -80,9 +79,6 @@ async def install(ctx:discord.Interaction,app_name:str):
             file.write(json.dumps(guilds))
         
         await ctx.response.send_message(f"Application installé", ephemeral=True)
-        
-        await Lib.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
-        execv(executable, ["None", path.basename(argv[0]), "sync"])
     else:
         if Lib.store.is_installed(app_name, ctx.guild_id):
             await ctx.response.send_message(f"Application déjà installé", ephemeral=True)

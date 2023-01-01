@@ -373,6 +373,7 @@ async def on_socket_raw_send(payload):
 
 @client.event
 async def on_ready():
+    client.info = await client.application_info()
     change_status.start()
     #maintenance.start()
 
