@@ -490,7 +490,7 @@ class Event:
     async def on_app_command_completion(self, interaction, command):
         pass
 
-    async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
+    async def on_app_command_error(self, ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
         pass
 
     #AutoMod

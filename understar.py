@@ -13,30 +13,31 @@ from system.lib import *
 
 Lib = Lib_UsOS()
 
-bot_version = "0.1"
-sys_folder = "system"
-token_folder = "token"
-save_folder = "save"
-app_folder = "app"
-classbot_token = f"{token_folder}/classbot_token"
-update_file = f"{sys_folder}/app/update/update.pyw"
-prefix="?"
+BOT_VERSION = "0.1"
+SYS_FOLDER = "system"
+TOKEN_FOLDER = "token"
+SAVE_FOLDER = "save"
+APP_FOLDER = "app"
+BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/classbot_token"
+UPDATE_FILE = f"{SYS_FOLDER}/app/update/update.pyw"
+PREFIX = "?"
+CODING = "utf-8"
 
 programmer = os.path.basename(sys.argv[0])
 
 
-vals = [sys_folder,app_folder]
+vals = [SYS_FOLDER,APP_FOLDER]
 
 for name in vals:
     Path(name).mkdir(exist_ok=True)
 
-bot_token = "" 
+BOT_TOKEN = "" 
 
 try:
-    with open(classbot_token, "r") as f:
-        bot_token = f.readlines()[0].strip()
+    with open(BOT_TOKEN_PATH, "r", encoding=CODING) as f:
+        BOT_TOKEN = f.readlines()[0].strip()
 except FileNotFoundError:
-    with open(classbot_token, "w") as f:
+    with open(BOT_TOKEN_PATH, "w", encoding=CODING) as f:
         f.write("TOKEN_HERE")
         input("please insert the bot token in the file classbot_token")
         sys.exit(0)
@@ -45,17 +46,19 @@ intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 
-client = commands.Bot(intents=intents, command_prefix=prefix, help_command=None)
+client = commands.Bot(intents=intents, command_prefix=PREFIX, help_command=None)
 client.remove_command('help')
 
 
 status = cycle(["UnderStar OS"])
 
 
-def get_apps(sys=False) -> dict:
+def get_apps(sys: bool=False) -> dict:
+    """"""
     return sys_apps.all_app if sys else apps.all_app
 
-async def import_apps(sys=False):
+async def import_apps(sys :bool=False) -> None:
+    """"""
     for app_name,app in get_apps(sys).items():
         print(f"\nIMPORT {app_name}: ")
         loaded = 0
@@ -108,9 +111,10 @@ async def import_apps(sys=False):
         print(f"Slash : {loaded} loaded | {errors} error : {error_lst}")
 
 
-def get_help(ctx:commands.context.Context):
+def get_help(ctx: commands.context.Context) -> list[discord.Embed]:
+    """"""
     embeds = []
-    embed = discord.Embed(title="OS Commands", description=f"Préfix : `{prefix}` | Version : `{bot_version}`", color=discord.Color.red())
+    embed = discord.Embed(title="OS Commands", description=f"Préfix : `{PREFIX}` | Version : `{BOT_VERSION}`", color=discord.Color.red())
     try:
         coms = [com for com in client.all_commands]
         coms.sort()
@@ -136,6 +140,7 @@ def get_help(ctx:commands.context.Context):
 
 
 def convert_time(value: int):
+    """"""
     val3, val2, val = 0, value//60, value % 60
     message = f"{val2}min {val}s."
 
@@ -145,35 +150,6 @@ def convert_time(value: int):
 
     return message
 
-
-"""def is_dev(ctx):
-    if ctx.author.id in []:
-        return True
-
-    member = ctx.message.author
-    roles = [role.name for role in member.roles]
-    admins = ["Bot Dev"]
-
-    for role in roles:
-        if role in admins:
-            return True
-
-
-def is_in_maintenance(ctx):
-    if ctx.author.id in []:
-        return True
-
-    member = ctx.message.author
-    roles = [role.name for role in member.roles]
-    admins = ["Admin", "Modo", "Bot Dev"]
-
-    for role in roles:
-        if role in admins:
-            return True
-
-        if "maint." in role:
-            return True"""
-
 timer = time.time()
 
 # -------------------------------- Slash Command -------------------
@@ -181,7 +157,7 @@ timer = time.time()
 @client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None)
 async def info(ctx:discord.Interaction):
     embed = discord.Embed(title="INFO")
-    embed.add_field(name=f"Version :", value=f"` {bot_version}   `")
+    embed.add_field(name=f"Version :", value=f"` {BOT_VERSION}   `")
     embed.add_field(name=f"Ping :", value=f"` {round(client.latency * 1000)} `")
     embed.add_field(name=f"Time up :", value=f"`{convert_time(int(time.time()-timer))}`")
     await ctx.response.send_message(embed=embed, ephemeral=True)
@@ -198,7 +174,7 @@ async def test(ctx:commands.context.Context):
 @commands.check(Lib.is_in_staff)
 async def version(ctx:commands.context.Context):
     embed = discord.Embed(title="INFO")
-    embed.add_field(name=f"Version :", value=f"` {bot_version}   `")
+    embed.add_field(name=f"Version :", value=f"` {BOT_VERSION}   `")
     embed.add_field(name=f"Ping :", value=f"` {round(client.latency * 1000)} `")
     embed.add_field(name=f"Time up :", value=f"`{convert_time(int(time.time()-timer))}`")
     await ctx.send(embed=embed)
@@ -223,7 +199,7 @@ async def help(ctx:commands.context.Context,*args):
                     await ctx.send(content=f"La fonction d'aide de l'application `{args[0]}` ne fonctionne pas. Merci de contacter son développeur.")
         else:
             if f"{args[0]}-{args[1]}" in client.all_commands.keys():
-                embed = discord.Embed(title=f"Aide sur la commande `{args[1]}`", description=f"Commande : `{prefix}{args[0]}-{args[1]}`", color=discord.Color.red())
+                embed = discord.Embed(title=f"Aide sur la commande `{args[1]}`", description=f"Commande : `{PREFIX}{args[0]}-{args[1]}`", color=discord.Color.red())
                 embed.set_author(name=f'App : {args[0]}')
                 aide=client.all_commands[f"{args[0]}-{args[1]}"].help if client.all_commands[f"{args[0]}-{args[1]}"].help!="" else "Pas d'aide pour cette commande"
                 alias=""
@@ -232,7 +208,7 @@ async def help(ctx:commands.context.Context,*args):
                         alias+=f"{command}, "
                 embed.add_field(name=f"**{aide}**", value=f"Alias : {alias[:-1]}")
             else:
-                embed = discord.Embed(title=f"La Command `{args[1]}` n'existe pas", description=f"Préfix de l'app : `{prefix}{args[0]}-`", color=discord.Color.red())
+                embed = discord.Embed(title=f"La Command `{args[1]}` n'existe pas", description=f"Préfix de l'app : `{PREFIX}{args[0]}-`", color=discord.Color.red())
                 embed.set_author(name=f"App : {args[0]}")
                 #embed.add_field(name=f"**La Command {args[1]} n'existe pas**", value=f"Commande d'aide de l'application {args[0]} : !{args[0]}-help")
             try:
@@ -247,18 +223,16 @@ async def help(ctx:commands.context.Context,*args):
 async def on_raw_app_command_permissions_update(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_app_command_permissions_update(payload)
-    pass
+
 @client.event
 async def on_app_command_completion(interaction, command):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_app_command_completion(interaction, command)
-    pass
 
 @client.tree.error
 async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_app_command_error(ctx, error)
-    pass
 
     if isinstance(error, discord.app_commands.CheckFailure):
         await ctx.response.send_message('Tu ne remplis pas les conditions pour executer cette commande.', ephemeral=True)
@@ -270,14 +244,17 @@ async def on_app_command_error(ctx: discord.Interaction, error: discord.app_comm
 async def on_automod_rule_create(rule):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_automod_rule_create(rule)
+
 @client.event
 async def on_automod_rule_update(rule):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_automod_rule_update(rule)
+
 @client.event
 async def on_automod_rule_delete(rule):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_automod_rule_delete(rule)
+
 @client.event
 async def on_automod_action(execution):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -288,55 +265,65 @@ async def on_automod_action(execution):
 async def on_guild_channel_delete(channel):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_channel_delete(channel)
+
 @client.event
 async def on_guild_channel_create(channel):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_channel_create(channel)
+
 @client.event
 async def on_guild_channel_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_channel_update(before, after)
+
 @client.event
 async def on_guild_channel_pins_update(channel, last_pin):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_channel_pins_update(channel, last_pin)
+
 @client.event
 async def on_private_channel_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_private_channel_update(before, after)
+
 @client.event
 async def on_private_channel_pins_update(channel, last_pin):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_private_channel_pins_update(channel, last_pin)
+
 @client.event
 async def on_typing(channel, user, when):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_typing(channel, user, when)
+
 @client.event
 async def on_raw_typing(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_typing(payload)
 
 #Connection
+
 @client.event
 async def on_connect(self):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_connect(self)
+
 @client.event
 async def on_disconnect(self):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_disconnect(self)
+
 @client.event
 async def on_shard_connect(shard_id):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_shard_connect(shard_id)
+
 @client.event
 async def on_shard_disconnect(shard_id):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_shard_disconnect(shard_id)
 
 #Commande
-
 @client.event
 async def on_command_error(ctx, error):
     if isinstance(error, commands.MissingRequiredArgument):
@@ -356,14 +343,17 @@ async def on_command_error(ctx, error):
 async def on_error(event, *args, **kwargs):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_error(event, *args, **kwargs)
+
 @client.event
 async def on_socket_event_type(event_type):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_socket_event_type(event_type)
+
 @client.event
 async def on_socket_raw_receive(msg):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_socket_raw_receive(msg)
+
 @client.event
 async def on_socket_raw_send(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -377,11 +367,11 @@ async def on_ready():
     change_status.start()
     #maintenance.start()
 
-    with open(f'{sys_folder}/icon.png', 'rb') as image:
+    with open(f'{SYS_FOLDER}/icon.png', 'rb') as image:
         pass
         #await client.user.edit(avatar=image.read())
 
-    print("version : ", programmer, bot_version)
+    print("version : ", programmer, BOT_VERSION)
     print("Logged in as : ", client.user.name)
     print("ID : ", client.user.id)
     await import_apps(True)
@@ -391,7 +381,7 @@ async def on_ready():
     #print(client.guilds)
     await client.tree.sync()
 
-    with open(f"{save_folder}/{sys_folder}/guilds.json") as f:
+    with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json") as f:
         data = json.load(f)
     for guild in client.guilds:
         pass
@@ -401,7 +391,7 @@ async def on_ready():
 
         if str(guild.id) not in data.keys():
             data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
-            with open(f"{save_folder}/{sys_folder}/guilds.json", "w") as f:
+            with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w") as f:
                 json.dump(data, fp=f)
 
     if "sync" in sys.argv:
@@ -409,14 +399,17 @@ async def on_ready():
 
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_ready()
+
 @client.event
 async def on_resumed():
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_resumed()
+
 @client.event
 async def on_shard_ready(shard_id):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_shard_ready(shard_id)
+
 @client.event
 async def on_shard_resumed(shard_id):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -427,41 +420,49 @@ async def on_shard_resumed(shard_id):
 async def on_guild_available(guild):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_available(guild)
+
 @client.event
 async def on_guild_unavailable(guild):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_unavailable(guild)
+
 @client.event
 async def on_guild_join(guild):
-    with open(f"{save_folder}/{sys_folder}/guilds.json") as f:
+    with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json") as f:
         data = json.load(f)
     if str(guild.id) in data.keys():
         data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
-        with open(f"{save_folder}/{sys_folder}/guilds.json", "w") as f:
+        with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w") as f:
             json.dump(data, fp=f)
 
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_join(guild)
+
 @client.event
 async def guild_remove(guild):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_remove(guild)
+
 @client.event
 async def on_guild_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_update(before, after)
+
 @client.event
 async def on_guild_emojis_update(guild, before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_emojis_update(guild, before, after)
+
 @client.event
 async def on_guild_stickers_update(guild, before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_stickers_update(guild, before, after)
+
 @client.event
 async def on_invite_create(invite):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_invite_create(invite)
+
 @client.event
 async def on_invite_delete(invite):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -472,18 +473,22 @@ async def on_invite_delete(invite):
 async def on_integration_create(integration):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_integration_create(integration)
+
 @client.event
 async def on_integration_update(integration):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_integration_update(integration)
+
 @client.event
 async def on_guild_integrations_update(guild):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_integrations_update(guild)
+
 @client.event
 async def on_webhooks_update(channel):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_webhooks_update(channel)
+
 @client.event
 async def on_raw_integration_delete(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -501,30 +506,37 @@ async def on_interaction(interaction):
 async def on_member_join(member):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_member_join(member)
+
 @client.event
 async def on_member_remove(member):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_member_remove(member)
+
 @client.event
 async def on_raw_member_remove(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_member_remove(payload)
+
 @client.event
 async def on_member_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_member_update(before, after)
+
 @client.event
 async def on_user_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_user_update(before, after)
+
 @client.event
 async def on_member_ban(guild, user):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_member_ban(guild, user)
+
 @client.event
 async def on_member_unban(guild, user):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_member_unban(guild, user)
+
 @client.event
 async def on_presence_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -535,26 +547,32 @@ async def on_presence_update(before, after):
 async def on_message(message):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_message(message)
+
 @client.event
 async def on_message_edit(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_message_edit(before, after)
+
 @client.event
 async def on_message_delete(message):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_message_delete(message)
+
 @client.event
 async def on_bulk_message_delete(messages):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_bulk_message_delete(messages)
+
 @client.event
 async def on_raw_message_edit(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_message_edit(payload)
+
 @client.event
 async def on_raw_message_delete(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_message_delete(payload)
+
 @client.event
 async def on_raw_bulk_message_delete(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -565,30 +583,37 @@ async def on_raw_bulk_message_delete(payload):
 async def on_reaction_add(reaction, user):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_reaction_add(reaction, user)
+
 @client.event
 async def on_reaction_remove(reaction, user):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_reaction_remove(reaction, user)
+
 @client.event
 async def on_reaction_clear(message, reactions):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_reaction_clear(message, reactions)
+
 @client.event
 async def on_reaction_clear_emoji(reaction):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_reaction_clear_emoji(reaction)
+
 @client.event
 async def on_raw_reaction_add(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_reaction_add(payload)
+
 @client.event
 async def on_raw_reaction_remove(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_reaction_remove(payload)
+
 @client.event
 async def on_raw_reaction_clear(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_reaction_clear(payload)
+
 @client.event
 async def on_raw_reaction_clear_emoji(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -599,10 +624,12 @@ async def on_raw_reaction_clear_emoji(payload):
 async def on_guild_role_create(role):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_role_create(role)
+
 @client.event
 async def on_guild_role_delete(role):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_guild_role_delete(role)
+
 @client.event
 async def on_guild_role_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -613,31 +640,38 @@ async def on_guild_role_update(before, after):
 async def on_scheduled_event_create(event):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_scheduled_event_create(event)
+
 @client.event
 async def on_scheduled_event_delete(event):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_scheduled_event_delete(event)
+
 @client.event
 async def on_scheduled_event_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_scheduled_event_update(before, after)
+
 @client.event
 async def on_scheduled_event_user_add(event, user):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_scheduled_event_user_add(event, user)
+
 @client.event
 async def on_scheduled_event_user_remove(event, user):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_scheduled_event_user_remove(event, user)
+
 #Stages
 @client.event
 async def on_stage_instance_create(stage_instance):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_stage_instance_create(stage_instance)
+
 @client.event
 async def on_stage_instance_delete(stage_instance):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_stage_instance_delete(stage_instance)
+
 @client.event
 async def on_stage_instance_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -648,38 +682,47 @@ async def on_stage_instance_update(before, after):
 async def on_thread_create(thread):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_thread_create(thread)
+
 @client.event
 async def on_thread_join(thread):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_thread_join(thread)
+
 @client.event
 async def on_thread_update(before, after):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_thread_update(before, after)
+
 @client.event
 async def on_thread_remove(thread):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_thread_remove(thread)
+
 @client.event
 async def on_thread_delete(thread):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_thread_delete(thread)
+
 @client.event
 async def on_raw_thread_update(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_thread_update(payload)
+
 @client.event
 async def on_raw_thread_delete(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_raw_thread_delete(payload)
+
 @client.event
 async def on_thread_member_join(member):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_thread_member_join(member)
+
 @client.event
 async def on_thread_member_remove(member):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         await app.Lib.event.on_thread_member_remove(member)
+
 @client.event
 async def on_raw_thread_member_remove(payload):
     for app in list(get_apps().values())+list(get_apps(True).values()):
@@ -719,7 +762,7 @@ async def update(ctx:commands.context.Context):
     await ctx.send("updating code !")
     await client.change_presence(activity=discord.Game("Updating..."), status=discord.Status.idle)
     
-    val = os.system(f"start {update_file}")
+    val = os.system(f"start {UPDATE_FILE}")
 
     await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
     print(val)
@@ -754,4 +797,4 @@ async def maintenance():
 
     resetSystem = True
 """
-client.run(bot_token)
+client.run(BOT_TOKEN)
