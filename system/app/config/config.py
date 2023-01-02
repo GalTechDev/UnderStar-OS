@@ -210,32 +210,32 @@ class App_config_view(Back_view):
 # -------------------------- menu --------------------------------
 
 async def admin_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Administation", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Administation", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Admin_view(ctx, main_menu))
 
 
 async def app_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Application", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Application", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=App_view(ctx, main_menu))
 
 
 async def langue_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Langage", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Langage", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
 async def customisation_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Personnalisation", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Personnalisation", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
 async def update_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Mise à jour", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Mise à jour", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
 async def main_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Paramètre", description="", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Paramètre", description="", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     embed.add_field(name="Administation", value='\u200b')
     embed.add_field(name="Application", value='\u200b')
     embed.add_field(name="Langage", value='\u200b')
@@ -249,21 +249,21 @@ async def main_menu(ctx: discord.Interaction):
 
 
 async def app_config_menu(ctx: discord.Interaction, app:str):
-    embed = discord.Embed(title=f"Application", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=f"Application", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     view = App_config_view(ctx,app,app_menu)
     embed.add_field(name=app.upper(), value=f"Téléchagé : {view.downloaded}\nInstallé : {view.instaled}")
     await ctx.edit_original_response(embed=embed, view=view)
 
 
 async def permission_denied(ctx: discord.Interaction, back, *args):
-    embed = discord.Embed(title="Paramètre", description="Vous n'avez pas les permissions.", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Paramètre", description="Vous n'avez pas les permissions.", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, back, args))
 
 
 @Lib.app.slash(name="config", description="config bot", force_name=True, guilds=None)
 @discord.app_commands.check(Lib.is_in_staff)
 async def config(ctx: discord.Interaction):
-    embed = discord.Embed(title="Chargement...", description="", color=theme[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title="Chargement...", description="", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.response.send_message(embed=embed, ephemeral=True)
     await main_menu(ctx)
 

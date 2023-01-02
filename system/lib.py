@@ -9,15 +9,16 @@ import shutil
 import googletrans
 
 
-langage = "fr"
+LANGAGE = "fr"
 client = None
 
-theme = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
+THEME = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
 
 def init_event():
     pass
 
 class Lib_UsOS:
+    """"""
     def __init__(self) -> None:
         self.app = App()
         self.app_name = ""
@@ -29,7 +30,8 @@ class Lib_UsOS:
         self.event = Event()
 
 
-    def set_app_name(self, app_name):
+    def set_app_name(self, app_name: str) -> None:
+        """"""
         self.app_name = app_name
         self.save.app_name = app_name
         self.app_path = f"app/{app_name}/"
@@ -37,13 +39,15 @@ class Lib_UsOS:
             for mod in self.app.fusioned_module:
                 mod.Lib.set_app_name(app_name)
 
-    def init_client(self,bot_client):
+    def init_client(self, bot_client: discord_commands.Bot):
+        """"""
         self.client = bot_client
         if self.app.fusioned:
             for app in self.app.fusioned_module:
                 app.Lib.init_client(bot_client)
         
-    def is_in_staff(self, ctx:discord.Interaction, direct_author=False): 
+    def is_in_staff(self, ctx:discord.Interaction, direct_author=False):
+        """"""
         if type(ctx)==discord.Interaction:
             user = ctx.user
         else:
@@ -59,18 +63,21 @@ class Lib_UsOS:
                 return True
 
     def get_lang_name(self):
+        """"""
         with open("system/lang/ref.json") as file:
             data = json.load(file)
         return data
 
-    def get_lang(self, lang = langage):
+    def get_lang(self, lang = LANGAGE):
+        """"""
         ref = self.get_lang_name()
         lang_txt = ref[lang]
         with open(f"system/lang/{lang_txt}.txt") as file:
             all_text = file.readlines()
         return all_text
 
-    def get_lang_ref(self, ref, lang = langage):
+    def get_lang_ref(self, ref, lang = LANGAGE):
+        """"""
         all_ref = self.get_lang(lang)
         if type(ref) == int:
             return all_ref[ref][:-1]
@@ -80,9 +87,11 @@ class Lib_UsOS:
             raise Exception
 
     async def change_presence(self, activity, status):
+        """"""
         await self.client.change_presence(activity=activity, status=status)
 
 class App:
+    """"""
     def __init__(self) -> None:
         self.commands = []
         self.slashs = []
@@ -92,30 +101,35 @@ class App:
         self.fusioned_module = []
     
     def command(self, name=None, help_text: str="", aliases: (list[str])=[], checks=[], force_name: bool = False):
+        """"""
         def apply(funct):
             self.commands.append(Command(name if name != None else funct.__name__ , funct, help_text, aliases, checks, force_name))
             return funct
         return apply
 
     def slash(self, description: str, name: str = None, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False):
+        """"""
         def apply(funct):
             self.slashs.append(Slash(name if name != None else funct.__name__ , description, funct, guild, guilds, force_name))
             return funct
         return apply
 
     def tasks(self, seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True):
+        """"""
         def apply(funct):
             self.task.append(Task(funct, seconds, minutes, hours, time, count, reconnect))
             return funct
         return apply
 
     def help(self):
+        """"""
         def apply(funct):
             self.help_com = funct
             return funct
         return apply
 
     def fusion(self, apps):
+        """"""
         self.fusioned = True
         self.fusioned_module+=apps
         for app in apps:
@@ -125,6 +139,7 @@ class App:
             self.help_com = app.Lib.app.help_com
 
 class Slash:
+    """"""
     def __init__(self, name: str, description: str, command, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False) -> None:
         self.name=name.replace(" ", "-")
         self.command=command
@@ -134,6 +149,7 @@ class Slash:
         self.force_name = force_name
         
 class Command:
+    """"""
     def __init__(self, name:str, command, help_text: str="",aliases: (list[str])=[],checks=[], force_name: bool = False) -> None:
         self.name=name.replace(" ", "-")
         self.command=command
@@ -143,6 +159,7 @@ class Command:
         self.force_name = force_name
 
 class Task:
+    """"""
     def __init__(self,fonction,seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True) -> None:
         self.fonction=fonction
         self.seconds=seconds
@@ -153,6 +170,7 @@ class Task:
         self.time=time
 
 class App_store:
+    """"""
     def __init__(self) -> None:
         pass
 
@@ -163,22 +181,24 @@ class App_store:
         return data
         
     def get_installed(self):
+        """"""
         return installed_app.all_app
 
-    def is_in_store(self, app_name):
+    def is_in_store(self, app_name: str) -> bool:
+        """"""
         apps = self.get_apps()
         return app_name in list(apps.keys())
     
-    def is_downloaded(self, app_name):
+    def is_downloaded(self, app_name: str) -> bool:
         apps = self.get_installed()
         return app_name in list(apps.keys())
 
-    def is_installed(self, app_name, guild_id):
+    def is_installed(self, app_name: str, guild_id: int) -> bool:
         with open("save/system/guilds.json") as file:
             data = json.load(file)
         return app_name in data[str(guild_id)]["apps"]
 
-    def add_link(self, app_name, app_link):
+    def add_link(self, app_name: str, app_link: str) -> None:
         file_path="save/system/app_store.json"
         with open(file_path) as file:
             store = json.load(file)
@@ -189,12 +209,13 @@ class App_store:
             file.write(json.dumps(store))
 
 class Save:
-    def __init__(self, app_name) -> None:
+    """"""
+    def __init__(self, app_name: str) -> None:
         self.path = None
         self.app_name = app_name
         self.save_path = "save/app"
 
-    def add_file(self, name, path="", over_write=False):
+    def add_file(self, name: str, path: str="", over_write: bool=False) -> None:
         """ajoute un fichier à sauvegarder"""
         try:
             if path=="":
@@ -216,7 +237,7 @@ class Save:
             else: 
                 raise FileExistsError
 
-    def open(self, name, path=""):
+    def open(self, name: str, path: str=""):
         if path=="":
             path = f"{self.save_path}/{self.app_name}/{name}"
         else:
@@ -293,6 +314,7 @@ class Save:
         return path
 
 class Guilds:
+    """"""
     def __init__(self) -> None:
         pass
         
@@ -372,18 +394,20 @@ class Guilds:
             return []
 
 class Trad:
+    """"""
     def __init__(self) -> None:
         self.trad = googletrans.Translator()
 
     def __add__(self, text):
         try:
-            text = self.trad.translate(text, dest=langage).text
+            text = self.trad.translate(text, dest=LANGAGE).text
             print(text)
         except Exception as error:
             print(error)
         return text
 
 class Event:
+    """"""
     def __init__(self) -> None:
         self.on_raw_app_command_permissions_update = self.on_raw_app_command_permissions_update
         self.on_app_command_completion = self.on_app_command_completion
