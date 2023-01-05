@@ -1,17 +1,28 @@
-name: Write Version to File
-on:
-  push:
-    branches:
-      - main
+name: Increment version
+
+on: push
 
 jobs:
-  write-version:
+  increment-version:
     runs-on: ubuntu-latest
-    name: Write Version to File
     steps:
-    - uses: actions/checkout@master
-    - name: Update version
-      uses: brettdorrans/write-version-to-file@master
-      with:
-        filename: '.VERSION'
-        placeholder: '${VERSION}'
+      - uses: actions/checkout@v2
+      - name: Increment version
+        run: |
+          # Read the current version from the .version file
+          current_version=$(cat .version)
+
+          # Increment the version number by 0.1
+          new_version=$(awk -v ver="$current_version" 'BEGIN { print ver+0.1 }')
+
+          # Update the .version file with the new version number
+          echo "$new_version" > .version
+
+          # Add the modified .version file to the staging area
+          git add .version
+
+          # Commit the changes with a message
+          git commit -m "Increment version to $new_version"
+
+          # Push the changes back to the repository
+          git push
