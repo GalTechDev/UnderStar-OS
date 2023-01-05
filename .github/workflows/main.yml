@@ -21,5 +21,5 @@ jobs:
               BOT_VERSION = f.read()
 
             with open("system/version", "w") as f:
-                f.write(str(int(BOT_VERSION)+0.1))
+              f.write(str(int(BOT_VERSION)+0.1))
               print(f"Bot updated to {BOT_VERSION}")
