@@ -9,6 +9,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Increment version
         run: |
+          git config --global user.email "poussigalitv@gmail.com"
           # Read the current version from the .version file
           current_version=$(cat .version)
 
