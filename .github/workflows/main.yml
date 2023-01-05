@@ -18,7 +18,7 @@ jobs:
           fail-on-error: false
           script: |
             import sys
-            print(sys.listdir())
+            print(sys.path)
             with open("system/version") as f:
               BOT_VERSION = f.read().replace("\n", "")
 
