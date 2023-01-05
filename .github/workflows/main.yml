@@ -3,8 +3,7 @@ name: Update Bot version
 on:
   push:
     branches: [ main ]
-  
-
+            
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -14,8 +13,11 @@ jobs:
         with:
           python-version: '3.x'
       - uses: jannekem/run-python-script-action@v1
+        id: script
         with:
+          fail-on-error: false
           script: |
+            add_path("system/version")
             import sys
             with open("system/version") as f:
               BOT_VERSION = f.read()
@@ -23,3 +25,11 @@ jobs:
             with open("system/version", "w") as f:
               f.write(str(int(BOT_VERSION)+0.1))
               print(f"Bot updated to {BOT_VERSION}")
+      - name: Print errors
+        if: steps.script.outputs.error == 'true'
+        run: |
+          printenv "SCRIPT_STDOUT"
+          printenv "SCRIPT_STDERR"
+        env:
+          SCRIPT_STDOUT: ${{ steps.script.outputs.stdout }}
+          SCRIPT_STDERR: ${{ steps.script.outputs.stderr }} 
