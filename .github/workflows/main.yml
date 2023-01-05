@@ -14,8 +14,8 @@ jobs:
           # Read the current version from the .version file
           current_version=$(cat .version)
 
-          # Increment the version number by 0.1
-          new_version=$(awk -v ver="$current_version" 'BEGIN { print ver+0.1 }')
+          # Increment the version number by 0.01
+          new_version=$(awk -v ver="$current_version" 'BEGIN { print ver+0.01 }')
 
           # Update the .version file with the new version number
           echo "$new_version" > .version
