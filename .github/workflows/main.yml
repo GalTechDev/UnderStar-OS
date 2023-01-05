@@ -20,7 +20,7 @@ jobs:
             add_path("system/version")
             import sys
             with open("system/version") as f:
-              BOT_VERSION = f.read()
+              BOT_VERSION = f.read().replace("\n", "")
 
             with open("system/version", "w") as f:
               f.write(str(int(BOT_VERSION)+0.1))
