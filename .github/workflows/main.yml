@@ -23,7 +23,7 @@ jobs:
               BOT_VERSION = f.read().replace("\n", "")
 
             with open("system/version", "w") as f:
-              f.write(str(int(BOT_VERSION)+0.1))
+              f.write(str(float(BOT_VERSION)+0.1))
               print(f"Bot updated to {BOT_VERSION}")
       - name: Print errors
         if: steps.script.outputs.error == 'true'
