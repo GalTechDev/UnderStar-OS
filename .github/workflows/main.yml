@@ -20,7 +20,6 @@ jobs:
             with open("system/version") as f:
               BOT_VERSION = f.read()
 
-            if "upt_ver" in sys.argv:
-                with open("system/version", "w") as f:
-                    f.write(str(int(BOT_VERSION)+0.1))
-                print(f"Bot updated to {BOT_VERSION}")
+            with open("system/version", "w") as f:
+                f.write(str(int(BOT_VERSION)+0.1))
+              print(f"Bot updated to {BOT_VERSION}")
