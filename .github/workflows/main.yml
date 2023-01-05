@@ -18,11 +18,10 @@ jobs:
           fail-on-error: false
           script: |
             import sys
-            print(sys.path)
-            with open("system/version") as f:
+            with open("/home/runner/work/UnderStar-OS/UnderStar-OS/system/version") as f:
               BOT_VERSION = f.read().replace("\n", "")
 
-            with open("system/version", "w") as f:
+            with open("/home/runner/work/UnderStar-OS/UnderStar-OS/system/version", "w") as f:
               f.write(str(float(BOT_VERSION)+0.1))
               print(f"Bot updated to {BOT_VERSION}")
       - name: Print errors
