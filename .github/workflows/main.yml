@@ -19,7 +19,7 @@ jobs:
           script: |
             import sys
             import os
-            print(os.listdir("/home"))
+            print(os.walk("/home"))
             with open("/home/runner/work/UnderStar-OS/UnderStar-OS/system/version") as f:
               BOT_VERSION = f.read().replace("\n", "")
 
