@@ -12,7 +12,7 @@ jobs:
           git config --global user.email "poussigalitv@gmail.com"
           git config --global user.name "GalTechDev"
           # Read the current version from the .version file
-          current_version=$(cat .version)
+          current_version=$(cat system/.version)
 
           # Increment the version number by 0.1
           new_version=$(awk -v ver="$current_version" 'BEGIN { print ver+0.1 }')
@@ -21,7 +21,7 @@ jobs:
           echo "$new_version" > .version
 
           # Add the modified .version file to the staging area
-          git add .version
+          git add system/.version
 
           # Commit the changes with a message
           git commit -m "Increment version to $new_version"
