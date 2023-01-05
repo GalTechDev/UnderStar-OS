@@ -19,7 +19,14 @@ jobs:
           script: |
             import sys
             import os
-            print(os.walk("/home"))
+            startpath = "/home"
+            for root, dirs, files in os.walk(startpath):
+              level = root.replace(startpath, '').count(os.sep)
+              indent = ' ' * 4 * (level)
+              print('{}{}/'.format(indent, os.path.basename(root)))
+              subindent = ' ' * 4 * (level + 1)
+              for f in files:
+                  print('{}{}'.format(subindent, f))
             with open("/home/runner/work/UnderStar-OS/UnderStar-OS/system/version") as f:
               BOT_VERSION = f.read().replace("\n", "")
 
