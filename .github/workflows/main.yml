@@ -21,7 +21,7 @@ jobs:
           echo "$new_version" > .version
 
           # Add the modified .version file to the staging area
-          git add system/.version
+          git add .version
 
           # Commit the changes with a message
           git commit -m "Increment version to $new_version"
