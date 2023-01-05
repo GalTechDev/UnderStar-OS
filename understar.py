@@ -13,7 +13,7 @@ from system.lib import *
 
 Lib = Lib_UsOS()
 
-with open("system/.version") as f:
+with open(".version") as f:
     BOT_VERSION = f.read()
 SYS_FOLDER = "system"
 TOKEN_FOLDER = "token"
