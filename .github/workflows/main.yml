@@ -1,43 +1,17 @@
-name: Update Bot version
-
+name: Write Version to File
 on:
   push:
-    branches: [ main ]
-            
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - uses: jannekem/run-python-script-action@v1
-        id: script
-        with:
-          fail-on-error: false
-          script: |
-            import sys
-            import os
-            startpath = "/home"
-            for root, dirs, files in os.walk(startpath):
-              level = root.replace(startpath, '').count(os.sep)
-              indent = ' ' * 4 * (level)
-              print('{}{}/'.format(indent, os.path.basename(root)))
-              subindent = ' ' * 4 * (level + 1)
-              for f in files:
-                  print('{}{}'.format(subindent, f))
-            with open("/home/runner/work/UnderStar-OS/UnderStar-OS/system/version") as f:
-              BOT_VERSION = f.read().replace("\n", "")
+    branches:
+      - master
 
-            with open("/home/runner/work/UnderStar-OS/UnderStar-OS/system/version", "w") as f:
-              f.write(str(float(BOT_VERSION)+0.1))
-              print(f"Bot updated to {BOT_VERSION}")
-      - name: Print errors
-        if: steps.script.outputs.error == 'true'
-        run: |
-          printenv "SCRIPT_STDOUT"
-          printenv "SCRIPT_STDERR"
-        env:
-          SCRIPT_STDOUT: ${{ steps.script.outputs.stdout }}
-          SCRIPT_STDERR: ${{ steps.script.outputs.stderr }} 
+jobs:
+  write-version:
+    runs-on: ubuntu-latest
+    name: Write Version to File
+    steps:
+    - uses: actions/checkout@master
+    - name: Update version
+      uses: brettdorrans/write-version-to-file@master
+      with:
+        filename: '/system/.VERSION'
+        placeholder: '${VERSION}'
