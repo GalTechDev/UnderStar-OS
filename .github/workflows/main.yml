@@ -18,6 +18,8 @@ jobs:
           fail-on-error: false
           script: |
             import sys
+            import os
+            print(os.listdir(/home)
             with open("/home/runner/work/UnderStar-OS/UnderStar-OS/system/version") as f:
               BOT_VERSION = f.read().replace("\n", "")
 
