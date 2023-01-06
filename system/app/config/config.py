@@ -104,7 +104,7 @@ class Config_view(discord.ui.View):
         super().__init__(timeout=timeout)
         self.ctx = ctx
         if Lib.client.info.owner.id == ctx.user.id:
-            self.add_item(self.Restart_button())
+            self.add_item(self.Restart_button(ctx=ctx))
     
 
     @discord.ui.button(label="Administation",style=discord.ButtonStyle.gray)
@@ -137,11 +137,13 @@ class Config_view(discord.ui.View):
         await valide_intaraction(interaction)
 
     class Restart_button(discord.ui.Button):
-        def __init__(self, *, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None):
+        def __init__(self, *, ctx: discord.Interaction, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None):
             super().__init__(style=style, label="Redémarer", disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
+            self.ctx = ctx
 
         async def callback(self, interaction: discord.Interaction) -> Any:
             await valide_intaraction(interaction)
+            await self.ctx.delete_original_response()
             await Lib.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
             execv(executable, ["None", path.basename(argv[0]), "sync"])
         
@@ -224,32 +226,32 @@ class App_config_view(Back_view):
 # -------------------------- menu --------------------------------
 
 async def admin_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Administation", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=":gear:  Administation", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Admin_view(ctx, main_menu))
 
 
 async def app_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Application", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=":gear:  Application", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=App_view(ctx, main_menu))
 
 
 async def langue_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Langage", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=":gear:  Langage", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
 async def customisation_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Personnalisation", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=":gear:  Personnalisation", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
 async def update_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Mise à jour", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=":gear:  Mise à jour", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
 
 
 async def main_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title="Paramètre", description="", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=":gear:  Paramètre", description="", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     embed.add_field(name="Administation", value='\u200b')
     embed.add_field(name="Application", value='\u200b')
     embed.add_field(name="Langage", value='\u200b')
@@ -263,7 +265,7 @@ async def main_menu(ctx: discord.Interaction):
 
 
 async def app_config_menu(ctx: discord.Interaction, app:str):
-    embed = discord.Embed(title=f"Application", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=f":gear:  Application", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     view = App_config_view(ctx,app,app_menu)
     embed.add_field(name=app.upper(), value=f"Téléchagé : {view.downloaded}\nInstallé : {view.instaled}")
     await ctx.edit_original_response(embed=embed, view=view)
@@ -274,7 +276,7 @@ async def permission_denied(ctx: discord.Interaction, back, *args):
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, back, args))
 
 
-@Lib.app.slash(name="config", description="config bot", force_name=True, guilds=None)
+@Lib.app.slash(name="config", description="config bot", force_name=True)
 @discord.app_commands.check(Lib.is_in_staff)
 async def config(ctx: discord.Interaction):
     embed = discord.Embed(title="Chargement...", description="", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())

@@ -133,7 +133,6 @@ class App:
         self.fusioned_module+=apps
         for app in apps:
             self.commands+=app.Lib.app.commands
-            self.task+=app.Lib.app.task
             self.slashs+=app.Lib.app.slashs
             self.help_com = app.Lib.app.help_com
 

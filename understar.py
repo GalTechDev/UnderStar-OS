@@ -94,7 +94,10 @@ async def import_apps(sys :bool=False) -> None:
                         guilds = [discord.Object(id=608779766958653440)]
                     else:
                         guilds = command.guilds
-                        guilds = [discord.Object(id=608779766958653440)]+app.Lib.guilds.get_app_guilds(app_name=app.Lib.app_name)
+                        if sys:
+                            guilds = client.guilds
+                        else:
+                            guilds = [discord.Object(id=608779766958653440)]+app.Lib.guilds.get_app_guilds(app_name=app.Lib.app_name)
                     client.tree.add_command(new_com, guild=command.guild, guilds = guilds) #command.guilds
                     loaded+=1
             except Exception as error:
@@ -150,9 +153,9 @@ timer = time.time()
 @client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None)
 async def info(ctx:discord.Interaction):
     embed = discord.Embed(title="INFO")
-    embed.add_field(name=f"Version :", value=f"` {BOT_VERSION}   `")
-    embed.add_field(name=f"Ping :", value=f"` {round(client.latency * 1000)} `")
-    embed.add_field(name=f"Time up :", value=f"`{convert_time(int(time.time()-timer))}`")
+    embed.add_field(name=f"Version  :", value=f"`{BOT_VERSION}`")
+    embed.add_field(name=f"Ping  :", value=f"` {round(client.latency * 1000)} `")
+    embed.add_field(name=f"Time up  :", value=f"`{convert_time(int(time.time()-timer))}`")
     await ctx.response.send_message(embed=embed, ephemeral=True)
 
 

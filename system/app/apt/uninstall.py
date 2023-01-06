@@ -5,8 +5,8 @@ from os import execv, path
 import save.system.installed_app as apps
 Lib = Lib_UsOS()
 
-@Lib.app.slash(name="uninstall", description="uninstall from this server", guilds=None)
-@discord.app_commands.check(Lib.is_in_staff)
+#@Lib.app.slash(name="uninstall", description="uninstall from this server", guilds=None)
+#@discord.app_commands.check(Lib.is_in_staff)
 async def uninstall(ctx:discord.Interaction,app_name:str):
     if Lib.store.is_installed(app_name, ctx.guild_id):
         with open("save/system/guilds.json") as file:
@@ -21,8 +21,8 @@ async def uninstall(ctx:discord.Interaction,app_name:str):
     else:
         await ctx.response.send_message(f"Application déjà désinstallé", ephemeral=True)
     
-@Lib.app.slash(name="delete", description="delete from machine", guilds=None)
-@discord.app_commands.check(Lib.is_in_staff)
+#@Lib.app.slash(name="delete", description="delete from machine", guilds=None)
+#@discord.app_commands.check(Lib.is_in_staff)
 async def delete(ctx:discord.Interaction, app_name:str, remove_save:bool=False):
     if Lib.store.is_downloaded(app_name):
         rmtree(f"app/{app_name}")

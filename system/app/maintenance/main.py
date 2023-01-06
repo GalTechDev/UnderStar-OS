@@ -1,7 +1,7 @@
 from system.lib import *
 Lib = Lib_UsOS()
 
-@Lib.app.slash(name="clear", description="supprime des messages", guilds=None)
+@Lib.app.slash(name="clear", description="supprime des messages", force_name=True)
 async def clear(ctx:discord.Interaction, nombre:int = 1):
     await ctx.response.send_message('Netoyage en cour...', ephemeral=True)
     try:
