@@ -200,11 +200,41 @@ class App_store:
         file_path="save/system/app_store.json"
         with open(file_path) as file:
             store = json.load(file)
-            
+
+        if app_name in store.keys():
+            return False
         store[app_name]=app_link
 
         with open(file_path, "w") as file:
             file.write(json.dumps(store))
+        return True
+
+    def edit_link(self, old_name: str, app_name: str, app_link: str) -> None:
+        file_path="save/system/app_store.json"
+        with open(file_path) as file:
+            store = json.load(file)
+
+        old_link = store.pop(old_name)
+        if app_name in store.keys():
+            store[old_name]=old_link
+            return False
+        
+        store[app_name]=app_link
+
+        with open(file_path, "w") as file:
+            file.write(json.dumps(store))
+        return True
+
+    def del_link(self, app_name: str) -> None:
+        file_path="save/system/app_store.json"
+        with open(file_path) as file:
+            store = json.load(file)
+
+        store.pop(app_name)
+
+        with open(file_path, "w") as file:
+            file.write(json.dumps(store))
+
 
 class Save:
     """"""

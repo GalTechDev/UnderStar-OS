@@ -27,7 +27,29 @@ async def valide_intaraction(interaction: discord.Interaction):
         #print(error)
 
 #----------------------- modal ----------------------------
+class Set_app_link_modal(discord.ui.Modal): 
+    def __init__(self, *, name: str="", link: str="", title: str = discord.utils.MISSING, timeout: Optional[float] = None, custom_id: str = discord.utils.MISSING) -> None:
+        super().__init__(title=title, timeout=timeout, custom_id=custom_id)
+        self.old_name = name
+        self.app_name = discord.ui.TextInput(label='app_name', default=name, placeholder="Saisis le nom de l'appli", min_length=1)
+        self.link = discord.ui.TextInput(label='link', default=link, placeholder="Saisis l'adresse de l'appli")
+        self.add_item(self.app_name)
+        self.add_item(self.link)
 
+    class Link_not_conform(Exception):
+        def __init__(self, *args: object) -> None:
+            super().__init__(*args)
+
+    async def on_submit(self, interaction: discord.Interaction) -> None:
+        if self.old_name=="":
+            out =Lib.store.add_link(self.app_name.__str__(), self.link.__str__())
+        else:
+            out = Lib.store.edit_link(self.old_name, self.app_name.__str__(), self.link.__str__())
+        if out:
+            await valide_intaraction(interaction)
+        else:
+            raise self.Link_not_conform()
+            
 
 # --------------------- select ----------------------------
 
@@ -79,6 +101,14 @@ class App_view(Back_view):
                 options=[]
         if options!=[]:
             self.add_item(App_select(ctx, options))
+        self.add_item(self.Set_app_link(label="Ajouter un lien"))
+
+    class Set_app_link(discord.ui.Button):
+        def __init__(self, *, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None): 
+            super().__init__(style=style, label=label, disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
+
+        async def callback(self, interaction: discord.Interaction) -> Any:
+            await interaction.response.send_modal(Set_app_link_modal(title="Ajouter un lien"))   
 
 
 class Langue_view(Back_view):
@@ -165,9 +195,10 @@ class App_config_view(Back_view):
         if owner.id == ctx.user.id:
             if self.downloaded:
                 self.add_item(self.Delete(app=app, label="Supprimer", style=discord.ButtonStyle.danger, disabled=(not self.downloaded)))
-                #self.add_item(self.Update_app(label="Mettre à jour"))
             else:
                 self.add_item(self.Download(app=app, label="Télécharger", style=discord.ButtonStyle.primary, disabled=self.downloaded))
+            self.add_item(self.Set_app_link(app=app, label="Changer le lien", style=discord.ButtonStyle.gray))
+            self.add_item(self.Del_app_link(app=app), label="Supprimer le lien", style=discord.ButtonStyle.danger)
         
         if self.downloaded and self.instaled:
             self.add_item(self.Config_app(app=app, label="Config", style=discord.ButtonStyle.primary, disabled=(installed_app.all_app[self.app]==None or installed_app.all_app[self.app].Lib.app.conf_com==None)))
@@ -222,6 +253,22 @@ class App_config_view(Back_view):
         async def callback(self, interaction: discord.Interaction) -> Any:
             await valide_intaraction(interaction)
             await installed_app.all_app[self.app].Lib.app.conf_com()
+
+    class Set_app_link(discord.ui.Button):
+        def __init__(self, *, app, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None): 
+            super().__init__(style=style, label=label, disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
+            self.app = app
+
+        async def callback(self, interaction: discord.Interaction) -> Any:
+            await interaction.response.send_modal(Set_app_link_modal(title="Changer le lien", name=self.app, link=Lib.store.get_apps()[self.app]))
+
+    class Del_app_link(discord.ui.Button):
+        def __init__(self, *, app: str, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None): 
+            super().__init__(style=style, label=label, disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
+            self.app_name=app
+
+        async def callback(self, interaction: discord.Interaction) -> Any:
+            Lib.store.del_link(self.app_name)
 
 # -------------------------- menu --------------------------------
 
