@@ -4,6 +4,7 @@ from sys import executable, argv
 from typing import Optional, Union, Any
 from system.app.apt import install, uninstall
 
+
 Lib = Lib_UsOS()
 
 """class lang_select(discord.ui.Select):
@@ -146,24 +147,28 @@ class Config_view(discord.ui.View):
         
 
 class App_config_view(Back_view):
-    def __init__(self, ctx: discord.Interaction, app, back_menu, args=[], *, timeout=180):
+    def __init__(self, ctx: discord.Interaction, app: str, back_menu, args=[], *, timeout=180):
         super().__init__(ctx, back_menu, args, timeout=timeout)
         self.downloaded = Lib.store.is_downloaded(app)
         self.instaled = Lib.store.is_installed(app, ctx.guild_id)
         self.app = app
         self.ctx=ctx
+        owner = Lib.client.info.owner
         
         if self.instaled:
             self.add_item(self.Rm_to_serv(app=app, label="Retirer du server", style=discord.ButtonStyle.danger, disabled=(not self.instaled)))
         else:
             self.add_item(self.Add_to_serv(app=app, label="Ajouter au server", style=discord.ButtonStyle.primary, disabled=self.instaled))
-        owner = Lib.client.info.owner
+        
         if owner.id == ctx.user.id:
             if self.downloaded:
                 self.add_item(self.Delete(app=app, label="Supprimer", style=discord.ButtonStyle.danger, disabled=(not self.downloaded)))
                 #self.add_item(self.Update_app(label="Mettre à jour"))
             else:
                 self.add_item(self.Download(app=app, label="Télécharger", style=discord.ButtonStyle.primary, disabled=self.downloaded))
+        
+        if self.downloaded and self.instaled:
+            self.add_item(self.Config_app(app=app, label="Config", style=discord.ButtonStyle.primary, disabled=(installed_app.all_app[self.app]==None or installed_app.all_app[self.app].Lib.app.conf_com==None)))
 
     async def reload(self):
         await app_config_menu(self.ctx, self.app)
@@ -206,6 +211,15 @@ class App_config_view(Back_view):
 
         async def callback(self, interaction: discord.Interaction) -> Any:
             await valide_intaraction(interaction)
+
+    class Config_app(discord.ui.Button):
+        def __init__(self, *, app, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None): 
+            super().__init__(style=style, label=label, disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
+            self.app = app
+
+        async def callback(self, interaction: discord.Interaction) -> Any:
+            await valide_intaraction(interaction)
+            await installed_app.all_app[self.app].Lib.app.conf_com()
 
 # -------------------------- menu --------------------------------
 

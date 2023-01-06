@@ -1,14 +1,10 @@
 # coding: utf-8
 from itertools import cycle
 from pathlib import Path
-import discord
-from discord.ext import commands, tasks
 import os.path
 import time
 import sys
-import save.system.installed_app as apps
 import system.sys_app as sys_apps
-import asyncio
 from system.lib import *
 
 Lib = Lib_UsOS()
@@ -47,7 +43,7 @@ intents = discord.Intents.default()
 intents.members = True
 intents.message_content = True
 
-client = commands.Bot(intents=intents, command_prefix=PREFIX, help_command=None)
+client = discord_commands.Bot(intents=intents, command_prefix=PREFIX, help_command=None)
 client.remove_command('help')
 
 
@@ -56,7 +52,7 @@ status = cycle(["UnderStar OS"])
 
 def get_apps(sys: bool=False) -> dict:
     """"""
-    return sys_apps.all_app if sys else apps.all_app
+    return sys_apps.all_app if sys else installed_app.all_app
 
 async def import_apps(sys :bool=False) -> None:
     """"""
@@ -72,7 +68,7 @@ async def import_apps(sys :bool=False) -> None:
         
         for command in app.Lib.app.commands:
             try:
-                new_com=commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
+                new_com=discord_commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
                 if not new_com in client.all_commands.keys():
                     client.add_command(new_com)
                     loaded+=1
@@ -80,10 +76,6 @@ async def import_apps(sys :bool=False) -> None:
                 errors+=1
                 error_lst.append(error)
         print(f"Command : {loaded} loaded | {errors} error : {error_lst}")
-            
-        for task in app.Lib.app.task:
-            new_task=tasks.Loop(task.fonction,seconds=task.seconds, hours=task.hours,minutes=task.minutes, time=task.time, count=task.count, reconnect=task.reconnect)
-            #await new_task.start()
 
         loaded = 0
         errors = 0
@@ -112,7 +104,7 @@ async def import_apps(sys :bool=False) -> None:
         print(f"Slash : {loaded} loaded | {errors} error : {error_lst}")
 
 
-def get_help(ctx: commands.context.Context) -> list[discord.Embed]:
+def get_help(ctx: discord_commands.context.Context) -> list[discord.Embed]:
     """"""
     embeds = []
     embed = discord.Embed(title="OS Commands", description=f"Préfix : `{PREFIX}` | Version : `{BOT_VERSION}`", color=discord.Color.red())
@@ -167,13 +159,13 @@ async def info(ctx:discord.Interaction):
 # -------------------------------- COMMANDE -------------------------------
 
 @client.command(name="os-test", help="Envoie une pizza gatuite")
-async def test(ctx:commands.context.Context):
+async def test(ctx:discord_commands.context.Context):
     await ctx.send(":pizza:")
 
 
 @client.command(name="os-ping", aliases=["os-ver", "ver", "ping"], help="Donne des infos sur le bot")
-@commands.check(Lib.is_in_staff)
-async def version(ctx:commands.context.Context):
+@discord_commands.check(Lib.is_in_staff)
+async def version(ctx:discord_commands.context.Context):
     embed = discord.Embed(title="INFO")
     embed.add_field(name=f"Version :", value=f"` {BOT_VERSION}   `")
     embed.add_field(name=f"Ping :", value=f"` {round(client.latency * 1000)} `")
@@ -182,7 +174,7 @@ async def version(ctx:commands.context.Context):
 
 
 @client.command(name="os-help", aliases=["help"], help="Pour avoir ce message")
-async def help(ctx:commands.context.Context,*args):
+async def help(ctx:discord_commands.context.Context,*args):
     if args==():
         await ctx.send(embeds=get_help(ctx))
     else :
@@ -327,10 +319,10 @@ async def on_shard_disconnect(shard_id):
 #Commande
 @client.event
 async def on_command_error(ctx, error):
-    if isinstance(error, commands.MissingRequiredArgument):
+    if isinstance(error, discord_commands.MissingRequiredArgument):
         await ctx.send('Please pass in all required arguments')
 
-    elif isinstance(error, commands.CommandOnCooldown):
+    elif isinstance(error, discord_commands.CommandOnCooldown):
         value = int(f"{error.retry_after:.0f}")
         message = "Try again in "
         message += convert_time(value)
@@ -740,8 +732,8 @@ async def on_voice_state_update(member, before, after):
 
 
 @client.command(name="restart", help="Pour restart le bot")
-@commands.check(Lib.is_in_staff)
-async def reboot(ctx:commands.context.Context):
+@discord_commands.check(Lib.is_in_staff)
+async def reboot(ctx:discord_commands.context.Context):
     await client.change_presence(activity=discord.Game("Restarting..."), status=discord.Status.dnd)
 
     await ctx.send("Restarting bot")
@@ -749,8 +741,8 @@ async def reboot(ctx:commands.context.Context):
 
 
 @client.command(help="stop le bot")
-@commands.check(Lib.is_in_staff)
-async def stop(ctx:commands.context.Context):
+@discord_commands.check(Lib.is_in_staff)
+async def stop(ctx:discord_commands.context.Context):
     await ctx.send("Stopping")
     await client.change_presence(activity=discord.Game("Shutting down..."), status=discord.Status.dnd)
     exit(1)
@@ -758,8 +750,8 @@ async def stop(ctx:commands.context.Context):
 
 
 @client.command(aliases=["upt"], help="Pour update le bot")
-@commands.check(Lib.is_in_staff)
-async def update(ctx:commands.context.Context):
+@discord_commands.check(Lib.is_in_staff)
+async def update(ctx:discord_commands.context.Context):
     await ctx.send("updating code !")
     await client.change_presence(activity=discord.Game("Updating..."), status=discord.Status.idle)
     
@@ -778,7 +770,7 @@ async def update(ctx:commands.context.Context):
 # -------------------------------------- TASKS -----------------------------------
 
 
-@tasks.loop(seconds=127)
+@discord_tasks.loop(seconds=127)
 async def change_status():
     if "sync" in sys.argv:
         await client.change_presence(activity=discord.Game("Re-Sync..."), status=discord.Status.dnd)

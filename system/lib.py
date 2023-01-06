@@ -3,7 +3,6 @@ from discord.ext import commands as discord_commands
 from discord.ext import tasks as discord_tasks
 import json
 import save.system.installed_app as installed_app
-import sys
 import os
 import shutil
 import googletrans
@@ -95,8 +94,8 @@ class App:
     def __init__(self) -> None:
         self.commands = []
         self.slashs = []
-        self.task = []
         self.help_com = None
+        self.conf_com = None
         self.fusioned = False
         self.fusioned_module = []
     
@@ -114,17 +113,17 @@ class App:
             return funct
         return apply
 
-    def tasks(self, seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True):
-        """"""
-        def apply(funct):
-            self.task.append(Task(funct, seconds, minutes, hours, time, count, reconnect))
-            return funct
-        return apply
-
     def help(self):
         """"""
         def apply(funct):
             self.help_com = funct
+            return funct
+        return apply
+
+    def config(self):
+        """"""
+        def apply(funct):
+            self.conf_com = funct
             return funct
         return apply
 
