@@ -198,7 +198,7 @@ class App_config_view(Back_view):
             else:
                 self.add_item(self.Download(app=app, label="Télécharger", style=discord.ButtonStyle.primary, disabled=self.downloaded))
             self.add_item(self.Set_app_link(app=app, label="Changer le lien", style=discord.ButtonStyle.gray))
-            self.add_item(self.Del_app_link(app=app), label="Supprimer le lien", style=discord.ButtonStyle.danger)
+            self.add_item(self.Del_app_link(app=app, label="Supprimer le lien", style=discord.ButtonStyle.danger))
         
         if self.downloaded and self.instaled:
             self.add_item(self.Config_app(app=app, label="Config", style=discord.ButtonStyle.primary, disabled=(installed_app.all_app[self.app]==None or installed_app.all_app[self.app].Lib.app.conf_com==None)))
