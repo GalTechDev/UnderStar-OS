@@ -5,6 +5,7 @@ import os.path
 import time
 import sys
 import system.sys_app as sys_apps
+import save.system.installed_app as installed_app
 from system.lib import *
 
 Lib = Lib_UsOS()
@@ -62,9 +63,8 @@ async def import_apps(sys :bool=False) -> None:
         errors = 0
         error_lst=[]
 
-        app.Lib.init_client(client)
+        app.Lib.init(client, installed_app)
         app.Lib.set_app_name(app_name)
-        app.init_event()
         
         for command in app.Lib.app.commands:
             try:

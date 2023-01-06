@@ -53,7 +53,7 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
                     file.writelines(content)
 
                 rmtree(path_folder)
-                installed_app.all_app.update({app_name:None})
+                Lib.store.installed_app.update({app_name:None})
                 await ctx.response.send_message("Installé", ephemeral=True)
 
             else:

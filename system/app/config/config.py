@@ -19,13 +19,6 @@ Lib = Lib_UsOS()
         await interaction.response.edit_message(embed=embed,view=lang_view)
 """
 
-async def valide_intaraction(interaction: discord.Interaction):
-    try:
-        await interaction.response.send_message()
-    except Exception as error:
-        pass
-        #print(error)
-
 #----------------------- modal ----------------------------
 class Set_app_link_modal(discord.ui.Modal): 
     def __init__(self, *, name: str="", link: str="", title: str = discord.utils.MISSING, timeout: Optional[float] = None, custom_id: str = discord.utils.MISSING) -> None:
@@ -61,6 +54,7 @@ class App_select(discord.ui.Select):
     async def callback(self, interaction: discord.Interaction):
         app = self.values[0]
         await app_config_menu(self.ctx, app)
+        await valide_intaraction(interaction)
 
 
 
@@ -201,7 +195,7 @@ class App_config_view(Back_view):
             self.add_item(self.Del_app_link(app=app, label="Supprimer le lien", style=discord.ButtonStyle.danger))
         
         if self.downloaded and self.instaled:
-            self.add_item(self.Config_app(app=app, label="Config", style=discord.ButtonStyle.primary, disabled=(installed_app.all_app[self.app]==None or installed_app.all_app[self.app].Lib.app.conf_com==None)))
+            self.add_item(self.Config_app(app=app, label="Config", style=discord.ButtonStyle.primary, disabled=(Lib.store.get_installed()[self.app]==None or Lib.store.get_installed()[self.app].Lib.app.conf_com==None)))
 
     async def reload(self):
         await app_config_menu(self.ctx, self.app)
@@ -251,8 +245,7 @@ class App_config_view(Back_view):
             self.app = app
 
         async def callback(self, interaction: discord.Interaction) -> Any:
-            await valide_intaraction(interaction)
-            await installed_app.all_app[self.app].Lib.app.conf_com()
+            await Lib.store.get_installed()[self.app].Lib.app.conf_com(interaction)
 
     class Set_app_link(discord.ui.Button):
         def __init__(self, *, app, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None): 

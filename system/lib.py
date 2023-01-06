@@ -1,20 +1,22 @@
 import discord
 from discord.ext import commands as discord_commands
 from discord.ext import tasks as discord_tasks
+from discord.utils import MISSING
+from typing import Any, Callable, ClassVar, Coroutine, Dict, Iterator, List, Optional, Sequence, TYPE_CHECKING, Tuple, Union
 import json
-import save.system.installed_app as installed_app
 import os
 import shutil
 import googletrans
 
-
 LANGAGE = "fr"
-client = None
 
 THEME = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
 
-def init_event():
-    pass
+async def valide_intaraction(interaction: discord.Interaction):
+    try:
+        await interaction.response.send_message()
+    except Exception as error:
+        pass
 
 class Lib_UsOS:
     """"""
@@ -22,7 +24,7 @@ class Lib_UsOS:
         self.app = App()
         self.app_name = ""
         self.client: discord_commands.bot = None
-        self.store = App_store()
+        self.store = App_store(None)
         self.save = Save(self.app_name)
         self.guilds = Guilds()
         self.trad = Trad()
@@ -38,12 +40,13 @@ class Lib_UsOS:
             for mod in self.app.fusioned_module:
                 mod.Lib.set_app_name(app_name)
 
-    def init_client(self, bot_client: discord_commands.Bot):
+    def init(self, bot_client: discord_commands.Bot, installed_app):
         """"""
         self.client = bot_client
+        self.store.installed_app = installed_app
         if self.app.fusioned:
             for app in self.app.fusioned_module:
-                app.Lib.init_client(bot_client)
+                app.Lib.init(bot_client, installed_app)
         
     def is_in_staff(self, ctx:discord.Interaction, direct_author=False):
         """"""
@@ -169,8 +172,8 @@ class Task:
 
 class App_store:
     """"""
-    def __init__(self) -> None:
-        pass
+    def __init__(self, installed_app) -> None:
+        self.installed_app = installed_app
 
     def get_apps(self) -> dict:
         """Give a dict object {"app_name":"app_link",}"""
@@ -180,7 +183,7 @@ class App_store:
         
     def get_installed(self):
         """"""
-        return installed_app.all_app
+        return self.installed_app.all_app
 
     def is_in_store(self, app_name: str) -> bool:
         """"""
