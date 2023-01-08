@@ -24,7 +24,7 @@ CODING = "utf-8"
 programmer = os.path.basename(sys.argv[0])
 
 
-vals = [SYS_FOLDER,APP_FOLDER]
+vals = [SYS_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, APP_FOLDER]
 
 for name in vals:
     Path(name).mkdir(exist_ok=True)
