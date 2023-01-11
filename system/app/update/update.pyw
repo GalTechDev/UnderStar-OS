@@ -3,9 +3,9 @@ from shutil import move, rmtree
 from os import listdir, remove, path, curdir, system
 download_folder = "download/os"
 
-git_url = "https://github.com/GalTechDev/UnderStar-OS.git"
+git_url = "https://github.com/GalTechDev/UnderStar-OS/archive/refs/heads/main.zip"
 
-response = requests.get(lien)
+response = requests.get(git_url)
 folder = uuid.uuid4()
 content_type = response.headers['content-type']
 extension = mimetypes.guess_extension(content_type)
