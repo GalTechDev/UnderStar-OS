@@ -442,6 +442,7 @@ class Event:
     def __init__(self) -> None:
         self.on_raw_app_command_permissions_update = self.on_raw_app_command_permissions_update
         self.on_app_command_completion = self.on_app_command_completion
+        self.on_app_command_error = self.on_app_command_error
         self.on_automod_rule_create = self.on_automod_rule_create
         self.on_automod_rule_update = self.on_automod_rule_update
         self.on_automod_rule_delete = self.on_automod_rule_delete
