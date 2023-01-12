@@ -1,6 +1,9 @@
 import requests
+import uuid
 from shutil import move, rmtree
-from os import listdir, remove, path, curdir, system
+from os import mkdir, listdir, remove, path, curdir, system
+import zipfile as zip
+
 download_folder = "download/os"
 
 git_url = "https://github.com/GalTechDev/UnderStar-OS/archive/refs/heads/main.zip"
@@ -28,9 +31,10 @@ else:
 #Repo.clone_from(git_url, repo_dir)
 move("app", f"{path_folder}/{old_name}")
 move("token", f"{path_folder}/{old_name}")
+move("save", f"{path_folder}/{old_name}"
 
 for p in listdir():
-    if p not in ["download",".git", "save"]:
+    if p not in ["download",".git"]:
         if path.isdir(p):
             rmtree(p)
         else:
