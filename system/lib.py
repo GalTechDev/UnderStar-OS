@@ -78,8 +78,6 @@ class Lib_UsOS:
         #lines = [ligne.text for ligne in content]
         return float(content.text)
 
-print(get_bot_info("GalTechDev","UnderStar-OS", ".version")[0])
-
     def get_lang_name(self):
         """"""
         with open("system/lang/ref.json") as file:
