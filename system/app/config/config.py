@@ -121,7 +121,7 @@ class Update_view(Back_view):
     def __init__(self, ctx: discord.Interaction, back, *, update: bool=False, timeout=180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
-        self.update = True #update
+        self.update = update
         self.update_button = self.Update_button(ctx=self.ctx, enabled=self.update, label="Mettre à jour")
         self.add_item(self.update_button)
         
