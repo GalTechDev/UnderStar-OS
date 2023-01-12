@@ -2,6 +2,7 @@ import requests
 import uuid
 from shutil import move, rmtree
 from os import mkdir, listdir, remove, path, curdir, system, execv
+from sys import argv
 import mimetypes
 import zipfile as zip
 
