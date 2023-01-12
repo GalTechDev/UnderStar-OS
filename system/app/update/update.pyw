@@ -31,7 +31,7 @@ else:
 #Repo.clone_from(git_url, repo_dir)
 move("app", f"{path_folder}/{old_name}")
 move("token", f"{path_folder}/{old_name}")
-move("save", f"{path_folder}/{old_name}"
+move("save", f"{path_folder}/{old_name}")
 
 for p in listdir():
     if p not in ["download",".git"]:
