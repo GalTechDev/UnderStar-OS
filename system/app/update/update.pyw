@@ -50,5 +50,4 @@ for p in listdir(f"{path_folder}/{old_name}"):
         move(f"{path_folder}/{old_name}/{p}", curdir)
     
 system('rmdir /S /Q "{}"'.format(path_folder))
-print(argv)
 execv(executable, ["None", "understar.py"])
