@@ -303,7 +303,7 @@ async def customisation_menu(ctx: discord.Interaction):
 async def update_menu(ctx: discord.Interaction):
     embed = discord.Embed(title=":gear:  Mise à jour", description="Rechercher de mise à jour...", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     update = Lib.get_last_update_stats() > float(BOT_VERSION)
-    await ctx.edit_original_response(embed=embed, view=Update_view(ctx, main_menu, update))
+    await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=update))
     
 
 
