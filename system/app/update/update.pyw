@@ -51,4 +51,4 @@ for p in listdir(f"{path_folder}/{old_name}"):
     
 system('rmdir /S /Q "{}"'.format(path_folder))
 print(argv)
-execv("understar.py", ["None", path.basename(argv[0])])
+execv(path.abspath("understar.py"), ["None", path.basename(argv[0])])
