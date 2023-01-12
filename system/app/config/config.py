@@ -312,7 +312,7 @@ async def app_config_menu(ctx: discord.Interaction, app:str):
 
 
 async def permission_denied(ctx: discord.Interaction, back, *args):
-    embed = discord.Embed(title="Paramètre", description="Vous n'avez pas les permissions.", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed = discord.Embed(title=":gear:  Paramètre", description="Vous n'avez pas les permissions.", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, back, args))
 
 
