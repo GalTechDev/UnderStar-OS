@@ -10,8 +10,6 @@ from system.lib import *
 
 Lib = Lib_UsOS()
 
-with open(".version") as f:
-    BOT_VERSION = f.read()
 SYS_FOLDER = "system"
 TOKEN_FOLDER = "token"
 SAVE_FOLDER = "save"
