@@ -134,7 +134,7 @@ class Update_view(Back_view):
             await valide_intaraction(interaction)
             await self.ctx.delete_original_response()
             await Lib.change_presence(activity=discord.Game("Updating..."), status=discord.Status.dnd)
-            execv("system/app/update/update.pyw", ["None", path.basename(argv[0])])
+            execv(path.abspath("system/app/update/update.pyw"), ["None", path.basename(argv[0])])
 
             
 
