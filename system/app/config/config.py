@@ -118,10 +118,25 @@ class Custom_view(Back_view):
 
 
 class Update_view(Back_view):
-    def __init__(self, ctx: discord.Interaction, back, *, timeout=180):
+    def __init__(self, ctx: discord.Interaction, back, *, update: bool=False, timeout=180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
+        self.update = True #update
+        self.update_button = self.Update_button(ctx=self.ctx, enabled=self.update, label="Mettre à jour")
+        self.add_item(self.update_button)
+        
+    class Update_button(discord.ui.Button):
+        def __init__(self, *, ctx, enabled, style: discord.ButtonStyle = discord.ButtonStyle.primary, label: Optional[str] = None, disabled: bool = False, custom_id: Optional[str] = None, url: Optional[str] = None, emoji: Optional[Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: Optional[int] = None): 
+            super().__init__(style=style, label=label, disabled= not enabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
+            self.ctx = ctx
+        
+        async def callback(self, interaction: discord.Interaction) -> Any:
+            await valide_intaraction(interaction)
+            await self.ctx.delete_original_response()
+            await Lib.change_presence(activity=discord.Game("Updating..."), status=discord.Status.dnd)
+            execv("system/app/update/update.pwy", ["None", path.basename(argv[0])])
 
+            
 
 class Config_view(discord.ui.View):
     def __init__(self, ctx: discord.Interaction, *, timeout=180):
@@ -286,8 +301,9 @@ async def customisation_menu(ctx: discord.Interaction):
 
 
 async def update_menu(ctx: discord.Interaction):
-    embed = discord.Embed(title=":gear:  Mise à jour", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
-    await ctx.edit_original_response(embed=embed, view=Back_view(ctx, main_menu))
+    embed = discord.Embed(title=":gear:  Mise à jour", description="Rechercher de mise à jour...", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    await ctx.edit_original_response(embed=embed, view=Update_view(ctx, main_menu))
+    
 
 
 async def main_menu(ctx: discord.Interaction):
