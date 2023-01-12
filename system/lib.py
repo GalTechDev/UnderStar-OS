@@ -7,6 +7,8 @@ import json
 import os
 import shutil
 import googletrans
+import requests
+import requests_html
 
 LANGAGE = "fr"
 
@@ -66,6 +68,17 @@ class Lib_UsOS:
         for role in roles:
             if role in admins:
                 return True
+            
+    def get_last_update_stats(self):
+        """"""
+        url = f'https://github.com/GalTechDev/UnderStar-OS/blob/master/.version'
+        session = requests_html.HTMLSession()
+        r = session.get(url)
+        content = r.html.find('.blob-code', first=True)
+        #lines = [ligne.text for ligne in content]
+        return float(content.text)
+
+print(get_bot_info("GalTechDev","UnderStar-OS", ".version")[0])
 
     def get_lang_name(self):
         """"""
