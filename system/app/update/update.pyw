@@ -24,7 +24,7 @@ if zip.is_zipfile(file_path):
 if len(listdir(path_folder))==2:
     remove(file_path)
     old_name = listdir(path_folder)[0]
-    rmtree(f"{path_folder}/{old_name}/save")
+    system('rmdir /S /Q "{}"'.format(f"{path_folder}/{old_name}/save"))
 else:
     exit()
 
