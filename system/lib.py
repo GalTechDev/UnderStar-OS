@@ -17,7 +17,10 @@ async def valide_intaraction(interaction: discord.Interaction):
         await interaction.response.send_message()
     except Exception as error:
         pass
-
+    
+with open(".version") as f:
+    BOT_VERSION = f.read()    
+    
 class Lib_UsOS:
     """"""
     def __init__(self) -> None:
