@@ -38,7 +38,7 @@ move("save", f"{path_folder}/{old_name}")
 for p in listdir():
     if p not in ["download",".git"]:
         if path.isdir(p):
-            rmtree(p)
+            system('rmdir /S /Q "{}"'.format(f"{p}"))
         else:
             remove(p)
 
