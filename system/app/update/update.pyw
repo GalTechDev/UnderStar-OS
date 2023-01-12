@@ -1,8 +1,8 @@
 import requests
 import uuid
 from shutil import move, rmtree
-from os import mkdir, listdir, remove, path, curdir, system, execv, executable
-from sys import argv
+from os import mkdir, listdir, remove, path, curdir, system, execv
+from sys import argv, executable
 import mimetypes
 import zipfile as zip
 
