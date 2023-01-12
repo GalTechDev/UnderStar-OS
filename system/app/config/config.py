@@ -302,7 +302,11 @@ async def customisation_menu(ctx: discord.Interaction):
 
 async def update_menu(ctx: discord.Interaction):
     embed = discord.Embed(title=":gear:  Mise à jour", description="Rechercher de mise à jour...", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
-    update = Lib.get_last_update_stats() > float(BOT_VERSION)
+    await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=False))
+    last = Lib.get_last_update_stats()
+    update = last > float(BOT_VERSION)
+    embed = discord.Embed(title=":gear:  Mise à jour", description=f"{'Vous êtes à jour.' if last <= float(BOT_VERSION) else 'Nouvelle version disponible'}", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed.add_field(name=f"UnderStar OS v{last}", value='\u200b')
     await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=update))
     
 
