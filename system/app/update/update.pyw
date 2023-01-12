@@ -2,6 +2,7 @@ import requests
 import uuid
 from shutil import move, rmtree
 from os import mkdir, listdir, remove, path, curdir, system
+import mimetypes
 import zipfile as zip
 
 download_folder = "download/os"
