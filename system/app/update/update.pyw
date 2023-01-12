@@ -1,7 +1,7 @@
 import requests
 import uuid
 from shutil import move, rmtree
-from os import mkdir, listdir, remove, path, curdir, system, execv
+from os import mkdir, listdir, remove, path, curdir, system, execv, executable
 from sys import argv
 import mimetypes
 import zipfile as zip
@@ -51,4 +51,4 @@ for p in listdir(f"{path_folder}/{old_name}"):
     
 system('rmdir /S /Q "{}"'.format(path_folder))
 print(argv)
-execv(path.abspath("understar.py"), ["None", path.basename(argv[0])])
+execv(executable, ["None", "understar.py"])
