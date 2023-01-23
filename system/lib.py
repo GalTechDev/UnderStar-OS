@@ -9,6 +9,7 @@ import shutil
 import googletrans
 import requests
 import requests_html
+import asyncio
 
 LANGAGE = "fr"
 
@@ -45,13 +46,15 @@ class Lib_UsOS:
             for mod in self.app.fusioned_module:
                 mod.Lib.set_app_name(app_name)
 
-    def init(self, bot_client: discord_commands.Bot, installed_app):
+    def init(self, bot_client: discord_commands.Bot, installed_app, tasks):
         """"""
         self.client = bot_client
         self.store.installed_app = installed_app
+        self.tasks = tasks
         if self.app.fusioned:
             for app in self.app.fusioned_module:
-                app.Lib.init(bot_client, installed_app)
+                app.Lib.init(bot_client, installed_app, tasks)
+
         
     def is_in_staff(self, ctx:discord.Interaction, direct_author=False):
         """"""
@@ -111,6 +114,8 @@ class App:
     def __init__(self) -> None:
         self.commands = []
         self.slashs = []
+        self.all_tasks = []
+        self.discord_tasks=[]
         self.help_com = None
         self.conf_com = None
         self.fusioned = False
@@ -141,6 +146,19 @@ class App:
         """"""
         def apply(funct):
             self.conf_com = funct
+            return funct
+        return apply
+
+    def loop(self, 
+    seconds: float = MISSING,
+    minutes: float = MISSING,
+    hours: float = MISSING,
+    time: Union[discord_tasks.datetime.time, Sequence[discord_tasks.datetime.time]] = MISSING,
+    count: Optional[int] = None,
+    reconnect: bool = True,):
+        """"""
+        def apply(funct):
+            self.all_tasks.append(Task(function=discord_tasks.asyncio.coroutine(funct), seconds=seconds, minutes=minutes, hours=hours, count=count, time=time, reconnect=reconnect))
             return funct
         return apply
 
@@ -175,8 +193,8 @@ class Command:
 
 class Task:
     """"""
-    def __init__(self,fonction,seconds: int = discord_tasks.MISSING, minutes: int = discord_tasks.MISSING, hours: int = discord_tasks.MISSING, time=discord_tasks.MISSING, count = None, reconnect: bool = True) -> None:
-        self.fonction=fonction
+    def __init__(self,function,seconds: float = discord_tasks.MISSING, minutes: float = discord_tasks.MISSING, hours: float = discord_tasks.MISSING, time: Union[discord_tasks.datetime.time, Sequence[discord_tasks.datetime.time]] = discord_tasks.MISSING, count = None, reconnect: bool = True) -> None:
+        self.function=function
         self.seconds=seconds
         self.minutes=minutes
         self.hours=hours

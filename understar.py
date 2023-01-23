@@ -52,17 +52,43 @@ status = cycle(["UnderStar OS"])
 def get_apps(sys: bool=False) -> dict:
     """"""
     return sys_apps.all_app if sys else installed_app.all_app
-
+            
 async def import_apps(sys :bool=False) -> None:
     """"""
     for app_name,app in get_apps(sys).items():
         print(f"\nIMPORT {app_name}: ")
+
+        app.Lib.init(client, installed_app, discord_tasks)
+        app.Lib.set_app_name(app_name)
+
         loaded = 0
         errors = 0
         error_lst=[]
+        ttasks = []
+        try:
+            for task in app.Lib.app.all_tasks: # 
+                try:
+                    ttasks.append(discord_tasks.Loop[discord_tasks.LF](coro=task.function, seconds=task.seconds, minutes=task.minutes, hours=task.hours, count=task.count, time=task.time, reconnect=task.reconnect))
+                except Exception as error:
+                    errors+=1
+                    error_lst.append(error)
 
-        app.Lib.init(client, installed_app)
-        app.Lib.set_app_name(app_name)
+            for task in ttasks:
+                try:
+                    asyncio.gather(task._loop())
+                    loaded+=1
+                except Exception as error:
+                    errors+=1
+                    error_lst.append(error)
+        except Exception as error:
+            print(error)
+            
+        print(f"Task : {loaded} loaded | {errors} error : {error_lst}")
+
+
+        loaded = 0
+        errors = 0
+        error_lst=[]
         
         for command in app.Lib.app.commands:
             try:
@@ -388,6 +414,8 @@ async def on_ready():
     client.info = await client.application_info()
     change_status.start()
     #maintenance.start()
+    await import_apps(True)
+    await import_apps()
 
     with open(f'{SYS_FOLDER}/icon.png', 'rb') as image:
         pass
@@ -396,8 +424,8 @@ async def on_ready():
     print("version : ", programmer, BOT_VERSION)
     print("Logged in as : ", client.user.name)
     print("ID : ", client.user.id)
-    await import_apps(True)
-    await import_apps()
+    #await import_apps(True)
+    #await import_apps()
     
     #await sync(client, "sync" in sys.argv)
     #print(client.guilds)
@@ -468,7 +496,7 @@ async def on_guild_join(guild):
             await app.Lib.event.on_guild_join(guild)
 
 @client.event
-async def guild_remove(guild):
+async def on_guild_remove(guild):
     for app in list(get_apps().values())+list(get_apps(True).values()):
         if app!=None:
             await app.Lib.event.on_guild_remove(guild)
@@ -883,4 +911,7 @@ async def maintenance():
 
     resetSystem = True
 """
+# await import_apps(True)
+# await import_apps()
+
 client.run(BOT_TOKEN)
