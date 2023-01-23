@@ -339,8 +339,8 @@ class Save:
     def get_files(self, path=""):
         return os.listdir(f"{self.save_path}/{self.app_name}/{path}")
 
-    def existe(self, name, in_path=""):
-        return name in self.get_files(in_path)
+    def existe(self, name, path=""):
+        return name in self.get_files(path)
 
     def remove_file(self, name, path=""):
         if path=="":
