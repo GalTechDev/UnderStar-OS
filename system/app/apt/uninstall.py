@@ -16,11 +16,11 @@ async def uninstall(ctx:discord.Interaction,app_name:str):
 
         with open("save/system/guilds.json", "w") as file:
             file.write(json.dumps(guilds))
-        
-        await ctx.response.send_message(f"Application désinstallé", ephemeral=True)
+
+        await ctx.response.send_message(f"Application désinstallée", ephemeral=True)
     else:
-        await ctx.response.send_message(f"Application déjà désinstallé", ephemeral=True)
-    
+        await ctx.response.send_message(f"Application déjà désinstallée", ephemeral=True)
+
 #@Lib.app.slash(name="delete", description="delete from machine", guilds=None)
 #@discord.app_commands.check(Lib.is_in_staff)
 async def delete(ctx:discord.Interaction, app_name:str, remove_save:bool=False):
@@ -39,12 +39,12 @@ async def delete(ctx:discord.Interaction, app_name:str, remove_save:bool=False):
 
         content.pop(i)
         content[-1] = content[-1].replace(f'"{app_name}":{app_name},', "")
-                
+
         with open("save/system/installed_app.py", "w") as file:
             file.writelines(content)
 
         Lib.store.installed_app.all_app.pop(app_name)
         await ctx.response.send_message("Supprimé.", ephemeral=True)
-        
+
     else:
-        await ctx.response.send_message("Application non trouvé", ephemeral=True)
+        await ctx.response.send_message("Application non trouvée", ephemeral=True)

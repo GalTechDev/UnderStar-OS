@@ -14,7 +14,7 @@ Lib = Lib_UsOS()
 #@discord.app_commands.check(Lib.is_in_staff)
 async def download(ctx:discord.Interaction,app_name:str, link:str=""):
     if Lib.store.is_downloaded(app_name):
-        await ctx.response.send_message("Application déjà téléchargé", ephemeral=True)
+        await ctx.response.send_message("Application déjà téléchargée", ephemeral=True)
         return
 
     try:
@@ -23,7 +23,7 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
         else:
             Lib.store.add_link(app_name=app_name, app_link=link)
             lien = link
-            
+
         response = requests.get(lien)
         folder = uuid.uuid4()
         content_type = response.headers['content-type']
@@ -48,7 +48,7 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
                     content = file.readlines()
                 content.insert(0, f"import app.{app_name}.main as {app_name}\n")
                 content[-1]=content[-1][:-1]+f'"{app_name}":{app_name}'+",}"
-                
+
                 with open("save/system/installed_app.py", "w") as file:
                     file.writelines(content)
 
@@ -57,13 +57,13 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
                 await ctx.response.send_message("Installé", ephemeral=True)
 
             else:
-                await ctx.response.send_message("Plus d'un élément trouvé dans l'archive, installation ignoré", ephemeral=True)
+                await ctx.response.send_message("Plus d'un élément trouvé dans l'archive, installation ignorée", ephemeral=True)
                 rmtree(path_folder)
 
         else:
-            await ctx.response.send_message("Type d'archive non pris en charge", ephemeral=True)
+            await ctx.response.send_message("Type d'archive non prise en charge", ephemeral=True)
     except Exception as error:
-        await ctx.response.send_message(f"Une erreur c'est produit : {error}", ephemeral=True)
+        await ctx.response.send_message(f"Une erreur s'est produite : {error}", ephemeral=True)
         print(error)
 
 #@Lib.app.slash(name="install", description="install", guilds=None)
@@ -72,12 +72,12 @@ async def install(ctx:discord.Interaction,app_name:str):
     if Lib.store.is_downloaded(app_name):
         with open("save/system/guilds.json") as file:
             guilds = json.load(file)
-            
+
         guilds[str(ctx.guild_id)]["apps"].append(app_name)
 
         with open("save/system/guilds.json", "w") as file:
             file.write(json.dumps(guilds))
-        
+
         await ctx.response.send_message(f"Application installé", ephemeral=True)
     else:
         if Lib.store.is_installed(app_name, ctx.guild_id):
