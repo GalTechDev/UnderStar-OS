@@ -6,7 +6,7 @@ from typing import Any, Callable, ClassVar, Coroutine, Dict, Iterator, List, Opt
 import json
 import os
 import shutil
-import googletrans
+# import googletrans
 import requests
 import requests_html
 import asyncio
@@ -20,10 +20,11 @@ async def valide_intaraction(interaction: discord.Interaction):
         await interaction.response.send_message()
     except Exception as error:
         pass
-    
+
 with open(".version") as f:
-    BOT_VERSION = f.read()    
-    
+    BOT_VERSION = f.read()
+
+
 class Lib_UsOS:
     """"""
     def __init__(self) -> None:
@@ -33,7 +34,7 @@ class Lib_UsOS:
         self.store = App_store(None)
         self.save = Save(self.app_name)
         self.guilds = Guilds()
-        self.trad = Trad()
+        # self.trad = Trad()
         self.event = Event()
 
 
@@ -55,15 +56,15 @@ class Lib_UsOS:
             for app in self.app.fusioned_module:
                 app.Lib.init(bot_client, installed_app, tasks)
 
-        
+
     def is_in_staff(self, ctx:discord.Interaction, direct_author=False):
         """"""
-        if type(ctx)==discord.Interaction:
+        if type(ctx) == discord.Interaction:
             user = ctx.user
         else:
             user = ctx.author
         if user.id in self.guilds.get_admin_guilds(guild = ctx.guild_id if type(ctx)==discord.Interaction else ctx.guild.id):
-            return True 
+            return True
 
         roles = [role.name for role in user.roles]
         admins = ["Admin", "Modo", "Bot Dev"]
@@ -71,7 +72,7 @@ class Lib_UsOS:
         for role in roles:
             if role in admins:
                 return True
-            
+
     def get_last_update_stats(self):
         """"""
         url = f'https://github.com/GalTechDev/UnderStar-OS/blob/master/.version'
@@ -120,18 +121,18 @@ class App:
         self.conf_com = None
         self.fusioned = False
         self.fusioned_module = []
-    
-    def command(self, name=None, help_text: str="", aliases: (list[str])=[], checks=[], force_name: bool = False):
+
+    def command(self, name=None, help_text: str="", aliases: list=[], checks=[], force_name: bool = False):
         """"""
         def apply(funct):
-            self.commands.append(Command(name if name != None else funct.__name__ , funct, help_text, aliases, checks, force_name))
+            self.commands.append(Command(name if name else funct.__name__ , funct, help_text, aliases, checks, force_name))
             return funct
         return apply
 
     def slash(self, description: str, name: str = None, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False):
         """"""
         def apply(funct):
-            self.slashs.append(Slash(name if name != None else funct.__name__ , description, funct, guild, guilds, force_name))
+            self.slashs.append(Slash(name if name else funct.__name__ , description, funct, guild, guilds, force_name))
             return funct
         return apply
 
@@ -149,7 +150,7 @@ class App:
             return funct
         return apply
 
-    def loop(self, 
+    def loop(self,
     seconds: float = MISSING,
     minutes: float = MISSING,
     hours: float = MISSING,
@@ -180,10 +181,10 @@ class Slash:
         self.guild=guild
         self.guilds=guilds
         self.force_name = force_name
-        
+
 class Command:
     """"""
-    def __init__(self, name:str, command, help_text: str="",aliases: (list[str])=[],checks=[], force_name: bool = False) -> None:
+    def __init__(self, name:str, command, help_text: str="",aliases: list=[],checks=[], force_name: bool = False) -> None:
         self.name=name.replace(" ", "-")
         self.command=command
         self.help = help_text if help_text!="" else "Aucune aide disponible"
@@ -212,7 +213,7 @@ class App_store:
         with open("save/system/app_store.json") as file:
             data = json.load(file)
         return data
-        
+
     def get_installed(self):
         """"""
         return self.installed_app.all_app
@@ -221,7 +222,7 @@ class App_store:
         """"""
         apps = self.get_apps()
         return app_name in list(apps.keys())
-    
+
     def is_downloaded(self, app_name: str) -> bool:
         apps = self.get_installed()
         return app_name in list(apps.keys())
@@ -253,7 +254,7 @@ class App_store:
         if app_name in store.keys():
             store[old_name]=old_link
             return False
-        
+
         store[app_name]=app_link
 
         with open(file_path, "w") as file:
@@ -285,7 +286,7 @@ class Save:
                 full_path=f"{self.save_path}/{self.app_name}/{name}"
             else:
                 full_path=f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
-                
+
             with open(full_path, "x"):
                 pass
 
@@ -297,7 +298,7 @@ class Save:
                     full_path=f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
                 os.remove(full_path)
                 self.add_file(name,path,over_write)
-            else: 
+            else:
                 raise FileExistsError
 
     def open(self, name: str, path: str=""):
@@ -305,7 +306,7 @@ class Save:
             path = f"{self.save_path}/{self.app_name}/{name}"
         else:
             path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
-            
+
         with open(path) as file:
             return file
 
@@ -314,7 +315,7 @@ class Save:
             path = f"{self.save_path}/{self.app_name}/{name}"
         else:
             path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
-            
+
         with open(path, 'rb' if binary_mode else 'r') as file:
             return file.read()
 
@@ -347,9 +348,9 @@ class Save:
             path = f"{self.save_path}/{self.app_name}/{name}"
         else:
             path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
-        
+
         os.remove(f"{path}/{self.app_name}/{name}")
-        
+
 
     def add_folder(self, path="", ignor_exception=True):
         try:
@@ -380,7 +381,7 @@ class Guilds:
     """"""
     def __init__(self) -> None:
         pass
-        
+
     def get_app_guilds(self, app_name=None, guild=None):
         if not app_name==None and not guild==None:
             raise Exception("app_name and guild cannot be mixed")
@@ -559,7 +560,7 @@ class Event:
         self.on_thread_member_remove = self.on_thread_member_remove
         self.on_raw_thread_member_remove = self.on_raw_thread_member_remove
         self.on_voice_state_update = self.on_voice_state_update
-        
+
 
     def event(self):
         def apply(funct):
@@ -605,7 +606,7 @@ class Event:
 
     async def on_guild_channel_update(self, before, after):
         pass
-    
+
     async def on_guild_channel_pins_update(self, channel, last_pin):
         pass
 
@@ -864,4 +865,3 @@ class Event:
 
     async def on_voice_state_update(self, member, before, after):
         pass
-    
