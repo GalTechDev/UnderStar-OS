@@ -242,13 +242,10 @@ async def help(ctx:discord_commands.context.Context,*args):
 
 # ---------------------------------- EVENTS ------------------------------------
 
-launched = []
 
 async def manage_event(command, *args, **kwargs):
     for app in list(get_apps().values()) + list(get_apps(True).values()):
-        if app and command not in launched:
-            # launched.append(command)
-            # print(command, args)
+        if app:
             data = getattr(app.Lib.event, command)
             await data(*args, **kwargs)
 
