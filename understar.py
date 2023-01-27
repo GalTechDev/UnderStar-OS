@@ -1,12 +1,16 @@
 # coding: utf-8
+from discord.ext import commands as discord_commands
+from discord.ext import tasks as discord_tasks
 from itertools import cycle
 from pathlib import Path
 import os.path
+import discord
 import time
 import sys
 import system.sys_app as sys_apps
 import save.system.installed_app as installed_app
 from system.lib import *
+import asyncio
 
 Lib = Lib_UsOS()
 
@@ -27,7 +31,7 @@ vals = [SYS_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, APP_FOLDER]
 for name in vals:
     Path(name).mkdir(exist_ok=True)
 
-BOT_TOKEN = "" 
+BOT_TOKEN = ""
 
 try:
     with open(BOT_TOKEN_PATH, "r", encoding=CODING) as f:
@@ -38,21 +42,21 @@ except FileNotFoundError:
         input("please insert the bot token in the file classbot_token")
         sys.exit(0)
 
-intents = discord.Intents.default()
-intents.members = True
-intents.message_content = True
+intents = discord.Intents.all()
+# intents.members = True
+# intents.message_content = True
 
 client = discord_commands.Bot(intents=intents, command_prefix=PREFIX, help_command=None)
 client.remove_command('help')
 
 
-status = cycle(["UnderStar OS"])
+status = cycle(["TEST EN COURS"])
 
 
-def get_apps(sys: bool=False) -> dict:
+def get_apps(sys: bool = False) -> dict:
     """"""
     return sys_apps.all_app if sys else installed_app.all_app
-            
+
 async def import_apps(sys :bool=False) -> None:
     """"""
     for app_name,app in get_apps(sys).items():
@@ -66,7 +70,7 @@ async def import_apps(sys :bool=False) -> None:
         error_lst=[]
         ttasks = []
         try:
-            for task in app.Lib.app.all_tasks: # 
+            for task in app.Lib.app.all_tasks: #
                 try:
                     ttasks.append(discord_tasks.Loop[discord_tasks.LF](coro=task.function, seconds=task.seconds, minutes=task.minutes, hours=task.hours, count=task.count, time=task.time, reconnect=task.reconnect))
                 except Exception as error:
@@ -82,14 +86,14 @@ async def import_apps(sys :bool=False) -> None:
                     error_lst.append(error)
         except Exception as error:
             print(error)
-            
+
         print(f"Task : {loaded} loaded | {errors} error : {error_lst}")
 
 
         loaded = 0
         errors = 0
         error_lst=[]
-        
+
         for command in app.Lib.app.commands:
             try:
                 new_com=discord_commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
@@ -103,7 +107,7 @@ async def import_apps(sys :bool=False) -> None:
 
         loaded = 0
         errors = 0
-        error_lst=[] 
+        error_lst=[]
 
         for command in app.Lib.app.slashs:
             try:
@@ -127,11 +131,11 @@ async def import_apps(sys :bool=False) -> None:
             except Exception as error:
                 errors+=1
                 error_lst.append(error)
-            
+
         print(f"Slash : {loaded} loaded | {errors} error : {error_lst}")
 
 
-def get_help(ctx: discord_commands.context.Context) -> list[discord.Embed]:
+def get_help(ctx: discord_commands.context.Context) -> list:
     """"""
     embeds = []
     embed = discord.Embed(title="OS Commands", description=f"Préfix : `{PREFIX}` | Version : `{BOT_VERSION}`", color=discord.Color.red())
@@ -238,24 +242,28 @@ async def help(ctx:discord_commands.context.Context,*args):
 
 # ---------------------------------- EVENTS ------------------------------------
 
+launched = []
+
+async def manage_event(command, *args, **kwargs):
+    for app in list(get_apps().values()) + list(get_apps(True).values()):
+        if app and command not in launched:
+            # launched.append(command)
+            # print(command, args)
+            data = getattr(app.Lib.event, command)
+            await data(*args, **kwargs)
+
 #App Commands
 @client.event
 async def on_raw_app_command_permissions_update(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_app_command_permissions_update(payload)
+    await manage_event("on_raw_app_command_permissions_update", payload)
 
 @client.event
 async def on_app_command_completion(interaction, command):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_app_command_completion(interaction, command)
+    await manage_event("on_app_command_completion", interaction, command)
 
 @client.tree.error
 async def on_app_command_error(ctx: discord.Interaction, error: discord.app_commands.AppCommandError):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_app_command_error(ctx, error)
+    await manage_event("on_app_command_error", ctx, error)
 
     if isinstance(error, discord.app_commands.CheckFailure):
         await ctx.response.send_message('Tu ne remplis pas les conditions pour executer cette commande.', ephemeral=True)
@@ -265,102 +273,69 @@ async def on_app_command_error(ctx: discord.Interaction, error: discord.app_comm
 #AutoMod
 @client.event
 async def on_automod_rule_create(rule):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_automod_rule_create(rule)
+    await manage_event("on_automod_rule_create", rule)
 
 @client.event
 async def on_automod_rule_update(rule):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_automod_rule_update(rule)
+    await manage_event("on_automod_rule_update", rule)
 
 @client.event
 async def on_automod_rule_delete(rule):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_automod_rule_delete(rule)
+    await manage_event("on_automod_rule_delete", rule)
 
 @client.event
 async def on_automod_action(execution):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_automod_action(execution)
+    await manage_event("on_automod_action", execution)
 
 #Channels
 @client.event
 async def on_guild_channel_delete(channel):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_channel_delete(channel)
+    await manage_event("on_guild_channel_delete", channel)
 
 @client.event
 async def on_guild_channel_create(channel):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_channel_create(channel)
+    await manage_event("on_guild_channel_create", channel)
 
 @client.event
 async def on_guild_channel_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_channel_update(before, after)
+    await manage_event("on_guild_channel_update", before, after)
 
 @client.event
 async def on_guild_channel_pins_update(channel, last_pin):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_channel_pins_update(channel, last_pin)
+    await manage_event("on_guild_channel_pins_update", channel, last_pin)
 
 @client.event
 async def on_private_channel_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_private_channel_update(before, after)
+    await manage_event("on_private_channel_update", before, after)
 
 @client.event
 async def on_private_channel_pins_update(channel, last_pin):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_private_channel_pins_update(channel, last_pin)
+    await manage_event("on_private_channel_pins_update", channel, last_pin)
 
 @client.event
 async def on_typing(channel, user, when):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_typing(channel, user, when)
+    await manage_event("on_typing", channel, user, when)
 
 @client.event
 async def on_raw_typing(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_typing(payload)
+    await manage_event("on_raw_typing", payload)
 
 #Connection
-
 @client.event
 async def on_connect(self):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_connect(self)
+    await manage_event("on_connect", self)
 
 @client.event
 async def on_disconnect(self):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_disconnect(self)
+    await manage_event("on_disconnect", self)
 
 @client.event
 async def on_shard_connect(shard_id):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_shard_connect(shard_id)
+    await manage_event("on_shard_connect", shard_id)
 
 @client.event
 async def on_shard_disconnect(shard_id):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_shard_disconnect(shard_id)
+    await manage_event("on_shard_disconnect", shard_id)
 
 #Commande
 @client.event
@@ -375,44 +350,36 @@ async def on_command_error(ctx, error):
 
         em = discord.Embed(title="Slow it down bro!", description=message)
         await ctx.send(embed=em)
-        
+
     print("error h", error)
-    
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_command_error(ctx, error)
+    await manage_event("on_command_error", ctx, error)
+
 
 #Debug
 @client.event
 async def on_error(event, *args, **kwargs):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_error(event, *args, **kwargs)
+    await manage_event("on_error", event, *args, **kwargs)
 
 @client.event
 async def on_socket_event_type(event_type):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_socket_event_type(event_type)
+    await manage_event("on_socket_event_type", event_type)
 
 @client.event
 async def on_socket_raw_receive(msg):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_socket_raw_receive(msg)
+    await manage_event("on_socket_raw_receive", msg)
 
 @client.event
 async def on_socket_raw_send(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_socket_raw_send(payload)
+    await manage_event("on_socket_raw_send", payload)
+
 
 #Gateway
-
 @client.event
 async def on_ready():
     client.info = await client.application_info()
+
     change_status.start()
+
     #maintenance.start()
     await import_apps(True)
     await import_apps()
@@ -426,17 +393,18 @@ async def on_ready():
     print("ID : ", client.user.id)
     #await import_apps(True)
     #await import_apps()
-    
+
     #await sync(client, "sync" in sys.argv)
     #print(client.guilds)
     await client.tree.sync()
 
     with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json") as f:
         data = json.load(f)
+
     for guild in client.guilds:
-        pass
         if "sync" in sys.argv:
             client.tree.copy_global_to(guild=discord.Object(id=guild.id))
+
         await client.tree.sync(guild=discord.Object(id=guild.id))
 
         if str(guild.id) not in data.keys():
@@ -447,40 +415,28 @@ async def on_ready():
     if "sync" in sys.argv:
         os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_ready()
+    await manage_event("on_ready")
 
 @client.event
 async def on_resumed():
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_resumed()
+    await manage_event("on_resumed")
 
 @client.event
 async def on_shard_ready(shard_id):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_shard_ready(shard_id)
+    await manage_event("on_shard_ready", shard_id)
 
 @client.event
 async def on_shard_resumed(shard_id):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_shard_resumed(shard_id)
+    await manage_event("on_shard_resumed", shard_id)
 
 #Guilds
 @client.event
 async def on_guild_available(guild):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_available(guild)
+    await manage_event("on_guild_available", guild)
 
 @client.event
 async def on_guild_unavailable(guild):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_unavailable(guild)
+    await manage_event("on_guild_unavailable", guild)
 
 @client.event
 async def on_guild_join(guild):
@@ -491,362 +447,248 @@ async def on_guild_join(guild):
         with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w") as f:
             json.dump(data, fp=f)
 
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_join(guild)
+    await manage_event("on_guild_join", guild)
 
 @client.event
 async def on_guild_remove(guild):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_remove(guild)
+    await manage_event("on_guild_remove", guild)
 
 @client.event
 async def on_guild_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_update(before, after)
+    await manage_event("on_guild_update", before, after)
 
 @client.event
 async def on_guild_emojis_update(guild, before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_emojis_update(guild, before, after)
+    await manage_event("on_guild_emojis_update", guild, before, after)
 
 @client.event
 async def on_guild_stickers_update(guild, before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_stickers_update(guild, before, after)
+    await manage_event("on_guild_stickers_update", guild, before, after)
 
 @client.event
 async def on_invite_create(invite):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_invite_create(invite)
+    await manage_event("on_invite_create", invite)
 
 @client.event
 async def on_invite_delete(invite):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_invite_delete(invite)
+    await manage_event("on_invite_delete", invite)
 
 #Integrations
 @client.event
 async def on_integration_create(integration):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_integration_create(integration)
+    await manage_event("on_integration_create", integration)
 
 @client.event
 async def on_integration_update(integration):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_integration_update(integration)
+    await manage_event("on_integration_update", integration)
 
 @client.event
 async def on_guild_integrations_update(guild):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_integrations_update(guild)
+    await manage_event("on_guild_integrations_update", guild)
 
 @client.event
 async def on_webhooks_update(channel):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_webhooks_update(channel)
+    await manage_event("on_webhooks_update", channel)
 
 @client.event
 async def on_raw_integration_delete(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_integration_delete(payload)
+    await manage_event("on_raw_integration_delete", payload)
 
 #Interactions
 @client.event
 async def on_interaction(interaction):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_interaction(interaction)
-    pass
+    await manage_event("on_interaction", interaction)
 
 #Members
 @client.event
 async def on_member_join(member):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_member_join(member)
+    await manage_event("on_member_join", member)
 
 @client.event
 async def on_member_remove(member):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_member_remove(member)
+    await manage_event("on_member_remove", member)
 
 @client.event
 async def on_raw_member_remove(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_member_remove(payload)
+    await manage_event("on_raw_member_remove", payload)
 
 @client.event
 async def on_member_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_member_update(before, after)
+    await manage_event("on_member_update", before, after)
 
 @client.event
 async def on_user_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_user_update(before, after)
+    await manage_event("on_user_update", before, after)
 
 @client.event
 async def on_member_ban(guild, user):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_member_ban(guild, user)
+    await manage_event("on_member_ban", guild, user)
 
 @client.event
 async def on_member_unban(guild, user):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_member_unban(guild, user)
+    await manage_event("on_member_unban", guild, user)
 
 @client.event
 async def on_presence_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_presence_update(before, after)
+    await manage_event("on_presence_update", before, after)
 
 #Messages
 @client.event
 async def on_message(message):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_message(message)
+    await manage_event("on_message", message)
 
 @client.event
 async def on_message_edit(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_message_edit(before, after)
+    await manage_event("on_message_edit", before, after)
 
 @client.event
 async def on_message_delete(message):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_message_delete(message)
+    await manage_event("on_message_delete", message)
+
 
 @client.event
 async def on_bulk_message_delete(messages):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_bulk_message_delete(messages)
+    await manage_event("on_bulk_message_delete", message)
+
 
 @client.event
 async def on_raw_message_edit(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_message_edit(payload)
+    await manage_event("on_raw_message_edit", payload)
+
 
 @client.event
 async def on_raw_message_delete(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_message_delete(payload)
+    await manage_event("on_raw_message_delete", payload)
 
 @client.event
 async def on_raw_bulk_message_delete(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_bulk_message_delete(payload)
+    await manage_event("on_raw_bulk_message_delete", payload)
 
 #Reactions
 @client.event
 async def on_reaction_add(reaction, user):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_reaction_add(reaction, user)
+    await manage_event("on_reaction_add", reaction, user)
 
 @client.event
 async def on_reaction_remove(reaction, user):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_reaction_remove(reaction, user)
+    await manage_event("on_reaction_remove", reaction, user)
 
 @client.event
 async def on_reaction_clear(message, reactions):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_reaction_clear(message, reactions)
+    await manage_event("on_reaction_clear", message, reaction)
 
 @client.event
 async def on_reaction_clear_emoji(reaction):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_reaction_clear_emoji(reaction)
+    await manage_event("on_reaction_clear_emoji", reaction)
 
 @client.event
 async def on_raw_reaction_add(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_reaction_add(payload)
+    await manage_event("on_raw_reaction_add", payload)
 
 @client.event
 async def on_raw_reaction_remove(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_reaction_remove(payload)
+    await manage_event("on_raw_reaction_remove", payload)
 
 @client.event
 async def on_raw_reaction_clear(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_reaction_clear(payload)
+    await manage_event("on_raw_reaction_clear", payload)
 
 @client.event
 async def on_raw_reaction_clear_emoji(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_reaction_clear_emoji(payload)
+    await manage_event("on_raw_reaction_clear_emoji", payload)
 
 #Roles
 @client.event
 async def on_guild_role_create(role):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_role_create(role)
+    await manage_event("on_guild_role_create", role)
 
 @client.event
 async def on_guild_role_delete(role):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_role_delete(role)
+    await manage_event("on_guild_role_delete", role)
 
 @client.event
 async def on_guild_role_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_guild_role_update(before, after)
+    await manage_event("on_guild_role_update", before, after)
 
 #Scheduled Events
 @client.event
 async def on_scheduled_event_create(event):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_scheduled_event_create(event)
+    await manage_event("on_scheduled_event_create", event)
 
 @client.event
 async def on_scheduled_event_delete(event):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_scheduled_event_delete(event)
+    await manage_event("on_scheduled_event_delete", event)
 
 @client.event
 async def on_scheduled_event_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_scheduled_event_update(before, after)
+    await manage_event("on_scheduled_event_update", before, after)
 
 @client.event
 async def on_scheduled_event_user_add(event, user):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_scheduled_event_user_add(event, user)
+    await manage_event("on_scheduled_event_user_add", event, user)
 
 @client.event
 async def on_scheduled_event_user_remove(event, user):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_scheduled_event_user_remove(event, user)
+    await manage_event("on_scheduled_event_user_remove", event, user)
 
 #Stages
 @client.event
 async def on_stage_instance_create(stage_instance):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_stage_instance_create(stage_instance)
+    await manage_event("on_stage_instance_create", stage_instance)
 
 @client.event
 async def on_stage_instance_delete(stage_instance):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_stage_instance_delete(stage_instance)
+    await manage_event("on_stage_instance_delete", stage_instance)
 
 @client.event
 async def on_stage_instance_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_stage_instance_update(before, after)
+    await manage_event("on_stage_instance_update", before, after)
 
 #Threads
 @client.event
 async def on_thread_create(thread):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_thread_create(thread)
+    await manage_event("on_thread_create", thread)
 
 @client.event
 async def on_thread_join(thread):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_thread_join(thread)
+    await manage_event("on_thread_join", thread)
 
 @client.event
 async def on_thread_update(before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_thread_update(before, after)
+    await manage_event("on_thread_update", before, after)
 
 @client.event
 async def on_thread_remove(thread):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_thread_remove(thread)
+    await manage_event("on_thread_remove", thread)
 
 @client.event
 async def on_thread_delete(thread):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_thread_delete(thread)
+    await manage_event("on_thread_delete", thread)
 
 @client.event
 async def on_raw_thread_update(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_thread_update(payload)
+    await manage_event("on_raw_thread_update", payload)
 
 @client.event
 async def on_raw_thread_delete(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_thread_delete(payload)
+    await manage_event("on_raw_thread_delete", payload)
 
 @client.event
 async def on_thread_member_join(member):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_thread_member_join(member)
+    await manage_event("on_thread_member_join", member)
 
 @client.event
 async def on_thread_member_remove(member):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_thread_member_remove(member)
+    await manage_event("on_thread_member_remove", member)
 
 @client.event
 async def on_raw_thread_member_remove(payload):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_raw_thread_member_remove(payload)
+    await manage_event("on_raw_thread_member_remove", payload)
 
 #Voice
 @client.event
 async def on_voice_state_update(member, before, after):
-    for app in list(get_apps().values())+list(get_apps(True).values()):
-        if app!=None:
-            await app.Lib.event.on_voice_state_update(member, before, after)
+    await manage_event("on_voice_state_update", member, before, after)
 
 
 # ----------------------------COMMANDE MAINTENANCE----------------------------------
@@ -875,7 +717,7 @@ async def stop(ctx:discord_commands.context.Context):
 async def update(ctx:discord_commands.context.Context):
     await ctx.send("updating code !")
     await client.change_presence(activity=discord.Game("Updating..."), status=discord.Status.idle)
-    
+
     val = os.system(f"start {UPDATE_FILE}")
 
     await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
@@ -911,7 +753,5 @@ async def maintenance():
 
     resetSystem = True
 """
-# await import_apps(True)
-# await import_apps()
 
 client.run(BOT_TOKEN)
