@@ -11,6 +11,8 @@ import system.sys_app as sys_apps
 import save.system.installed_app as installed_app
 from system.lib import *
 import asyncio
+from easy_events import AsyncEvents, Parameters
+import threading
 
 Lib = Lib_UsOS()
 
@@ -49,6 +51,7 @@ intents = discord.Intents.all()
 client = discord_commands.Bot(intents=intents, command_prefix=PREFIX, help_command=None)
 client.remove_command('help')
 
+cmd = AsyncEvents()
 
 status = cycle(["TEST EN COURS"])
 
@@ -97,6 +100,7 @@ async def import_apps(sys :bool=False) -> None:
         for command in app.Lib.app.commands:
             try:
                 new_com=discord_commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
+                cmd.event(command.command)
                 if not new_com in client.all_commands.keys():
                     client.add_command(new_com)
                     loaded+=1
@@ -190,12 +194,14 @@ async def info(ctx:discord.Interaction):
 # -------------------------------- COMMANDE -------------------------------
 
 @client.command(name="os-test", help="Envoie une pizza gatuite")
+#@cmd.event()
 async def test(ctx:discord_commands.context.Context):
     await ctx.send(":pizza:")
 
 
 @client.command(name="os-ping", aliases=["os-ver", "ver", "ping"], help="Donne des infos sur le bot")
 @discord_commands.check(Lib.is_in_staff)
+@cmd.event()
 async def version(ctx:discord_commands.context.Context):
     embed = discord.Embed(title="INFO")
     embed.add_field(name=f"Version :", value=f"` {BOT_VERSION}   `")
@@ -205,6 +211,7 @@ async def version(ctx:discord_commands.context.Context):
 
 
 @client.command(name="os-help", aliases=["help"], help="Pour avoir ce message")
+@cmd.event()
 async def help(ctx:discord_commands.context.Context,*args):
     if args==():
         await ctx.send(embeds=get_help(ctx))
@@ -388,6 +395,7 @@ async def on_ready():
     print("version : ", programmer, BOT_VERSION)
     print("Logged in as : ", client.user.name)
     print("ID : ", client.user.id)
+    run_cmd.start()
     #await import_apps(True)
     #await import_apps()
 
@@ -532,6 +540,7 @@ async def on_presence_update(before, after):
 #Messages
 @client.event
 async def on_message(message):
+    await client.process_commands(message)
     await manage_event("on_message", message)
 
 @client.event
@@ -726,6 +735,35 @@ async def update(ctx:discord_commands.context.Context):
         await ctx.send("Error!")
         exit(0)
 
+# --------------------------------------- CMD ------------------------------------
+
+@discord_tasks.loop(seconds=.5)
+async def run_cmd():
+    await cmd.run_task()
+
+
+async def send(*args, **kwargs):
+    print(args, kwargs)
+
+
+def _inputs():
+    time.sleep(4)
+
+    while True:
+        command = input("> ")
+
+        if not command:
+            continue
+
+        command = Parameters(command)
+        command.send = send
+        print(command)        
+        # add command to the waiting list
+        cmd.trigger(command)
+        time.sleep(.5)
+
+
+threading.Thread(target=_inputs).start()
 
 # -------------------------------------- TASKS -----------------------------------
 
