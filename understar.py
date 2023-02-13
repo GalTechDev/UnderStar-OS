@@ -50,7 +50,7 @@ intents = discord.Intents.all()
 client = discord_commands.Bot(intents=intents, command_prefix=PREFIX, help_command=None)
 client.remove_command('help')
 
-status = cycle(["TEST EN COURS"])
+status = cycle(["UnderStar OS"])
 
 
 def get_apps(sys: bool = False) -> dict:
