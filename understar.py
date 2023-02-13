@@ -73,6 +73,7 @@ async def import_apps(sys :bool=False) -> None:
             for task in app.Lib.app.all_tasks: #
                 try:
                     ttasks.append(discord_tasks.Loop[discord_tasks.LF](coro=task.function, seconds=task.seconds, minutes=task.minutes, hours=task.hours, count=task.count, time=task.time, reconnect=task.reconnect))
+                    terminal(callback=task.function, aliases=[f"{app_name}-{task.function.__name__}"])
                 except Exception as error:
                     errors+=1
                     error_lst.append(error)
@@ -176,6 +177,18 @@ def convert_time(value: int):
 
 timer = time.time()
 
+async def send_error(ctx, error, *args, **kwargs):
+    embed = discord.Embed(title=f"Error on command", description=f"DateTime : `{time.localtime(time.time())}`", color=discord.Color.red())
+    if ctx!=None:
+        embed.set_author(name=f"{ctx.user.name} use {ctx.command}", icon_url=ctx.user.avatar.url)
+        embed.add_field(name="ctx info :", value=ctx.data.items())
+    embed.add_field(name="error :", value=error)
+    embed.add_field(name="error :", value=error)
+    if client.owner_id==None:
+        return
+    user = await client.fetch_user(client.owner_id)
+    user.send(embed=embed)
+
 # -------------------------------- Slash Command -------------------
 
 @client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None)
@@ -242,7 +255,7 @@ async def help(ctx:discord_commands.context.Context,*args):
 
 # ---------------------------------- EVENTS ------------------------------------
 
-@terminal()
+#@terminal()
 async def manage_event(command, *args, **kwargs):
     for app in list(get_apps().values()) + list(get_apps(True).values()):
         if app:
@@ -266,6 +279,9 @@ async def on_app_command_error(ctx: discord.Interaction, error: discord.app_comm
         await ctx.response.send_message('Tu ne remplis pas les conditions pour executer cette commande.', ephemeral=True)
     elif isinstance(error, discord.app_commands.BotMissingPermissions):
         await ctx.response.send_message('Le bot ne peut pas executer cette commande car il lui manque des autorisations. Merci de contacter le STAFF', ephemeral=True)
+    else:
+        await send_error(ctx, error)
+        
 
 #AutoMod
 @client.event
@@ -356,6 +372,7 @@ async def on_command_error(ctx, error):
 @client.event
 async def on_error(event, *args, **kwargs):
     await manage_event("on_error", event, *args, **kwargs)
+    await send_error(None, event, args, kwargs)
 
 @client.event
 async def on_socket_event_type(event_type):
@@ -546,7 +563,7 @@ async def on_message_delete(message):
 
 @client.event
 async def on_bulk_message_delete(messages):
-    await manage_event("on_bulk_message_delete", message)
+    await manage_event("on_bulk_message_delete", messages)
 
 
 @client.event
@@ -573,7 +590,7 @@ async def on_reaction_remove(reaction, user):
 
 @client.event
 async def on_reaction_clear(message, reactions):
-    await manage_event("on_reaction_clear", message, reaction)
+    await manage_event("on_reaction_clear", message, reactions)
 
 @client.event
 async def on_reaction_clear_emoji(reaction):
