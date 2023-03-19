@@ -261,6 +261,10 @@ async def manage_event(command, *args, **kwargs):
         if app:
             data = getattr(app.Lib.event, command)
             await data(*args, **kwargs)
+            if app.Lib.app.fusioned:
+                for sub_app in app.Lib.app.fusioned_module:
+                    data = getattr(sub_app.Lib.event, command)
+                    await data(*args, **kwargs)
 
 #App Commands
 @client.event
