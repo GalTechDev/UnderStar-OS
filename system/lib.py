@@ -129,10 +129,10 @@ class App:
             return funct
         return apply
 
-    def slash(self, description: str, name: str = None, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False):
+    def slash(self, name: Union[str, discord.app_commands.locale_str] = None, description: Union[str, discord.app_commands.locale_str] = "No description", nsfw: bool = False, parent: Optional[discord.app_commands.Group] = None, guild_ids: Optional[List[int]] = None, auto_locale_strings: bool = True, extras: Dict[Any, Any] = ..., direct_command: bool = False):
         """"""
         def apply(funct):
-            self.slashs.append(Slash(name if name else funct.__name__ , description, funct, guild, guilds, force_name))
+            self.slashs.append(Slash(name = name.lower().replace(" ", "-") if name else funct.__name__ , description=description, callback = funct, nsfw=nsfw, parent=parent, guild_ids=guild_ids, auto_locale_strings=auto_locale_strings, extras=extras, direct_command=direct_command))
             return funct
         return apply
 
@@ -172,15 +172,11 @@ class App:
             self.slashs+=app.Lib.app.slashs
             self.help_com = app.Lib.app.help_com
 
-class Slash:
+class Slash(discord.app_commands.Command):
     """"""
-    def __init__(self, name: str, description: str, command, guild = discord.app_commands.tree.MISSING, guilds: list = discord.app_commands.tree.MISSING, force_name: bool = False) -> None:
-        self.name=name.replace(" ", "-")
-        self.command=command
-        self.description=description
-        self.guild=guild
-        self.guilds=guilds
-        self.force_name = force_name
+    def __init__(self, *, name: Union[str, discord.app_commands.locale_str], description: Union[str, discord.app_commands.locale_str], callback, nsfw: bool = False, parent: Optional[discord.app_commands.Group] = None, guild_ids: Optional[List[int]] = None, auto_locale_strings: bool = True, extras: Dict[Any, Any] = ..., direct_command = False):
+        super().__init__(name=name, description=description, callback=callback, nsfw=nsfw, parent=parent, guild_ids=guild_ids, auto_locale_strings=auto_locale_strings, extras=extras)
+        self.direct_command = direct_command
 
 class Command:
     """"""

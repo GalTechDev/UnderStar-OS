@@ -337,7 +337,7 @@ async def permission_denied(ctx: discord.Interaction, back, *args):
     await ctx.edit_original_response(embed=embed, view=Back_view(ctx, back, args))
 
 
-@Lib.app.slash(name="config", description="config bot", force_name=True)
+@Lib.app.slash(name="config", description="config bot", direct_command=True)
 @discord.app_commands.check(Lib.is_in_staff)
 async def config(ctx: discord.Interaction):
     embed = discord.Embed(title="Chargement...", description="", color=THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())

@@ -65,6 +65,8 @@ async def import_apps(sys :bool=False) -> None:
         app.Lib.init(client, installed_app, discord_tasks)
         app.Lib.set_app_name(app_name)
 
+        # Task
+
         loaded = 0
         errors = 0
         error_lst=[]
@@ -90,6 +92,7 @@ async def import_apps(sys :bool=False) -> None:
 
         print(f"Task : {loaded} loaded | {errors} error : {error_lst}")
 
+        # Command
 
         loaded = 0
         errors = 0
@@ -106,32 +109,30 @@ async def import_apps(sys :bool=False) -> None:
                 error_lst.append(error)
         print(f"Command : {loaded} loaded | {errors} error : {error_lst}")
 
+        # Slash
+
         loaded = 0
         errors = 0
         error_lst=[]
 
+        app_groupe = discord.app_commands.Group(name=app_name, description=f"{len(app.Lib.app.slashs)} commands")
+
         for command in app.Lib.app.slashs:
             try:
-                #new_com=commands.Command(command.command,name=f"{app_name}-{command.name}",help=command.help,aliases=command.aliases,checks=command.checks)
-                new_com=discord.app_commands.Command(name=f"{app_name.lower()}-{command.name.lower()}" if not command.force_name else command.name, description=command.description,callback=command.command)
-                new_com.guild_only = False
-                #new_com.default_permissions=discord.Permissions(8)
-                if not new_com.name in [com.name for com in client.tree._get_all_commands()]:
-                    if command.guilds == None:
-                        guilds = discord.app_commands.tree.MISSING
-                    elif command.guilds == []:
-                        guilds = [discord.Object(id=608779766958653440)]
-                    else:
-                        guilds = command.guilds
-                        if sys:
-                            guilds = client.guilds
-                        else:
-                            guilds = [discord.Object(id=608779766958653440)]+app.Lib.guilds.get_app_guilds(app_name=app.Lib.app_name)
-                    client.tree.add_command(new_com, guild=command.guild, guilds = guilds) #command.guilds
-                    loaded+=1
+                if command.direct_command:
+                    if not command.name in [com.name for com in client.tree.get_commands()]:
+                        client.tree.add_command(command)
+                        loaded+=1
+                else:
+                    if not command.name in [com.name for com in app_groupe.commands]:
+                        app_groupe.add_command(command)
+                        loaded+=1
             except Exception as error:
                 errors+=1
                 error_lst.append(error)
+
+        if len(app_groupe.commands)>0:
+            client.tree.add_command(app_groupe)
 
         print(f"Slash : {loaded} loaded | {errors} error : {error_lst}")
 
@@ -711,6 +712,10 @@ async def on_voice_state_update(member, before, after):
 
 
 # ----------------------------COMMANDE MAINTENANCE----------------------------------
+@client.command(name="triger_event", help="Simule un event")
+@discord_commands.check(Lib.is_in_staff)
+async def stop(ctx:discord_commands.context.Context, event_name):
+    await manage_event(event_name)
 
 
 @client.command(name="restart", help="Pour restart le bot")
