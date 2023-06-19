@@ -3,7 +3,7 @@ from discord.ext import commands as discord_commands
 from discord.ext import tasks as discord_tasks
 from itertools import cycle
 from pathlib import Path
-import os.path
+import os
 import discord
 import time
 import sys
@@ -11,15 +11,16 @@ import system.sys_app as sys_apps
 import save.system.installed_app as installed_app
 from system.lib import *
 import asyncio
-from easy_terminal import terminal
+import json
+#from easy_terminal import terminal
 
-Lib = Lib_UsOS()
+Lib = App()
 
 SYS_FOLDER = "system"
 TOKEN_FOLDER = "token"
 SAVE_FOLDER = "save"
 APP_FOLDER = "app"
-BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/classbot_token"
+BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/bot_token"
 UPDATE_FILE = f"{SYS_FOLDER}/app/update/update.pyw"
 PREFIX = "?"
 CODING = "utf-8"
@@ -60,10 +61,12 @@ def get_apps(sys: bool = False) -> dict:
 async def import_apps(sys :bool=False) -> None:
     """"""
     for app_name,app in get_apps(sys).items():
-        print(f"\nIMPORT {app_name}: ")
+        print(f"\n * IMPORT {app_name}: ")
 
         app.Lib.init(client, installed_app, discord_tasks)
         app.Lib.set_app_name(app_name)
+        if not os.path.exists(os.path.join(app.Lib.save.save_path, app_name)):
+            os.mkdir(os.path.join(app.Lib.save.save_path, app_name))
 
         # Task
 
@@ -75,7 +78,7 @@ async def import_apps(sys :bool=False) -> None:
             for task in app.Lib.app.all_tasks: #
                 try:
                     ttasks.append(discord_tasks.Loop[discord_tasks.LF](coro=task.function, seconds=task.seconds, minutes=task.minutes, hours=task.hours, count=task.count, time=task.time, reconnect=task.reconnect))
-                    terminal(callback=task.function, aliases=[f"{app_name}-{task.function.__name__}"])
+                    #terminal(callback=task.function, aliases=[f"{app_name}-{task.function.__name__}"])
                 except Exception as error:
                     errors+=1
                     error_lst.append(error)
@@ -90,7 +93,7 @@ async def import_apps(sys :bool=False) -> None:
         except Exception as error:
             print(error)
 
-        print(f"Task : {loaded} loaded | {errors} error : {error_lst}")
+        print(f" * - Task : {loaded} loaded | {errors} error : {error_lst}")
 
         # Command
 
@@ -107,7 +110,7 @@ async def import_apps(sys :bool=False) -> None:
             except Exception as error:
                 errors+=1
                 error_lst.append(error)
-        print(f"Command : {loaded} loaded | {errors} error : {error_lst}")
+        print(f" * - Command : {loaded} loaded | {errors} error : {error_lst}")
 
         # Slash
 
@@ -134,7 +137,7 @@ async def import_apps(sys :bool=False) -> None:
         if len(app_groupe.commands)>0:
             client.tree.add_command(app_groupe)
 
-        print(f"Slash : {loaded} loaded | {errors} error : {error_lst}")
+        print(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}")
 
 
 def get_help(ctx: discord_commands.context.Context) -> list:
@@ -406,10 +409,10 @@ async def on_ready():
     with open(f'{SYS_FOLDER}/icon.png', 'rb') as image:
         pass
         #await client.user.edit(avatar=image.read())
-
-    print("version : ", programmer, BOT_VERSION)
-    print("Logged in as : ", client.user.name)
-    print("ID : ", client.user.id)
+    print("\n * Bot Starting...")
+    print(" * version : ", programmer, BOT_VERSION)
+    print(" * Logged in as : ", client.user.name)
+    print(" * ID : ", client.user.id)
     #await import_apps(True)
     #await import_apps()
 

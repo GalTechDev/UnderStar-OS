@@ -2,13 +2,13 @@ from system.lib import *
 import requests
 import mimetypes
 import uuid
-from os import mkdir, listdir,remove, rename, execv, path, removedirs
-from sys import executable, argv
+from os import mkdir, listdir,remove, rename
 from shutil import rmtree, move
 import zipfile as zip
-import save.system.installed_app as apps
+import discord
+import json
 
-Lib = Lib_UsOS()
+Lib = App()
 
 #@Lib.app.slash(name="download", description="download", guilds=None)
 #@discord.app_commands.check(Lib.is_in_staff)
@@ -41,17 +41,7 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
                 old_name = listdir(path_folder)[0]
                 move(f"{path_folder}/{old_name}", "app")
                 rename(f"app/{old_name}", f'app/{app_name.replace("-", "_")}')
-                app_name=app_name.replace("-", "_")
-                if not app_name in listdir("save/app"):
-                    mkdir(f"save/app/{app_name}")
-                with open("save/system/installed_app.py") as file:
-                    content = file.readlines()
-                content.insert(0, f"import app.{app_name}.main as {app_name}\n")
-                content[-1]=content[-1][:-1]+f'"{app_name}":{app_name}'+",}"
-
-                with open("save/system/installed_app.py", "w") as file:
-                    file.writelines(content)
-
+                
                 rmtree(path_folder)
                 Lib.store.installed_app.all_app.update({app_name:None})
                 await ctx.response.send_message("Installé", ephemeral=True)

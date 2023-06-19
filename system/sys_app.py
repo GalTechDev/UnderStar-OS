@@ -1,5 +1,3 @@
-import system.app.maintenance.main as maintenance
-import system.app.apt.main as apt
-import system.app.config.config as config
+from system.lib import import_module
 
-all_app={"maintenance":maintenance, "config":config, "apt":apt}
+all_app=import_module("system.app", True)

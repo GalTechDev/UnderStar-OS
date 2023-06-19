@@ -1,11 +1,11 @@
 from system.lib import *
 from os import execv, path
 from sys import executable, argv
-from typing import Optional, Union, Any
+import discord 
 from system.app.apt import install, uninstall
 
 
-Lib = Lib_UsOS()
+Lib = App()
 
 """class lang_select(discord.ui.Select):
     def __init__(self) -> None:
