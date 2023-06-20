@@ -162,6 +162,9 @@ def get_help(ctx: discord_commands.context.Context) -> list:
                 embed = discord.Embed(title="OS Commands", color=discord.Color.red())
                 embed.set_author(name=f'Liste des commandes {page}/{nb_page}')
                 page+=1
+        if nb > 0:
+            embeds.append(embed)
+        
     except Exception as error:
         print(error)
 
