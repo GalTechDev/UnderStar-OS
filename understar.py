@@ -16,9 +16,11 @@ import json
 
 Lib = App()
 
+DOWNLOAD_FOLDER = "download"
 SYS_FOLDER = "system"
 TOKEN_FOLDER = "token"
 SAVE_FOLDER = "save"
+SAVE_APP_FOLDER = "save/app"
 APP_FOLDER = "app"
 BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/bot_token"
 UPDATE_FILE = f"{SYS_FOLDER}/app/update/update.pyw"
@@ -28,7 +30,7 @@ CODING = "utf-8"
 programmer = os.path.basename(sys.argv[0])
 
 
-vals = [SYS_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, APP_FOLDER]
+vals = [DOWNLOAD_FOLDER, SYS_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, SAVE_APP_FOLDER, APP_FOLDER]
 
 for name in vals:
     Path(name).mkdir(exist_ok=True)
