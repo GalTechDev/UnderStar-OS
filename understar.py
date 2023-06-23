@@ -22,7 +22,7 @@ TOKEN_FOLDER = "token"
 SAVE_FOLDER = "save"
 SAVE_APP_FOLDER = "save/app"
 APP_FOLDER = "app"
-BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/bot_token"
+BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/unc_token"
 UPDATE_FILE = f"{SYS_FOLDER}/app/update/update.pyw"
 PREFIX = "?"
 CODING = "utf-8"
@@ -239,7 +239,7 @@ async def help(ctx:discord_commands.context.Context,*args):
             try:
                 await get_apps(sys_com)[args[0]].Lib.help(ctx)
             except Exception as error:
-                if type(error) == AttributeError:
+                if types(error) == AttributeError:
                     await ctx.send(content=f"L'application `{args[0]}` n'a pas de fonction d'aide")
                 else:
                     await ctx.send(content=f"La fonction d'aide de l'application `{args[0]}` ne fonctionne pas. Merci de contacter son développeur.")
@@ -722,8 +722,12 @@ async def on_voice_state_update(member, before, after):
 # ----------------------------COMMANDE MAINTENANCE----------------------------------
 @client.command(name="triger_event", help="Simule un event")
 @discord_commands.check(Lib.is_in_staff)
-async def stop(ctx:discord_commands.context.Context, event_name):
-    await manage_event(event_name)
+async def triger_event(ctx:discord_commands.context.Context, event_name, *args):
+    if event_name == "on_member_join":
+        member = ctx.author
+        await manage_event(event_name, member)
+    else:
+        await manage_event(event_name)
 
 
 @client.command(name="restart", help="Pour restart le bot")

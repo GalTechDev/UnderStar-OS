@@ -1,4 +1,4 @@
-from .type import *
+from .types import *
 from discord.app_commands import Command, locale_str, Group
 
 class Slash(Command):

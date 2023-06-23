@@ -1,5 +1,5 @@
 import discord
-from .type import *
+from .types import *
 import json
 import importlib
 import glob

@@ -1,4 +1,4 @@
-from .type import *
+from .types import *
 from .store import App_store
 from .save import Save
 from .utils import Guilds, Task, LANGAGE, BOT_VERSION
