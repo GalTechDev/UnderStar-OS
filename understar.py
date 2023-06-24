@@ -22,7 +22,7 @@ TOKEN_FOLDER = "token"
 SAVE_FOLDER = "save"
 SAVE_APP_FOLDER = "save/app"
 APP_FOLDER = "app"
-BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/unc_token"
+BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/bot_token"
 UPDATE_FILE = f"{SYS_FOLDER}/app/update/update.pyw"
 PREFIX = "?"
 CODING = "utf-8"
@@ -723,7 +723,7 @@ async def on_voice_state_update(member, before, after):
 @client.command(name="triger_event", help="Simule un event")
 @discord_commands.check(Lib.is_in_staff)
 async def triger_event(ctx:discord_commands.context.Context, event_name, *args):
-    if event_name == "on_member_join":
+    if event_name == "on_member_join" or event_name == "on_member_remove":
         member = ctx.author
         await manage_event(event_name, member)
     else:
