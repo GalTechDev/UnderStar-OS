@@ -25,7 +25,7 @@ if zip.is_zipfile(file_path):
 if len(listdir(path_folder))==2:
     remove(file_path)
     old_name = listdir(path_folder)[0]
-    system('rmdir /S /Q "{}"'.format(f"{path_folder}/{old_name}/save"))
+    rmtree(f"{path_folder}/{old_name}/save")
 else:
     exit()
 
@@ -38,7 +38,7 @@ move("save", f"{path_folder}/{old_name}")
 for p in listdir():
     if p not in ["download",".git"]:
         if path.isdir(p):
-            system('rmdir /S /Q "{}"'.format(f"{p}"))
+            rmtree(p)
         else:
             remove(p)
 
