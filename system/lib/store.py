@@ -28,6 +28,16 @@ class App_store:
         with open("save/system/guilds.json") as file:
             data = json.load(file)
         return app_name in data[str(guild_id)]["apps"]
+    
+    def get_guilds_installed(self, app_name: str) -> list:
+        with open("save/system/guilds.json") as file:
+            data = json.load(file)
+            
+        guilds = []
+        for guild_id in data.keys():
+            if app_name in data[str(guild_id)]["apps"]:
+                guilds.append(int(guild_id))
+        return guilds
 
     def add_link(self, app_name: str, app_link: str) -> None:
         file_path="save/system/app_store.json"

@@ -16,6 +16,7 @@ import json
 
 Lib = App()
 
+TRASH_GUILD = 649021344058441739
 DOWNLOAD_FOLDER = "download"
 SYS_FOLDER = "system"
 TOKEN_FOLDER = "token"
@@ -120,13 +121,13 @@ async def import_apps(sys :bool=False) -> None:
         errors = 0
         error_lst=[]
 
-        app_groupe = discord.app_commands.Group(name=app_name, description=f"{len(app.Lib.app.slashs)} commands")
+        app_groupe = discord.app_commands.Group(name=app_name, description=f"{len(app.Lib.app.slashs)} commands", guild_ids=Lib.store.get_guilds_installed(app_name).append(TRASH_GUILD) if not sys else None)
 
         for command in app.Lib.app.slashs:
             try:
                 if command.direct_command:
                     if not command.name in [com.name for com in client.tree.get_commands()]:
-                        client.tree.add_command(command)
+                        client.tree.add_command(command, guilds=([client.get_guild(guild_id) for guild_id in Lib.store.get_guilds_installed(app_name) if client.get_guild(guild_id)!=None]+[client.get_guild(TRASH_GUILD)]) if not sys else MISSING)
                         loaded+=1
                 else:
                     if not command.name in [com.name for com in app_groupe.commands]:
@@ -137,8 +138,7 @@ async def import_apps(sys :bool=False) -> None:
                 error_lst.append(error)
 
         if len(app_groupe.commands)>0:
-            client.tree.add_command(app_groupe)
-
+            client.tree.add_command(app_groupe, guilds=([client.get_guild(guild_id) for guild_id in Lib.store.get_guilds_installed(app_name) if client.get_guild(guild_id)!=None]+[client.get_guild(TRASH_GUILD)]) if not sys else MISSING)
         print(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}")
 
 
