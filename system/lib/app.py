@@ -43,8 +43,11 @@ class Lib_UsOS:
             for app in self.app.fusioned_module:
                 app.Lib.init(bot_client, installed_app, tasks)
 
+    def is_in_guild(self, ctx:discord_commands.Context):
+        guild_id = ctx.guild.id
+        
 
-    def is_in_staff(self, ctx:Interaction, direct_author=False):
+    def is_in_staff(self, ctx:Interaction | discord_commands.Context, direct_author=False):
         """"""
         if type(ctx) == Interaction:
             user = ctx.user

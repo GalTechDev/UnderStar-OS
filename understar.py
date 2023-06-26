@@ -103,16 +103,22 @@ async def import_apps(sys :bool=False) -> None:
         loaded = 0
         errors = 0
         error_lst=[]
+        
+        com_groupe = discord_commands.Group()        
 
         for command in app.Lib.app.commands:
             try:
-                new_com=discord_commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
+                new_com=discord_commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks.append())
                 if not new_com in client.all_commands.keys():
-                    client.add_command(new_com)
+                    com_groupe.add_command(new_com)
+                    #client.add_command(new_com)
                     loaded+=1
             except Exception as error:
                 errors+=1
                 error_lst.append(error)
+                
+        if len(app_groupe.commands)>0:
+            client.add_command(com_groupe)
         print(f" * - Command : {loaded} loaded | {errors} error : {error_lst}")
 
         # Slash
@@ -205,7 +211,7 @@ async def info(ctx:discord.Interaction):
     embed = discord.Embed(title="INFO")
     embed.add_field(name=f"Version  :", value=f"`{BOT_VERSION}`")
     embed.add_field(name=f"Ping  :", value=f"` {round(client.latency * 1000)} `")
-    embed.add_field(name=f"Time up  :", value=f"`{convert_time(int(time.time()-timer))}`")
+    embed.add_field(name=f"Time up  :", value=f"<t:{int(timer)}:R>")
     await ctx.response.send_message(embed=embed, ephemeral=True)
 
 
