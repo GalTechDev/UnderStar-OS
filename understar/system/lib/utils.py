@@ -46,6 +46,17 @@ def import_module(folder: str, log=False, catch_error=True):
         print(f" * Import Module Finish")
     return modules
 
+def convert_time(value: int):
+        """"""
+        val3, val2, val = 0, value//60, value % 60
+        message = f"{val2}min {val}s."
+
+        if val2 > 60:
+            val3, val2 = val2//60, val2 % 60
+            message = f"{val3}h {val2}min {val}s."
+
+        return message
+
 class Task:
     """"""
     def __init__(self,function,seconds: float = MISSING, minutes: float = MISSING, hours: float = MISSING, time: Union[datetime.time, Sequence[datetime.time]] = MISSING, count = None, reconnect: bool = True) -> None:

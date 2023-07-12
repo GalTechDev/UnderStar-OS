@@ -1,6 +1,5 @@
 from system.lib import *
 from shutil import rmtree
-import save.system.installed_app as apps
 import discord
 import json
 Lib = App()

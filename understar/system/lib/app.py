@@ -1,7 +1,7 @@
 from .types import *
 from .store import App_store
 from .save import Save
-from .utils import Guilds, Task, LANGAGE, BOT_VERSION
+from .utils import Guilds, Task, LANGAGE, import_module
 from .event import Event
 from .com import *
 
@@ -21,7 +21,7 @@ class Lib_UsOS:
         self.store = App_store(None)
         self.save = Save(self.app_name)
         self.guilds = Guilds()
-        # self.trad = Trad()
+        self.store.installed_app = self.get_apps()
         self.event = Event()
 
 
@@ -34,14 +34,13 @@ class Lib_UsOS:
             for mod in self.app.fusioned_module:
                 mod.Lib.set_app_name(app_name)
 
-    def init(self, bot_client: discord_commands.Bot, installed_app, tasks):
+    def init(self, bot_client: discord_commands.Bot, tasks):
         """"""
         self.client = bot_client
-        self.store.installed_app = installed_app
         self.tasks = tasks
         if self.app.fusioned:
             for app in self.app.fusioned_module:
-                app.Lib.init(bot_client, installed_app, tasks)
+                app.Lib.init(bot_client, tasks)
 
     def is_in_guild(self, ctx:discord_commands.Context):
         guild_id = ctx.guild.id
@@ -99,6 +98,14 @@ class Lib_UsOS:
     async def change_presence(self, activity, status):
         """"""
         await self.client.change_presence(activity=activity, status=status)
+        
+    def get_apps(self, sys: bool = False) -> dict:
+        """"""
+        if sys:
+            all_app=import_module("system.app")
+        else: 
+            all_app=import_module("app")
+        return all_app
 
 class App:
     """"""

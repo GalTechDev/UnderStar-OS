@@ -2,7 +2,7 @@ from system.lib import *
 from os import execv, path
 from sys import executable, argv
 import discord 
-from system.app.apt import install, uninstall
+from .apt import install, uninstall
 
 
 Lib = App()
