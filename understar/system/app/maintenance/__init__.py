@@ -1,6 +1,6 @@
-from system.lib import *
+from understar import lib
 import discord
-Lib = App()
+Lib = lib.App()
 
 @Lib.app.slash(name="clear", description="supprime des messages", direct_command=True)
 async def clear(ctx:discord.Interaction, nombre:int = 1):

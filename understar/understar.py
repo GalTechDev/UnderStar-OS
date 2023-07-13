@@ -7,13 +7,10 @@ import os
 import discord
 import time
 import sys
-#from .system import sys_app
-#import save.system.installed_app as installed_app
 from .system.lib import *
 import asyncio
 import json
 
-#TRASH_GUILD = 649021344058441739
 DOWNLOAD_FOLDER = "download"
 SYS_FOLDER = "system"
 TOKEN_FOLDER = "token"
@@ -21,7 +18,6 @@ SAVE_FOLDER = "save"
 SAVE_APP_FOLDER = "save/app"
 APP_FOLDER = "app"
 BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/bot_token"
-#UPDATE_FILE = f"{SYS_FOLDER}/app/update/update.pyw"
 PREFIX = "?"
 CODING = "utf-8"
 

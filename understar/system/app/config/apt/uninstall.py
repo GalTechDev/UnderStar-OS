@@ -1,8 +1,8 @@
-from system.lib import *
+from understar import lib
 from shutil import rmtree
 import discord
 import json
-Lib = App()
+Lib = lib.App()
 
 #@Lib.app.slash(name="uninstall", description="uninstall from this server", guilds=None)
 #@discord.app_commands.check(Lib.is_in_staff)

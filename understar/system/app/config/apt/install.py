@@ -1,4 +1,4 @@
-from system.lib import *
+from understar import lib
 import requests
 import mimetypes
 import uuid
@@ -8,7 +8,7 @@ import zipfile as zip
 import discord
 import json
 
-Lib = App()
+Lib = lib.App()
 
 #@Lib.app.slash(name="download", description="download", guilds=None)
 #@discord.app_commands.check(Lib.is_in_staff)
