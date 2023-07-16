@@ -1,4 +1,4 @@
-from understar import lib
+from understar.system import lib
 from shutil import rmtree
 import discord
 import json

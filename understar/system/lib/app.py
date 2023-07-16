@@ -99,12 +99,9 @@ class Lib_UsOS:
         """"""
         await self.client.change_presence(activity=activity, status=status)
         
-    def get_apps(self, sys: bool = False) -> dict:
+    def get_apps(self) -> dict:
         """"""
-        if sys:
-            all_app=import_module("system.app")
-        else: 
-            all_app=import_module("app")
+        all_app=import_module("app")
         return all_app
 
 class App:

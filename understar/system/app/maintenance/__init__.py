@@ -1,4 +1,4 @@
-from understar import lib
+from understar.system import lib
 import discord
 Lib = lib.App()
 

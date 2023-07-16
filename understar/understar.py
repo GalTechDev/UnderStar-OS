@@ -8,6 +8,7 @@ import discord
 import time
 import sys
 from .system.lib import *
+from .system import app as sys_app
 import asyncio
 import json
 
@@ -22,6 +23,8 @@ PREFIX = "?"
 CODING = "utf-8"
 
 programmer = os.path.basename(sys.argv[0])
+
+
 
 class OS:
     
@@ -46,7 +49,7 @@ class OS:
          
     async def import_apps(self, sys :bool=False) -> None:
         """"""
-        for app_name,app in self.Lib.get_apps(sys).items():
+        for app_name,app in (self.Lib.get_apps().items() if not sys else sys_app.all_app.items()):
             print(f"\n * IMPORT {app_name}: ")
 
             app.Lib.init(self.client, discord_tasks)
@@ -82,7 +85,7 @@ class OS:
             print(f" * - Task : {loaded} loaded | {errors} error : {error_lst}")
 
             # Command & Slash
-            if len(self.Lib.store.get_guilds_installed(app_name)) > 0 :
+            if len(self.Lib.store.get_guilds_installed(app_name)) > 0 or sys:
                 
                 # Command
                 loaded = 0
@@ -171,7 +174,7 @@ class OS:
         if self.client.owner_id==None:
             return
         user = await self.client.fetch_user(self.client.owner_id)
-        user.send(embed=embed)
+        await user.send(embed=embed)
         
     ################################################################
     #                             INIT                             #
@@ -228,11 +231,15 @@ class OS:
             else :
                 if args[0] in Lib.get_apps().keys():
                     sys_com = False
-                elif args[0] in Lib.get_apps(True).keys():
+                    com = Lib.get_apps()
+                elif args[0] in sys_app.all_app:
                     sys_com = True
+                    com = sys_app.all_app
+                else:
+                    return
                 if len(args)==1:
                     try:
-                        await Lib.get_apps(sys_com)[args[0]].Lib.help(ctx)
+                        await com[args[0]].Lib.help(ctx)
                     except Exception as error:
                         if types(error) == AttributeError:
                             await ctx.send(content=f"L'application `{args[0]}` n'a pas de fonction d'aide")
@@ -261,7 +268,7 @@ class OS:
 
         #@terminal()
         async def manage_event(command, *args, **kwargs):
-            for app in list(Lib.get_apps().values()) + list(Lib.get_apps(True).values()):
+            for app in list(Lib.get_apps().values()) + list(sys_app.all_app.values()):
                 if app:
                     data = getattr(app.Lib.event, command)
                     await data(*args, **kwargs)
@@ -288,6 +295,10 @@ class OS:
             elif isinstance(error, discord.app_commands.BotMissingPermissions):
                 await ctx.response.send_message('Le bot ne peut pas executer cette commande car il lui manque des autorisations. Merci de contacter le STAFF', ephemeral=True)
             else:
+                try:
+                    await ctx.response.send_message(f"Data :\n{ctx.data}\nError :\n{error}", ephemeral = True)
+                except:
+                    print(f"Data :\n{ctx.data}\nError :\n{error}")
                 await self.send_error(ctx, error)
                 
 

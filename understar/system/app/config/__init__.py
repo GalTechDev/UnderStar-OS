@@ -1,4 +1,4 @@
-from understar import lib
+from understar.system import lib
 from os import execv, path
 from sys import executable, argv
 import discord 
