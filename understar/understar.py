@@ -17,6 +17,7 @@ SYS_FOLDER = "system"
 TOKEN_FOLDER = "token"
 SAVE_FOLDER = "save"
 SAVE_APP_FOLDER = "save/app"
+SAVE_SYS_FOLDER = "save/system"
 APP_FOLDER = "app"
 BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/bot_token"
 PREFIX = "?"
@@ -29,9 +30,21 @@ class OS:
     Lib = App()
     all_app = import_module("app")
     
-    vals = [DOWNLOAD_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, SAVE_APP_FOLDER, APP_FOLDER]
+    vals = [DOWNLOAD_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, SAVE_APP_FOLDER, APP_FOLDER, SAVE_SYS_FOLDER]
     for name in vals:
         Path(name).mkdir(exist_ok=True)
+        
+    files = ["guilds.json", "app_store.json"]
+    for file in files:
+        if not file in os.listdir("save/system"):
+            with open(os.path.join("save", "system", file), "w") as f:
+                pass
+        try:
+            with open(os.path.join("save", "system", file), "r") as f:
+                json.loads(f.read())
+        except json.JSONDecodeError:
+            with open(os.path.join("save", "system", file), "w") as f:
+                f.write(json.dumps({} if file=="guilds.json" else {"rolemanager": "https://github.com/GalTechDev/rolemanager/archive/refs/heads/main.zip", "uno": "https://github.com/GalTechDev/uno/archive/refs/heads/main.zip", "welcome": "https://github.com/GalTechDev/welcome/archive/refs/heads/main.zip"}))
         
     BOT_TOKEN = ""
     
