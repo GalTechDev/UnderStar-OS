@@ -13,7 +13,7 @@ class App_store:
 
     def get_installed(self):
         """"""
-        return self.installed_app.all_app
+        return self.installed_app
 
     def is_in_store(self, app_name: str) -> bool:
         """"""
@@ -38,6 +38,17 @@ class App_store:
             if app_name in data[str(guild_id)]["apps"]:
                 guilds.append(int(guild_id))
         return guilds
+    
+    def get_link(self, app_name: str) -> str:
+        file_path="save/system/app_store.json"
+        with open(file_path) as file:
+            store = json.load(file)
+
+        if not (app_name in store.keys()):
+            return None
+        else: 
+            app_link = store[app_name]
+            return app_link
 
     def add_link(self, app_name: str, app_link: str) -> None:
         file_path="save/system/app_store.json"

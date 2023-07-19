@@ -24,11 +24,11 @@ CODING = "utf-8"
 
 programmer = os.path.basename(sys.argv[0])
 
-
-
 class OS:
     
     Lib = App()
+    all_app = import_module("app")
+    
     vals = [DOWNLOAD_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, SAVE_APP_FOLDER, APP_FOLDER]
     for name in vals:
         Path(name).mkdir(exist_ok=True)
@@ -49,10 +49,11 @@ class OS:
          
     async def import_apps(self, sys :bool=False) -> None:
         """"""
-        for app_name,app in (self.Lib.get_apps().items() if not sys else sys_app.all_app.items()):
+        #print((self.all_app.items() if not sys else sys_app.all_app.items()))
+        for app_name,app in (self.all_app.items() if not sys else sys_app.all_app.items()):
             print(f"\n * IMPORT {app_name}: ")
 
-            app.Lib.init(self.client, discord_tasks)
+            app.Lib.init(self.client, discord_tasks, self.all_app)
             app.Lib.set_app_name(app_name)
             if not os.path.exists(os.path.join(app.Lib.save.save_path, app_name)):
                 os.mkdir(os.path.join(app.Lib.save.save_path, app_name))
@@ -218,9 +219,9 @@ class OS:
         @discord_commands.check(Lib.is_in_staff)
         async def version(ctx:discord_commands.context.Context):
             embed = discord.Embed(title="INFO")
-            embed.add_field(name=f"Version :", value=f"` {BOT_VERSION}   `")
-            embed.add_field(name=f"Ping :", value=f"` {round(client.latency * 1000)} `")
-            embed.add_field(name=f"Time up :", value=f"`{convert_time(int(time.time()-self.timer))}`")
+            embed.add_field(name=f"Version :", value=f"`{BOT_VERSION}`")
+            embed.add_field(name=f"Ping :", value=f"` {round(self.client.latency * 1000)} `")
+            embed.add_field(name=f"Time up :", value=f"<t:{int(self.timer)}:R>")
             await ctx.send(embed=embed)
 
 
@@ -229,9 +230,9 @@ class OS:
             if args==():
                 await ctx.send(embeds=self.get_help(ctx))
             else :
-                if args[0] in Lib.get_apps().keys():
+                if args[0] in self.all_app.keys():
                     sys_com = False
-                    com = Lib.get_apps()
+                    com = self.all_app
                 elif args[0] in sys_app.all_app:
                     sys_com = True
                     com = sys_app.all_app
@@ -268,7 +269,7 @@ class OS:
 
         #@terminal()
         async def manage_event(command, *args, **kwargs):
-            for app in list(Lib.get_apps().values()) + list(sys_app.all_app.values()):
+            for app in list(self.all_app.values()) + list(sys_app.all_app.values()):
                 if app:
                     data = getattr(app.Lib.event, command)
                     await data(*args, **kwargs)
@@ -417,18 +418,11 @@ class OS:
             await self.import_apps(True)
             await self.import_apps()
 
-            with open(f'{SYS_FOLDER}/icon.png', 'rb') as image:
-                pass
-                #await client.user.edit(avatar=image.read())
             print("\n * Bot Starting...")
             print(" * version : ", programmer, BOT_VERSION)
             print(" * Logged in as : ", client.user.name)
             print(" * ID : ", client.user.id)
-            #await import_apps(True)
-            #await import_apps()
-
-            #await sync(client, "sync" in sys.argv)
-            #print(client.guilds)
+            
             await client.tree.sync()
 
             with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json") as f:

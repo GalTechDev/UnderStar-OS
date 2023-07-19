@@ -21,7 +21,6 @@ class Lib_UsOS:
         self.store = App_store(None)
         self.save = Save(self.app_name)
         self.guilds = Guilds()
-        self.store.installed_app = self.get_apps()
         self.event = Event()
 
 
@@ -34,13 +33,14 @@ class Lib_UsOS:
             for mod in self.app.fusioned_module:
                 mod.Lib.set_app_name(app_name)
 
-    def init(self, bot_client: discord_commands.Bot, tasks):
+    def init(self, bot_client: discord_commands.Bot, tasks, installed_app):
         """"""
         self.client = bot_client
         self.tasks = tasks
+        self.store = App_store(installed_app)
         if self.app.fusioned:
             for app in self.app.fusioned_module:
-                app.Lib.init(bot_client, tasks)
+                app.Lib.init(bot_client, tasks, installed_app)
 
     def is_in_guild(self, ctx:discord_commands.Context):
         guild_id = ctx.guild.id
@@ -101,8 +101,7 @@ class Lib_UsOS:
         
     def get_apps(self) -> dict:
         """"""
-        all_app=import_module("app")
-        return all_app
+        return self.store.installed_app
 
 class App:
     """"""

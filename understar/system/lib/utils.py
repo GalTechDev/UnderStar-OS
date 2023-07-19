@@ -4,6 +4,7 @@ import json
 import importlib
 import glob
 import os
+import pkg_resources
 
 LANGAGE = "fr"
 
@@ -15,7 +16,9 @@ async def valide_intaraction(interaction: discord.Interaction):
     except Exception as error:
         pass
 
-with open(".version") as f:
+chemin_fichier = pkg_resources.resource_filename(__name__, '.version')
+
+with open(chemin_fichier.removesuffix("understar2/system/lib/.version")+".version", 'r') as f:
     BOT_VERSION = f.read()
 
 def import_module(folder: str, log=False, catch_error=True):

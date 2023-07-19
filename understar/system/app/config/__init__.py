@@ -6,7 +6,7 @@ from .apt import install, uninstall
 
 
 Lib = lib.App()
-
+Lib.app.fusion([install, uninstall])
 """class lang_select(discord.ui.Select):
     def __init__(self) -> None:
         super().__init__(placeholder=f"{Lib.get_lang_ref(10, langage)}",max_values=1,min_values=1,options=[discord.SelectOption(label=lang,description="100%") for lang in Lib.get_lang_ref(all_lang_ref, langage)])
@@ -205,7 +205,7 @@ class App_config_view(Back_view):
             if self.downloaded:
                 self.add_item(self.Delete(app=app, label="Supprimer", style=discord.ButtonStyle.danger, disabled=(not self.downloaded)))
             else:
-                self.add_item(self.Download(app=app, label="Télécharger", style=discord.ButtonStyle.primary, disabled=self.downloaded))
+                self.add_item(self.Download(app=app, label="Télécharger", style=discord.ButtonStyle.primary, disabled= (self.downloaded or not Lib.store.get_link(app))))
             self.add_item(self.Set_app_link(app=app, label="Changer le lien", style=discord.ButtonStyle.gray))
             self.add_item(self.Del_app_link(app=app, label="Supprimer le lien", style=discord.ButtonStyle.danger))
 
