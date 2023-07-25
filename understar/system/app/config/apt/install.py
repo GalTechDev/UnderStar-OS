@@ -43,7 +43,7 @@ async def download(ctx:discord.Interaction,app_name:str, link:str=""):
                 rename(f"app/{old_name}", f'app/{app_name.replace("-", "_")}')
                 
                 rmtree(path_folder)
-                Lib.store.installed_app.all_app.update({app_name:None})
+                Lib.store.installed_app.update({app_name:None})
                 await ctx.response.send_message("Installé", ephemeral=True)
 
             else:
