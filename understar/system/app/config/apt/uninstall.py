@@ -27,7 +27,7 @@ async def delete(ctx:discord.Interaction, app_name:str, remove_save:bool=False):
         rmtree(f"app/{app_name}")
         app_name = app_name
 
-        Lib.store.installed_app.all_app.pop(app_name)
+        Lib.store.installed_app.pop(app_name)
         await ctx.response.send_message("Supprimé.", ephemeral=True)
 
     else:
