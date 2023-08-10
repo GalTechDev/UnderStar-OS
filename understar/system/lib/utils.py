@@ -28,21 +28,22 @@ def import_module(folder: str, log=False, catch_error=True):
     modules = {}
     for file_path in glob.glob(os.path.join(folder.replace(".", "/"), "*/__init__.py"), recursive=True):
         # Obtention du nom du module à partir du chemin de l'app
-        module_name = os.path.basename(file_path)
 
         try:
             # Importation dynamique du module
-            file_path = file_path.replace("/", ".").replace("\\", ".")
-            module = importlib.import_module(f'{file_path}'[:-3])
+            module_path = file_path.replace("/", ".").replace("\\", ".")
+            module = importlib.import_module(f'{module_path[:-3]}')
+            print(module_path[:-3])
             
             # Ajout du module au dictionnaire
-            modules.update({file_path.removesuffix('/__init__.py').removeprefix(folder.replace('.', '/'))[1:]:module})
+            module_name = file_path.removesuffix('/__init__.py').removesuffix('\__init__.py').removeprefix(folder.replace('.', '/'))[1:]
+            modules.update({module_name:module})
             if log:
-                print(f" *  - imported {file_path.removesuffix('/__init__.py').removeprefix(folder.replace('.', '/'))[1:]}")
+                print(f" *  - imported {module_name}")
             
         except Exception as e:
             if log:
-                print(f" *  - failled importing {file_path.removesuffix('/__init__.py').removeprefix(folder.replace('.', '/'))[1:]} error : {e}")
+                print(f" *  - failled importing {module_name} error : {e}")
             if not catch_error:
                 raise e
     
