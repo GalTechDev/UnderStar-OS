@@ -32,7 +32,8 @@ def import_module(folder: str, log=False, catch_error=True):
 
         try:
             # Importation dynamique du module
-            module = importlib.import_module(f'{file_path.replace("/", ".")}'[:-3])
+            file_path = file_path.replace("/", ".").replace("\\", ".")
+            module = importlib.import_module(f'{file_path}'[:-3])
             
             # Ajout du module au dictionnaire
             modules.update({file_path.removesuffix('/__init__.py').removeprefix(folder.replace('.', '/'))[1:]:module})
