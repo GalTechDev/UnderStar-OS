@@ -28,7 +28,6 @@ programmer = os.path.basename(sys.argv[0])
 class OS:
     
     Lib = App()
-    all_app = import_module("app")
     
     vals = [DOWNLOAD_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, SAVE_APP_FOLDER, APP_FOLDER, SAVE_SYS_FOLDER]
     for name in vals:
@@ -194,7 +193,8 @@ class OS:
     #                             INIT                             #
     ################################################################
     
-    def __init__(self, token: str=None) -> None:
+    def __init__(self, token: str=None, log: bool=False) -> None:
+        self.all_app = import_module("app", log=log)
         if not token:
             try:
                 with open(BOT_TOKEN_PATH, "r", encoding=CODING) as f:

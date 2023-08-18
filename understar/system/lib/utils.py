@@ -28,15 +28,15 @@ def import_module(folder: str, log=False, catch_error=True):
     modules = {}
     for file_path in glob.glob(os.path.join(folder.replace(".", "/"), "*/__init__.py"), recursive=True):
         # Obtention du nom du module à partir du chemin de l'app
-
+        module_name = file_path.removesuffix('/__init__.py').removesuffix('\__init__.py').removeprefix(folder.replace('.', '/'))[1:]
+            
         try:
             # Importation dynamique du module
             module_path = file_path.replace("/", ".").replace("\\", ".")
             module = importlib.import_module(f'{module_path[:-3]}')
-            print(module_path[:-3])
+            #print(module_path[:-3])
             
             # Ajout du module au dictionnaire
-            module_name = file_path.removesuffix('/__init__.py').removesuffix('\__init__.py').removeprefix(folder.replace('.', '/'))[1:]
             modules.update({module_name:module})
             if log:
                 print(f" *  - imported {module_name}")
