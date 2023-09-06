@@ -5,6 +5,7 @@ import importlib
 import glob
 import os
 import pkg_resources
+import sys
 
 LANGAGE = "fr"
 
@@ -21,21 +22,32 @@ chemin_fichier = pkg_resources.resource_filename(__name__, '.version')
 with open(os.path.join(chemin_fichier.removesuffix(os.path.join("system","lib",".version")),".version"), 'r') as f:
     BOT_VERSION = f.read()
 
-def import_module(folder: str, log=False, catch_error=True):
+def import_module(folder: str, log=False, catch_error=True, directory = None, found_sub_dir = True):
+    """
+    Import a module.
+
+    The 'directory' argument is required when performing a relative import. It specifies the package to use as the anchor point from which to resolve the relative import to an absolute import.
+    """
     # Parcours des apps dans le répertoire du package
     if log:
         print(f" * Import Module Start :")
     modules = {}
-    for file_path in glob.glob(os.path.join(folder.replace(".", "/"), "*/__init__.py"), recursive=True):
+    path = os.path.join(folder.replace(".", "\\"), "*", "__init__.py") if found_sub_dir else os.path.join(folder.replace(".", "\\"), "*__init__.py")
+    #print(path, glob.glob(path, recursive=True, root_dir=directory))
+    for file_path in glob.glob(path, recursive=True, root_dir=directory):
         # Obtention du nom du module à partir du chemin de l'app
-        module_name = file_path.removesuffix('/__init__.py').removesuffix('\__init__.py').removeprefix(folder.replace('.', '/'))[1:]
+        if found_sub_dir:
+            module_name = file_path[len(folder)+1:-len("*__init__.py")]
+        else:
+            module_name = folder
             
         try:
+            if directory not in sys.path and directory!=None:
+                sys.path.append(os.path.join(directory))
             # Importation dynamique du module
             module_path = file_path.replace("/", ".").replace("\\", ".")
             module = importlib.import_module(f'{module_path[:-3]}')
             #print(module_path[:-3])
-            
             # Ajout du module au dictionnaire
             modules.update({module_name:module})
             if log:
