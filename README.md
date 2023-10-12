@@ -1,3 +1,3 @@
 # UnderStar-OS
 A discord bot OS.
-In progress
+Discord : https://discord.gg/CrEVTwjEvT
