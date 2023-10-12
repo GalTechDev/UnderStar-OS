@@ -161,6 +161,7 @@ class App:
         self.fusioned = True
         self.fusioned_module+=apps
         for app in apps:
+            self.all_tasks+=app.Lib.app.all_tasks
             self.commands+=app.Lib.app.commands
             self.slashs+=app.Lib.app.slashs
             self.help_com = app.Lib.app.help_com
