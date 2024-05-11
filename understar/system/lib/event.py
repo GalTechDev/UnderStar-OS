@@ -91,7 +91,6 @@ class Event:
         self.on_raw_thread_member_remove = self.on_raw_thread_member_remove
         self.on_voice_state_update = self.on_voice_state_update
 
-
     def event(self):
         def apply(funct):
             if funct.__name__ in self.__dict__.keys():

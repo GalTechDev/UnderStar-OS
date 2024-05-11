@@ -18,6 +18,7 @@ path_folder = f"download/{folder}"
 mkdir(path_folder)
 file_path = f"{path_folder}/file{extension}"
 open(file_path, "wb").write(response.content)
+
 if zip.is_zipfile(file_path):
     with zip.ZipFile(file_path, 'r') as zip_ref:
         zip_ref.extractall(path_folder)
@@ -26,6 +27,7 @@ if len(listdir(path_folder))==2:
     remove(file_path)
     old_name = listdir(path_folder)[0]
     rmtree(f"{path_folder}/{old_name}/save")
+
 else:
     exit()
 
@@ -39,6 +41,7 @@ for p in listdir():
     if p not in ["download",".git"]:
         if path.isdir(p):
             rmtree(p)
+
         else:
             remove(p)
 
@@ -46,8 +49,9 @@ for p in listdir(f"{path_folder}/{old_name}"):
     #print(listdir(download_folder))
     if p in [".git"]:
         pass
+        
     else:
         move(f"{path_folder}/{old_name}/{p}", curdir)
-    
+
 system('rmdir /S /Q "{}"'.format(path_folder))
 execv(executable, ["None", "understar.py"])
