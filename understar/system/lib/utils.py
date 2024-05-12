@@ -39,6 +39,7 @@ def import_module(folder: str, log: bool = False, catch_error: bool = True, dire
 
     # print(path, glob.glob(path, recursive=True, root_dir=directory))
     for file_path in glob.glob(path, recursive=True, root_dir=directory):
+
         # Obtention du nom du module à partir du chemin de l'app
         if found_sub_dir:
             module_name = file_path[len(folder)+1:-len("*__init__.py")]

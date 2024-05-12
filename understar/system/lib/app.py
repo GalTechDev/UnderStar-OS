@@ -113,6 +113,7 @@ class Lib_UsOS:
         """"""
         return self.store.installed_app
 
+
 class App:
     """"""
     def __init__(self) -> None:
@@ -125,7 +126,7 @@ class App:
         self.fusioned: bool = False
         self.fusioned_module: list = []
 
-    def command(self, name: str = None, help_text: str="", aliases: list=[], checks=[], force_name: bool = False):
+    def command(self, name: str = None, help_text: str = "", aliases: list = [], checks: list = [], force_name: bool = True):
         """"""
         def apply(funct):
             self.commands.append(Command(name if name else funct.__name__ , funct, help_text, aliases, checks, force_name))

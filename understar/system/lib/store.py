@@ -4,11 +4,12 @@ class App_store:
     """"""
     def __init__(self, installed_app) -> None:
         self.installed_app = installed_app
-        self.app_store_path = "save/system/app_store.json"
-        self.guilds_path = "save/system/guilds.json"
+        self.app_store_path: str = "save/system/app_store.json"
+        self.guilds_path: str = "save/system/guilds.json"
 
     def get_apps(self) -> dict:
         """Give a dict object {"app_name":"app_link",}"""
+
         with open("save/system/app_store.json", encoding="utf8") as file:
             data = json.load(file)
 
@@ -50,7 +51,7 @@ class App_store:
             return json.load(file)
 
     def get_link(self, app_name: str) -> str:
-        store= self.factorize_store()
+        store = self.factorize_store()
 
         if not (app_name in store.keys()):
             return None
