@@ -7,6 +7,7 @@ from .apt import install, uninstall
 
 Lib = lib.App()
 Lib.app.fusion([install, uninstall])
+
 """class lang_select(discord.ui.Select):
     def __init__(self) -> None:
         super().__init__(placeholder=f"{Lib.get_lang_ref(10, langage)}",max_values=1,min_values=1,options=[discord.SelectOption(label=lang,description="100%") for lang in Lib.get_lang_ref(all_lang_ref, langage)])
@@ -20,6 +21,8 @@ Lib.app.fusion([install, uninstall])
 """
 
 #----------------------- modal ----------------------------
+
+
 class Set_app_link_modal(discord.ui.Modal):
     def __init__(self, *, name: str="", link: str="", title: str = discord.utils.MISSING, timeout: lib.Optional[float] = None, custom_id: str = discord.utils.MISSING) -> None:
         super().__init__(title=title, timeout=timeout, custom_id=custom_id)
@@ -35,7 +38,7 @@ class Set_app_link_modal(discord.ui.Modal):
 
     async def on_submit(self, interaction: discord.Interaction) -> None:
         if not self.old_name:
-            out =Lib.store.add_link(self.app_name.__str__(), self.link.__str__())
+            out = Lib.store.add_link(self.app_name.__str__(), self.link.__str__())
 
         else:
             out = Lib.store.edit_link(self.old_name, self.app_name.__str__(), self.link.__str__())
@@ -83,7 +86,7 @@ class Admin_view(Back_view):
 
 
 class App_view(Back_view):
-    def __init__(self, ctx: discord.Interaction, back, *, timeout=180):
+    def __init__(self, ctx: discord.Interaction, back, *, timeout: int = 180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
         i: int = 0
@@ -104,7 +107,16 @@ class App_view(Back_view):
         self.add_item(self.Set_app_link(label="Ajouter un lien"))
 
     class Set_app_link(discord.ui.Button):
-        def __init__(self, *, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: lib.Optional[str] = None, disabled: bool = False, custom_id: lib.Optional[str] = None, url: lib.Optional[str] = None, emoji: lib.Optional[lib.Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: lib.Optional[int] = None):
+        def __init__(self, *,
+                style: discord.ButtonStyle = discord.ButtonStyle.secondary,
+                label: lib.Optional[str] = None,
+                disabled: bool = False,
+                custom_id: lib.Optional[str] = None,
+                 url: lib.Optional[str] = None,
+                 emoji: lib.Optional[lib.Union[str, discord.Emoji, discord.PartialEmoji]] = None,
+                 row: lib.Optional[int] = None
+            ):
+
             super().__init__(style=style, label=label, disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
 
         async def callback(self, interaction: discord.Interaction) -> lib.Any:
@@ -112,19 +124,19 @@ class App_view(Back_view):
 
 
 class Langue_view(Back_view):
-    def __init__(self, ctx: discord.Interaction, back, *, timeout=180):
+    def __init__(self, ctx: discord.Interaction, back, *, timeout: int = 180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
 
 
 class Custom_view(Back_view):
-    def __init__(self, ctx: discord.Interaction, back, *, timeout=180):
+    def __init__(self, ctx: discord.Interaction, back, *, timeout: int = 180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
 
 
 class Update_view(Back_view):
-    def __init__(self, ctx: discord.Interaction, back, *, update: bool=False, timeout=180):
+    def __init__(self, ctx: discord.Interaction, back, *, update: bool = False, timeout: int = 180):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
         self.update = update
@@ -132,7 +144,18 @@ class Update_view(Back_view):
         self.add_item(self.update_button)
 
     class Update_button(discord.ui.Button):
-        def __init__(self, *, ctx, enabled, style: discord.ButtonStyle = discord.ButtonStyle.primary, label: lib.Optional[str] = None, disabled: bool = False, custom_id: lib.Optional[str] = None, url: lib.Optional[str] = None, emoji: lib.Optional[lib.Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: lib.Optional[int] = None):
+        def __init__(self, *,
+                ctx,
+                enabled,
+                style: discord.ButtonStyle = discord.ButtonStyle.primary,
+                label: lib.Optional[str] = None,
+                disabled: bool = False,
+                custom_id: lib.Optional[str] = None,
+                url: lib.Optional[str] = None,
+                emoji: lib.Optional[lib.Union[str, discord.Emoji, discord.PartialEmoji]] = None,
+                row: lib.Optional[int] = None
+            ):
+
             super().__init__(style=style, label=label, disabled= not enabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
             self.ctx = ctx
 
@@ -145,13 +168,12 @@ class Update_view(Back_view):
 
 
 class Config_view(discord.ui.View):
-    def __init__(self, ctx: discord.Interaction, *, timeout=180):
+    def __init__(self, ctx: discord.Interaction, *, timeout: int = 180):
         super().__init__(timeout=timeout)
         self.ctx = ctx
 
-        if Lib.client.info.owner.id == ctx.user.id:
+        if Lib.client.info.owner.id == ctx.user.id or True in [role.permissions.administrator for role in ctx.user.roles]:
             self.add_item(self.Restart_button(ctx=ctx))
-
 
     @discord.ui.button(label="Administation", style=discord.ButtonStyle.gray)
     async def admin_button(self, interaction:discord.Interaction, button:discord.ui.Button):
@@ -182,7 +204,17 @@ class Config_view(discord.ui.View):
         await lib.valide_intaraction(interaction)
 
     class Restart_button(discord.ui.Button):
-        def __init__(self, *, ctx: discord.Interaction, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: lib.Optional[str] = None, disabled: bool = False, custom_id: lib.Optional[str] = None, url: lib.Optional[str] = None, emoji: lib.Optional[lib.Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: lib.Optional[int] = None):
+        def __init__(self, *,
+                ctx: discord.Interaction,
+                style: discord.ButtonStyle = discord.ButtonStyle.secondary,
+                label: lib.Optional[str] = None,
+                disabled: bool = False,
+                custom_id: lib.Optional[str] = None,
+                url: lib.Optional[str] = None,
+                emoji: lib.Optional[lib.Union[str, discord.Emoji, discord.PartialEmoji]] = None,
+                row: lib.Optional[int] = None
+            ):
+
             super().__init__(style=style, label="Redémarer", disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
             self.ctx = ctx
 
@@ -194,12 +226,12 @@ class Config_view(discord.ui.View):
 
 
 class App_config_view(Back_view):
-    def __init__(self, ctx: discord.Interaction, app: str, back_menu, args=[], *, timeout=180):
+    def __init__(self, ctx: discord.Interaction, app: str, back_menu, args: list = [], *, timeout: int = 180):
         super().__init__(ctx, back_menu, args, timeout=timeout)
         self.downloaded = Lib.store.is_downloaded(app)
         self.instaled = Lib.store.is_installed(app, ctx.guild_id)
         self.app = app
-        self.ctx=ctx
+        self.ctx = ctx
         owner = Lib.client.info.owner
 
         if self.instaled:
@@ -286,7 +318,7 @@ class App_config_view(Back_view):
     class Del_app_link(discord.ui.Button):
         def __init__(self, *, app: str, style: discord.ButtonStyle = discord.ButtonStyle.secondary, label: lib.Optional[str] = None, disabled: bool = False, custom_id: lib.Optional[str] = None, url: lib.Optional[str] = None, emoji: lib.Optional[lib.Union[str, discord.Emoji, discord.PartialEmoji]] = None, row: lib.Optional[int] = None):
             super().__init__(style=style, label=label, disabled=disabled, custom_id=custom_id, url=url, emoji=emoji, row=row)
-            self.app_name=app
+            self.app_name = app
 
         async def callback(self, interaction: discord.Interaction) -> lib.Any:
             Lib.store.del_link(self.app_name)
@@ -316,10 +348,12 @@ async def customisation_menu(ctx: discord.Interaction):
 async def update_menu(ctx: discord.Interaction):
     embed = discord.Embed(title=":gear:  Mise à jour", description="Rechercher de mise à jour...", color=lib.THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=False))
+
     last = Lib.get_last_update_stats()
     update = last > float(lib.BOT_VERSION)
     embed = discord.Embed(title=":gear:  Mise à jour", description=f"{'Vous êtes à jour.' if last <= float(lib.BOT_VERSION) else 'Nouvelle version disponible'}", color=lib.THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     embed.add_field(name=f"UnderStar OS v{last}", value='\u200b')
+
     await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=update))
 
 

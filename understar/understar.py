@@ -12,6 +12,8 @@ from .system import app as sys_app
 import asyncio
 import json
 
+print("DEV VERSION")
+
 DOWNLOAD_FOLDER: str = "download"
 SYS_FOLDER: str = "system"
 TOKEN_FOLDER: str = "token"
@@ -21,7 +23,6 @@ SAVE_SYS_FOLDER: str = "save/system"
 APP_FOLDER: str = "app"
 BOT_TOKEN_PATH: str = f"{TOKEN_FOLDER}/bot_token"
 UPDATE_FILE: str = f"{SYS_FOLDER}/app/update/update.pyw"
-PREFIX: str = "?"
 
 programmer = os.path.basename(sys.argv[0])
 
@@ -53,11 +54,6 @@ class OS:
 
     intents = discord.Intents.all()
 
-    client = discord_commands.Bot(intents=intents, command_prefix=PREFIX, help_command=None)
-    client.remove_command('help')
-
-    status = cycle(["UnderStar OS"])
-
     timer = time.time()
 
     def start(self):
@@ -67,7 +63,7 @@ class OS:
         """"""
         # print((self.all_app.items() if not sys else sys_app.all_app.items()))*
 
-        for app_name,app in (self.all_app.items() if not sys else sys_app.all_app.items()):
+        for app_name, app in (self.all_app.items() if not sys else sys_app.all_app.items()):
             print(f"\n * IMPORT {app_name}: ")
 
             app.Lib.init(self.client, discord_tasks, self.all_app)
@@ -137,24 +133,33 @@ class OS:
 
                 app_groupe = discord.app_commands.Group(name=app_name, description=f"{len(app.Lib.app.slashs)} commands", guild_ids=self.Lib.store.get_guilds_installed(app_name) if not sys else None)
 
+                dir_comm: list = []
+                ndir_comm: list = []
+
                 for command in app.Lib.app.slashs:
                     try:
                         if command.direct_command:
-                            if not command.name in [com.name for com in self.client.tree.get_commands()]:
-                                self.client.tree.add_command(command, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
-                                loaded += 1
+                            dir_comm.append(command)
 
                         else:
-                            if not command.name in [com.name for com in app_groupe.commands]:
-                                app_groupe.add_command(command)
-                                loaded += 1
+                            ndir_comm.append(command)
 
                     except Exception as error:
                         errors += 1
                         error_lst.append(error)
 
+                for command in dir_comm:
+                    if not command.name in [com.name for com in self.client.tree.get_commands()]:
+                        self.client.tree.add_command(command, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
+                        loaded += 1
+
                 if len(app_groupe.commands) > 0:
                     self.client.tree.add_command(app_groupe, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
+
+                for command in ndir_comm:
+                    if not command.name in [com.name for com in app_groupe.commands]:
+                        app_groupe.add_command(command)
+                        loaded += 1
 
                 print(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}")
 
@@ -162,11 +167,10 @@ class OS:
                 print(" * - Command : Any guild have installed this app, not loaded")
                 print(" * - Slash : Any guild have installed this app, not loaded")
 
-
     def get_help(self, ctx: discord_commands.context.Context) -> list:
         """"""
         embeds: list = []
-        embed = discord.Embed(title="OS Commands", description=f"Préfix : `{PREFIX}` | Version : `{BOT_VERSION}`", color=discord.Color.red())
+        embed = discord.Embed(title="OS Commands", description=f"Préfix : `{self.prefix}` | Version : `{BOT_VERSION}`", color=discord.Color.red())
 
         try:
             coms: list = [com for com in self.client.all_commands]
@@ -219,12 +223,22 @@ class OS:
     #                             INIT                             #
     ################################################################
 
-    def __init__(self, token: str = None, log: bool = False) -> None:
+    def __init__(self, token: str = None, log: bool = False, prefix: str = "?", status: list = ["UnderStar OS"]) -> None:
         self.all_app = import_module("app", log=log)
-        if not token:
+
+        self.status = cycle(status)
+        self.prefix = prefix
+
+        client = discord_commands.Bot(intents=self.intents, command_prefix=prefix, help_command=None)
+        client.remove_command('help')
+
+        self.client = client
+        Lib = self.Lib
+
+        if token is None:
             try:
                 with open(BOT_TOKEN_PATH, "r", encoding="utf8") as f:
-                    self.BOT_TOKEN = f.readlines()[0].strip()
+                    token = f.readlines()[0].strip()
 
             except FileNotFoundError:
                 with open(BOT_TOKEN_PATH, "w", encoding="utf8") as f:
@@ -232,11 +246,7 @@ class OS:
                     input("please insert the bot token in the file token/bot_token")
                     sys.exit(0)
 
-        else:
-            self.BOT_TOKEN = token
-
-        client = self.client
-        Lib = self.Lib
+        self.BOT_TOKEN = token
 
         # -------------------------------- Slash Command -------------------
 
@@ -297,7 +307,7 @@ class OS:
 
                 else:
                     if f"{args[0]}-{args[1]}" in client.all_commands.keys():
-                        embed = discord.Embed(title=f"Aide sur la commande `{args[1]}`", description=f"Commande : `{PREFIX}{args[0]}-{args[1]}`", color=discord.Color.red())
+                        embed = discord.Embed(title=f"Aide sur la commande `{args[1]}`", description=f"Commande : `{self.prefix}{args[0]}-{args[1]}`", color=discord.Color.red())
                         embed.set_author(name=f'App : {args[0]}')
                         aide: str = client.all_commands[f"{args[0]}-{args[1]}"].help if client.all_commands[f"{args[0]}-{args[1]}"].help!="" else "Pas d'aide pour cette commande"
                         alias: str = ""
@@ -309,7 +319,7 @@ class OS:
                         embed.add_field(name=f"**{aide}**", value=f"Alias : {alias[:-1]}")
 
                     else:
-                        embed = discord.Embed(title=f"La Command `{args[1]}` n'existe pas", description=f"Préfix de l'app : `{PREFIX}{args[0]}-`", color=discord.Color.red())
+                        embed = discord.Embed(title=f"La Command `{args[1]}` n'existe pas", description=f"Préfix de l'app : `{self.prefix}{args[0]}-`", color=discord.Color.red())
                         embed.set_author(name=f"App : {args[0]}")
                         # embed.add_field(name=f"**La Command {args[1]} n'existe pas**", value=f"Commande d'aide de l'application {args[0]} : !{args[0]}-help")
 
