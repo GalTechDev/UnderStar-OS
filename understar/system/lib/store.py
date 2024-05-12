@@ -4,11 +4,14 @@ class App_store:
     """"""
     def __init__(self, installed_app) -> None:
         self.installed_app = installed_app
+        self.app_store_path = "save/system/app_store.json"
+        self.guilds_path = "save/system/guilds.json"
 
     def get_apps(self) -> dict:
         """Give a dict object {"app_name":"app_link",}"""
-        with open("save/system/app_store.json") as file:
+        with open("save/system/app_store.json", encoding="utf8") as file:
             data = json.load(file)
+
         return data
 
     def get_installed(self):
@@ -25,66 +28,68 @@ class App_store:
         return app_name in list(apps.keys())
 
     def is_installed(self, app_name: str, guild_id: int) -> bool:
-        with open("save/system/guilds.json") as file:
+        with open(self.guilds_path, encoding="utf8") as file:
             data = json.load(file)
+
         return app_name in data[str(guild_id)]["apps"]
-    
+
     def get_guilds_installed(self, app_name: str) -> list:
-        with open("save/system/guilds.json") as file:
+        with open(self.guilds_path, encoding="utf8") as file:
             data = json.load(file)
-            
-        guilds = []
+
+        guilds: list = []
+
         for guild_id in data.keys():
             if app_name in data[str(guild_id)]["apps"]:
                 guilds.append(int(guild_id))
+
         return guilds
-    
+
+    def factorize_store(self):
+        with open(self.app_store_path, encoding="utf8") as file:
+            return json.load(file)
+
     def get_link(self, app_name: str) -> str:
-        file_path="save/system/app_store.json"
-        with open(file_path) as file:
-            store = json.load(file)
+        store= self.factorize_store()
 
         if not (app_name in store.keys()):
             return None
-        else: 
-            app_link = store[app_name]
-            return app_link
+
+        app_link = store[app_name]
+        return app_link
 
     def add_link(self, app_name: str, app_link: str) -> None:
-        file_path="save/system/app_store.json"
-        with open(file_path) as file:
-            store = json.load(file)
+        store = self.factorize_store()
 
         if app_name in store.keys():
             return False
-        store[app_name]=app_link
 
-        with open(file_path, "w") as file:
+        store[app_name] = app_link
+
+        with open(self.app_store_path, "w", encoding="utf8") as file:
             file.write(json.dumps(store))
+
         return True
 
     def edit_link(self, old_name: str, app_name: str, app_link: str) -> None:
-        file_path="save/system/app_store.json"
-        with open(file_path) as file:
-            store = json.load(file)
+        store = self.factorize_store()
 
         old_link = store.pop(old_name)
+
         if app_name in store.keys():
-            store[old_name]=old_link
+            store[old_name] = old_link
             return False
 
-        store[app_name]=app_link
+        store[app_name] = app_link
 
-        with open(file_path, "w") as file:
+        with open(self.app_store_path, "w", encoding="utf8") as file:
             file.write(json.dumps(store))
+
         return True
 
     def del_link(self, app_name: str) -> None:
-        file_path="save/system/app_store.json"
-        with open(file_path) as file:
-            store = json.load(file)
-
+        store = self.factorize_store()
         store.pop(app_name)
 
-        with open(file_path, "w") as file:
+        with open(self.app_store_path, "w", encoding="utf8") as file:
             file.write(json.dumps(store))

@@ -1,4 +1,4 @@
-from .types import *
+from .types import Union, Optional, List, Dict, Any
 from discord.app_commands import Command, locale_str, Group
 
 class Slash(Command):
@@ -9,10 +9,10 @@ class Slash(Command):
 
 class Command:
     """"""
-    def __init__(self, name:str, command, help_text: str="",aliases: list=[],checks=[], force_name: bool = False) -> None:
-        self.name=name.replace(" ", "-")
-        self.command=command
-        self.help = help_text if help_text!="" else "Aucune aide disponible"
-        self.aliases=aliases
-        self.checks=checks
+    def __init__(self, name: str, command, help_text: str = "", aliases: list = [], checks: list = [], force_name: bool = False) -> None:
+        self.name: str = name.replace(" ", "-")
+        self.command = command
+        self.help = help_text if help_text != "" else "Aucune aide disponible"
+        self.aliases = aliases
+        self.checks = checks
         self.force_name = force_name

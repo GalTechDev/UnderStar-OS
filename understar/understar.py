@@ -7,91 +7,101 @@ import os
 import discord
 import time
 import sys
-from .system.lib import *
+from .system.lib import App, MISSING, BOT_VERSION, types, convert_time, import_module
 from .system import app as sys_app
 import asyncio
 import json
 
-DOWNLOAD_FOLDER = "download"
-SYS_FOLDER = "system"
-TOKEN_FOLDER = "token"
-SAVE_FOLDER = "save"
-SAVE_APP_FOLDER = "save/app"
-SAVE_SYS_FOLDER = "save/system"
-APP_FOLDER = "app"
-BOT_TOKEN_PATH = f"{TOKEN_FOLDER}/bot_token"
-PREFIX = "?"
-CODING = "utf-8"
+DOWNLOAD_FOLDER: str = "download"
+SYS_FOLDER: str = "system"
+TOKEN_FOLDER: str = "token"
+SAVE_FOLDER: str = "save"
+SAVE_APP_FOLDER: str = "save/app"
+SAVE_SYS_FOLDER: str = "save/system"
+APP_FOLDER: str = "app"
+BOT_TOKEN_PATH: str = f"{TOKEN_FOLDER}/bot_token"
+UPDATE_FILE: str = f"{SYS_FOLDER}/app/update/update.pyw"
+PREFIX: str = "?"
 
 programmer = os.path.basename(sys.argv[0])
 
+
 class OS:
-    
     Lib = App()
-    
-    vals = [DOWNLOAD_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, SAVE_APP_FOLDER, APP_FOLDER, SAVE_SYS_FOLDER]
+
+    vals: list = [DOWNLOAD_FOLDER, TOKEN_FOLDER, SAVE_FOLDER, SAVE_APP_FOLDER, APP_FOLDER, SAVE_SYS_FOLDER]
+
     for name in vals:
         Path(name).mkdir(exist_ok=True)
-        
-    files = ["guilds.json", "app_store.json"]
+
+    files: list = ["guilds.json", "app_store.json"]
+
     for file in files:
         if not file in os.listdir("save/system"):
-            with open(os.path.join("save", "system", file), "w") as f:
+            with open(os.path.join("save", "system", file), "w", encoding="utf8") as f:
                 pass
+
         try:
-            with open(os.path.join("save", "system", file), "r") as f:
+            with open(os.path.join("save", "system", file), "r", encoding="utf8") as f:
                 json.loads(f.read())
+
         except json.JSONDecodeError:
-            with open(os.path.join("save", "system", file), "w") as f:
-                f.write(json.dumps({} if file=="guilds.json" else {"rolemanager": "https://github.com/GalTechDev/rolemanager/archive/refs/heads/main.zip", "uno": "https://github.com/GalTechDev/uno/archive/refs/heads/main.zip", "welcome": "https://github.com/GalTechDev/welcome/archive/refs/heads/main.zip"}))
-        
-    BOT_TOKEN = ""
-    
+            with open(os.path.join("save", "system", file), "w", encoding="utf8") as f:
+                f.write(json.dumps({} if file == "guilds.json" else {"rolemanager": "https://github.com/GalTechDev/rolemanager/archive/refs/heads/main.zip", "uno": "https://github.com/GalTechDev/uno/archive/refs/heads/main.zip", "welcome": "https://github.com/GalTechDev/welcome/archive/refs/heads/main.zip"}))
+
+    BOT_TOKEN: str = ""
+
     intents = discord.Intents.all()
 
     client = discord_commands.Bot(intents=intents, command_prefix=PREFIX, help_command=None)
     client.remove_command('help')
 
     status = cycle(["UnderStar OS"])
-    
+
     timer = time.time()
-       
+
     def start(self):
         self.client.run(self.BOT_TOKEN)
-         
-    async def import_apps(self, sys :bool=False) -> None:
+
+    async def import_apps(self, sys: bool = False) -> None:
         """"""
-        #print((self.all_app.items() if not sys else sys_app.all_app.items()))
+        # print((self.all_app.items() if not sys else sys_app.all_app.items()))*
+
         for app_name,app in (self.all_app.items() if not sys else sys_app.all_app.items()):
             print(f"\n * IMPORT {app_name}: ")
 
             app.Lib.init(self.client, discord_tasks, self.all_app)
             app.Lib.set_app_name(app_name)
+
             if not os.path.exists(os.path.join(app.Lib.save.save_path, app_name)):
                 os.mkdir(os.path.join(app.Lib.save.save_path, app_name))
 
             # Task
 
-            loaded = 0
-            errors = 0
-            error_lst=[]
-            ttasks = []
+            loaded: int = 0
+            errors: int = 0
+            error_lst: list = []
+            ttasks: list = []
+
             try:
-                for task in app.Lib.app.all_tasks: #
+                for task in app.Lib.app.all_tasks:
                     try:
                         ttasks.append(discord_tasks.Loop[discord_tasks.LF](coro=task.function, seconds=task.seconds, minutes=task.minutes, hours=task.hours, count=task.count, time=task.time, reconnect=task.reconnect))
                         #terminal(callback=task.function, aliases=[f"{app_name}-{task.function.__name__}"])
+
                     except Exception as error:
-                        errors+=1
+                        errors += 1
                         error_lst.append(error)
 
                 for task in ttasks:
                     try:
                         asyncio.gather(task._loop())
-                        loaded+=1
+                        loaded += 1
+
                     except Exception as error:
-                        errors+=1
+                        errors += 1
                         error_lst.append(error)
+
             except Exception as error:
                 print(error)
 
@@ -99,29 +109,31 @@ class OS:
 
             # Command & Slash
             if len(self.Lib.store.get_guilds_installed(app_name)) > 0 or sys:
-                
+
                 # Command
-                loaded = 0
-                errors = 0
-                error_lst=[]    
+                loaded: int = 0
+                errors: int = 0
+                error_lst: list = []
 
                 for command in app.Lib.app.commands:
                     try:
-                        new_com=discord_commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
+                        new_com = discord_commands.Command(command.command,name=f"{app_name}-{command.name}" if not command.force_name else command.name,help=command.help,aliases=command.aliases,checks=command.checks)
+
                         if not new_com in self.client.all_commands.keys():
                             self.client.add_command(new_com)
-                            loaded+=1
+                            loaded += 1
+
                     except Exception as error:
-                        errors+=1
+                        errors += 1
                         error_lst.append(error)
-                        
+
                 print(f" * - Command : {loaded} loaded | {errors} error : {error_lst}")
 
                 # Slash
-            
-                loaded = 0
-                errors = 0
-                error_lst=[]
+
+                loaded: int = 0
+                errors: int = 0
+                error_lst: list = []
 
                 app_groupe = discord.app_commands.Group(name=app_name, description=f"{len(app.Lib.app.slashs)} commands", guild_ids=self.Lib.store.get_guilds_installed(app_name) if not sys else None)
 
@@ -130,94 +142,110 @@ class OS:
                         if command.direct_command:
                             if not command.name in [com.name for com in self.client.tree.get_commands()]:
                                 self.client.tree.add_command(command, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
-                                loaded+=1
+                                loaded += 1
+
                         else:
                             if not command.name in [com.name for com in app_groupe.commands]:
                                 app_groupe.add_command(command)
-                                loaded+=1
+                                loaded += 1
+
                     except Exception as error:
-                        errors+=1
+                        errors += 1
                         error_lst.append(error)
 
-                if len(app_groupe.commands)>0:
+                if len(app_groupe.commands) > 0:
                     self.client.tree.add_command(app_groupe, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
+
                 print(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}")
+
             else:
-                print(f" * - Command : Any guild have installed this app, not loaded")
-                print(f" * - Slash : Any guild have installed this app, not loaded")
+                print(" * - Command : Any guild have installed this app, not loaded")
+                print(" * - Slash : Any guild have installed this app, not loaded")
 
 
     def get_help(self, ctx: discord_commands.context.Context) -> list:
         """"""
-        embeds = []
+        embeds: list = []
         embed = discord.Embed(title="OS Commands", description=f"Préfix : `{PREFIX}` | Version : `{BOT_VERSION}`", color=discord.Color.red())
+
         try:
-            coms = [com for com in self.client.all_commands]
+            coms: list = [com for com in self.client.all_commands]
             coms.sort()
-            nb = 0
-            page = 1
-            nb_page = len(coms)//25
+
+            nb: int = 0
+            page: int = 1
+            nb_page: int = len(coms)//25
+
             embed.set_author(name=f'Liste des commandes {(page+"/"+nb_page) if nb_page > 1 else ""}')
+
             for com in coms:
                 #print(com)
-                if all([check(ctx) for check in self.client.all_commands[com].checks]+[True]):
+                if all([check(ctx) for check in self.client.all_commands[com].checks] + [True]):
                     embed.add_field(name=f"**{com}**", value=f'{self.client.all_commands[com].help if self.client.all_commands[com].help != None else "Aucune aide disponible"}')
-                    nb+=1
-                if nb==25:
-                    nb=0
+                    nb += 1
+
+                if nb == 25:
+                    nb: int = 0
                     embeds.append(embed.copy())
                     embed = discord.Embed(title="OS Commands", color=discord.Color.red())
                     embed.set_author(name=f'Liste des commandes {page}/{nb_page}')
-                    page+=1
+                    page += 1
+
             if nb > 0:
                 embeds.append(embed)
-            
+
         except Exception as error:
             print(error)
 
         return embeds
 
     async def send_error(self, ctx: discord.Interaction, error: str, *args, **kwargs):
-        embed = discord.Embed(title=f"Unexpected Error", description=f"DateTime : `{time.localtime(time.time())}`", color=discord.Color.red())
-        if ctx!=None:
+        embed = discord.Embed(title="Unexpected Error", description=f"DateTime : `{time.localtime(time.time())}`", color=discord.Color.red())
+
+        if ctx is not None:
             embed.set_author(name=f"{ctx.user.name} use {ctx.command}", icon_url=ctx.user.avatar.url)
             embed.add_field(name="ctx info :", value=ctx.data.items())
+
         embed.add_field(name="error :", value=str(error))
         embed.add_field(name="error :", value=str(error))
-        if self.client.owner_id==None:
+
+        if self.client.owner_id is None:
             return
+
         user = await self.client.fetch_user(self.client.owner_id)
         await user.send(embed=embed)
-        
+
     ################################################################
     #                             INIT                             #
     ################################################################
-    
-    def __init__(self, token: str=None, log: bool=False) -> None:
+
+    def __init__(self, token: str = None, log: bool = False) -> None:
         self.all_app = import_module("app", log=log)
         if not token:
             try:
-                with open(BOT_TOKEN_PATH, "r", encoding=CODING) as f:
+                with open(BOT_TOKEN_PATH, "r", encoding="utf8") as f:
                     self.BOT_TOKEN = f.readlines()[0].strip()
+
             except FileNotFoundError:
-                with open(BOT_TOKEN_PATH, "w", encoding=CODING) as f:
+                with open(BOT_TOKEN_PATH, "w", encoding="utf8") as f:
                     f.write("TOKEN_HERE")
-                    input("please insert the bot token in the file classbot_token")
+                    input("please insert the bot token in the file token/bot_token")
                     sys.exit(0)
+
         else:
             self.BOT_TOKEN = token
 
         client = self.client
         Lib = self.Lib
-        
+
         # -------------------------------- Slash Command -------------------
 
         @client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None)
         async def info(ctx:discord.Interaction):
             embed = discord.Embed(title="INFO")
-            embed.add_field(name=f"Version  :", value=f"`{BOT_VERSION}`")
-            embed.add_field(name=f"Ping  :", value=f"` {round(self.client.latency * 1000)} `")
-            embed.add_field(name=f"Time up  :", value=f"<t:{int(self.timer)}:R>")
+            embed.add_field(name="Version  :", value=f"`{BOT_VERSION}`")
+            embed.add_field(name="Ping  :", value=f"` {round(self.client.latency * 1000)} `")
+            embed.add_field(name="Time up  :", value=f"<t:{int(self.timer)}:R>")
             await ctx.response.send_message(embed=embed, ephemeral=True)
 
 
@@ -232,49 +260,62 @@ class OS:
         @discord_commands.check(Lib.is_in_staff)
         async def version(ctx:discord_commands.context.Context):
             embed = discord.Embed(title="INFO")
-            embed.add_field(name=f"Version :", value=f"`{BOT_VERSION}`")
-            embed.add_field(name=f"Ping :", value=f"` {round(self.client.latency * 1000)} `")
-            embed.add_field(name=f"Time up :", value=f"<t:{int(self.timer)}:R>")
+            embed.add_field(name="Version :", value=f"`{BOT_VERSION}`")
+            embed.add_field(name="Ping :", value=f"` {round(self.client.latency * 1000)} `")
+            embed.add_field(name="Time up :", value=f"<t:{int(self.timer)}:R>")
+
             await ctx.send(embed=embed)
 
 
         @client.command(name="os-help", aliases=["help"], help="Pour avoir ce message")
         async def help(ctx:discord_commands.context.Context,*args):
-            if args==():
+            if args == ():
                 await ctx.send(embeds=self.get_help(ctx))
+
             else :
                 if args[0] in self.all_app.keys():
                     sys_com = False
                     com = self.all_app
+
                 elif args[0] in sys_app.all_app:
                     sys_com = True
                     com = sys_app.all_app
+
                 else:
                     return
-                if len(args)==1:
+
+                if len(args) == 1:
                     try:
                         await com[args[0]].Lib.help(ctx)
+
                     except Exception as error:
                         if types(error) == AttributeError:
                             await ctx.send(content=f"L'application `{args[0]}` n'a pas de fonction d'aide")
+
                         else:
                             await ctx.send(content=f"La fonction d'aide de l'application `{args[0]}` ne fonctionne pas. Merci de contacter son développeur.")
+
                 else:
                     if f"{args[0]}-{args[1]}" in client.all_commands.keys():
                         embed = discord.Embed(title=f"Aide sur la commande `{args[1]}`", description=f"Commande : `{PREFIX}{args[0]}-{args[1]}`", color=discord.Color.red())
                         embed.set_author(name=f'App : {args[0]}')
-                        aide=client.all_commands[f"{args[0]}-{args[1]}"].help if client.all_commands[f"{args[0]}-{args[1]}"].help!="" else "Pas d'aide pour cette commande"
-                        alias=""
+                        aide: str = client.all_commands[f"{args[0]}-{args[1]}"].help if client.all_commands[f"{args[0]}-{args[1]}"].help!="" else "Pas d'aide pour cette commande"
+                        alias: str = ""
+
                         for command in client.all_commands.keys():
-                            if command!=f"{args[0]}-{args[1]}" and client.all_commands[command]==client.all_commands[f"{args[0]}-{args[1]}"]:
-                                alias+=f"{command}, "
+                            if command != f"{args[0]}-{args[1]}" and client.all_commands[command]==client.all_commands[f"{args[0]}-{args[1]}"]:
+                                alias += f"{command}, "
+
                         embed.add_field(name=f"**{aide}**", value=f"Alias : {alias[:-1]}")
+
                     else:
                         embed = discord.Embed(title=f"La Command `{args[1]}` n'existe pas", description=f"Préfix de l'app : `{PREFIX}{args[0]}-`", color=discord.Color.red())
                         embed.set_author(name=f"App : {args[0]}")
-                        #embed.add_field(name=f"**La Command {args[1]} n'existe pas**", value=f"Commande d'aide de l'application {args[0]} : !{args[0]}-help")
+                        # embed.add_field(name=f"**La Command {args[1]} n'existe pas**", value=f"Commande d'aide de l'application {args[0]} : !{args[0]}-help")
+
                     try:
                         await ctx.send(embed=embed)
+
                     except Exception as error:
                         print(error)
 
@@ -286,6 +327,7 @@ class OS:
                 if app:
                     data = getattr(app.Lib.event, command)
                     await data(*args, **kwargs)
+
                     if app.Lib.app.fusioned:
                         for sub_app in app.Lib.app.fusioned_module:
                             data = getattr(sub_app.Lib.event, command)
@@ -306,15 +348,18 @@ class OS:
 
             if isinstance(error, discord.app_commands.CheckFailure):
                 await ctx.response.send_message('Tu ne remplis pas les conditions pour executer cette commande.', ephemeral=True)
+
             elif isinstance(error, discord.app_commands.BotMissingPermissions):
                 await ctx.response.send_message('Le bot ne peut pas executer cette commande car il lui manque des autorisations. Merci de contacter le STAFF', ephemeral=True)
+
             else:
                 try:
                     await ctx.response.send_message(f"Data :\n{ctx.data}\nError :\n{error}", ephemeral = True)
+
                 except:
                     print(f"Data :\n{ctx.data}\nError :\n{error}")
+
                 await self.send_error(ctx, error)
-                
 
         #AutoMod
         @client.event
@@ -390,16 +435,17 @@ class OS:
                 await ctx.send('Please pass in all required arguments')
 
             elif isinstance(error, discord_commands.CommandOnCooldown):
-                value = int(f"{error.retry_after:.0f}")
-                message = "Try again in "
+                value: int = int(f"{error.retry_after:.0f}")
+                message: str = "Try again in "
                 message += convert_time(value)
 
                 em = discord.Embed(title="Slow it down bro!", description=message)
                 await ctx.send(embed=em)
+
             else:
                 await self.send_error(None, error, ctx.args)
-            await manage_event("on_command_error", ctx, error)
 
+            await manage_event("on_command_error", ctx, error)
 
         #Debug
         @client.event
@@ -419,7 +465,6 @@ class OS:
         async def on_socket_raw_send(payload):
             await manage_event("on_socket_raw_send", payload)
 
-
         #Gateway
         @client.event
         async def on_ready():
@@ -435,10 +480,10 @@ class OS:
             print(" * version : ", programmer, BOT_VERSION)
             print(" * Logged in as : ", client.user.name)
             print(" * ID : ", client.user.id)
-            
+
             await client.tree.sync()
 
-            with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json") as f:
+            with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", encoding="utf8") as f:
                 data = json.load(f)
 
             for guild in client.guilds:
@@ -449,7 +494,8 @@ class OS:
 
                 if str(guild.id) not in data.keys():
                     data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
-                    with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w") as f:
+
+                    with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w", encoding="utf8") as f:
                         json.dump(data, fp=f)
 
             if "sync" in sys.argv:
@@ -480,11 +526,13 @@ class OS:
 
         @client.event
         async def on_guild_join(guild):
-            with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json") as f:
+            with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", encoding="utf8") as f:
                 data = json.load(f)
+
             if str(guild.id) in data.keys():
                 data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
-                with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w") as f:
+
+                with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w", encoding="utf8") as f:
                     json.dump(data, fp=f)
 
             await manage_event("on_guild_join", guild)
@@ -586,16 +634,13 @@ class OS:
         async def on_message_delete(message):
             await manage_event("on_message_delete", message)
 
-
         @client.event
         async def on_bulk_message_delete(messages):
             await manage_event("on_bulk_message_delete", messages)
 
-
         @client.event
         async def on_raw_message_edit(payload):
             await manage_event("on_raw_message_edit", payload)
-
 
         @client.event
         async def on_raw_message_delete(payload):
@@ -731,7 +776,6 @@ class OS:
         async def on_voice_state_update(member, before, after):
             await manage_event("on_voice_state_update", member, before, after)
 
-
         # ----------------------------COMMANDE MAINTENANCE----------------------------------
         @client.command(name="triger_event", help="Simule un event")
         @discord_commands.check(Lib.is_in_staff)
@@ -739,9 +783,9 @@ class OS:
             if event_name == "on_member_join" or event_name == "on_member_remove":
                 member = ctx.author
                 await manage_event(event_name, member)
+
             else:
                 await manage_event(event_name)
-
 
         @client.command(name="restart", help="Pour restart le bot")
         @discord_commands.check(Lib.is_in_staff)
@@ -751,7 +795,6 @@ class OS:
             await ctx.send("Restarting bot")
             os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
-
         @client.command(help="stop le bot")
         @discord_commands.check(Lib.is_in_staff)
         async def stop(ctx:discord_commands.context.Context):
@@ -759,7 +802,6 @@ class OS:
             await client.change_presence(activity=discord.Game("Shutting down..."), status=discord.Status.dnd)
             exit(1)
             quit()
-
 
         @client.command(aliases=["upt"], help="Pour update le bot")
         @discord_commands.check(Lib.is_in_staff)
@@ -771,20 +813,20 @@ class OS:
 
             await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
             print(val)
-            if val==0:
+
+            if val == 0:
                 await ctx.send("Done")
                 await client.close()
+
             else:
                 await ctx.send("Error!")
                 exit(0)
 
-
         # -------------------------------------- TASKS -----------------------------------
-
-
         @discord_tasks.loop(seconds=127)
         async def change_status():
             if "sync" in sys.argv:
                 await client.change_presence(activity=discord.Game("Re-Sync..."), status=discord.Status.dnd)
+
             else:
                 await client.change_presence(activity=discord.Game(next(self.status)))

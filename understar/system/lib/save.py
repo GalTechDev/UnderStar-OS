@@ -1,6 +1,7 @@
 import json
-from os import remove, listdir, mkdir, path
+from os import remove, listdir, mkdir
 from shutil import rmtree
+
 
 class Save:
     """"""
@@ -8,101 +9,88 @@ class Save:
         self.path = None
         self.app_name = app_name
         self.save_path = "save/app"
+        self.app_path = f"{self.save_path}/{self.app_name}"
 
-    def add_file(self, name: str, path: str="", over_write: bool=False) -> None:
+    def add_file(self, name: str, save_path: str = "", over_write: bool = False) -> None:
         """ajoute un fichier à sauvegarder"""
         try:
-            if path=="":
-                full_path=f"{self.save_path}/{self.app_name}/{name}"
-            else:
-                full_path=f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+            full_path = self.get_full_path(name, save_path)
 
             with open(full_path, "x"):
                 pass
 
         except (FileExistsError):
-            if over_write:
-                if path=="":
-                    full_path=f"{self.save_path}/{self.app_name}/{name}"
-                else:
-                    full_path=f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
-                remove(full_path)
-                self.add_file(name,path,over_write)
-            else:
+            if not over_write:
                 raise FileExistsError
 
-    def open(self, name: str, path: str=""):
-        if path=="":
-            path = f"{self.save_path}/{self.app_name}/{name}"
-        else:
-            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+            full_path = self.get_full_path(name, save_path)
+            remove(full_path)
+            self.add_file(name, save_path, over_write)
 
-        with open(path) as file:
-            return file
+    def open(self, name: str, save_path: str = ""):
+        return self.factorize_save(name=name, save_path=save_path, mode="r")
 
-    def read(self, name, path="", binary_mode=False):
-        if path=="":
-            path = f"{self.save_path}/{self.app_name}/{name}"
-        else:
-            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+    def read(self, name: str, save_path: str = "", binary_mode: bool = False):
+        return self.factorize_save(name=name, save_path=save_path, mode="r").read()
 
-        with open(path, 'rb' if binary_mode else 'r') as file:
-            return file.read()
+    def write(self, name, save_path: str = "", data: str = "", binary_mode: bool = False):
+        return self.factorize_save(name=name, save_path=save_path, mode='wb' if binary_mode else 'w', data=data)
 
-    def write(self, name, path="", data="", binary_mode=False):
-        if path=="":
-            path = f"{self.save_path}/{self.app_name}/{name}"
-        else:
-            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+    def json_read(self, name, save_path: str = ""):
+        return json.load(self.factorize_save(name=name, save_path=save_path, mode="r"))
 
-        with open(path, 'wb' if binary_mode else 'w') as file:
-            file.write(data)
+    def get_files(self, save_path: str = ""):
+        return listdir(f"{self.app_path}/{save_path}")
 
-    def json_read(self, name, path=""):
-        if path=="":
-            path = f"{self.save_path}/{self.app_name}/{name}"
-        else:
-            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
+    def existe(self, name, save_path: str = ""):
+        return name in self.get_files(save_path)
 
-        with open(path, 'r') as file:
-            return json.load(file)
+    def remove_file(self, name: str, save_path: str = ""):
+        save_path = self.get_full_path(name, save_path)
+        remove(f"{save_path}/{self.app_name}/{name}")
 
-    def get_files(self, path=""):
-        return listdir(f"{self.save_path}/{self.app_name}/{path}")
-
-    def existe(self, name, path=""):
-        return name in self.get_files(path)
-
-    def remove_file(self, name, path=""):
-        if path=="":
-            path = f"{self.save_path}/{self.app_name}/{name}"
-        else:
-            path = f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}"
-
-        remove(f"{path}/{self.app_name}/{name}")
-
-
-    def add_folder(self, path="", ignor_exception=True):
+    def add_folder(self, save_path: str = "", ignore_exception: bool = True):
         try:
-            mkdir(f"{self.save_path}/{self.app_name}/{path}")
-        except:
-            if not ignor_exception:
-                raise Exception(f"Path: {path} can't be create")
+            mkdir(f"{self.app_path}/{save_path}")
 
-    def remove_folder(self, path=""):
-        rmtree(f"{self.save_path}/{self.app_name}/{path}")
+        except:
+            if not ignore_exception:
+                raise Exception(f"Path: {save_path} can't be create")
+
+    def remove_folder(self, save_path: str = ""):
+        rmtree(f"{self.app_path}/{save_path}")
         pass
 
-    def get_tree(self, path=""):
-        tree={}
-        for folder in listdir(f"{self.save_path}/{self.app_name}/{path}"):
-            if path.isdir(f"{self.save_path}/{self.app_name}/{path}/{folder}"):
-                tree[folder]=self.get_tree(f"{path}/{folder}")
+    def get_tree(self, save_path: str = ""):
+        tree: dict = {}
+
+        for folder in listdir(f"{self.app_path}/{save_path}"):
+            if save_path.isdir(f"{self.app_path}/{save_path}/{folder}"):
+                tree[folder] = self.get_tree(f"{save_path}/{folder}")
+
         return tree
 
-    def get_full_path(self, name, path=""):
-        if path=="":
-            path=(f"{self.save_path}/{self.app_name}/{name}")
+    def factorize_save(self, name: str, save_path: str = "", mode: str = "r", data: any = ""):
+        if not save_path:
+            save_path = f"{self.app_path}/{name}"
+
         else:
-            path=(f"{self.save_path}/{self.app_name}/{path+'/' if path[-1]!='/' else ''}{name}")
-        return path
+            save_path = f"{self.app_path}/{save_path+'/' if save_path[-1]!='/' else ''}{name}"
+
+        encoding = "utf8" if "b" not in mode else None
+
+        if "w" in mode:
+            with open(save_path, mode, encoding=encoding) as file:
+                file.write(data)
+
+        elif "r" in mode:
+            with open(save_path, mode, encoding=encoding) as file:
+                return file
+
+    def get_full_path(self, name: str , save_path: str = ""):
+        if not save_path:
+            save_path = f"{self.app_path}/{save_path}"
+        else:
+            save_path = f"{self.app_path}/{save_path+'/' if save_path[-1]!='/' else ''}{name}"
+
+        return save_path
