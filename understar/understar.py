@@ -153,14 +153,17 @@ class OS:
                         self.client.tree.add_command(command, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
                         loaded += 1
 
-                if len(app_groupe.commands) > 0:
-                    self.client.tree.add_command(app_groupe, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
-
                 for command in ndir_comm:
                     if not command.name in [com.name for com in app_groupe.commands]:
                         app_groupe.add_command(command)
                         loaded += 1
 
+                if len(app_groupe.commands) > 0:
+                    try:
+                        self.client.tree.add_command(app_groupe, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
+                    except Exception as e:
+                        print(e)
+                        
                 print(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}")
 
             else:
@@ -178,7 +181,7 @@ class OS:
 
             nb: int = 0
             page: int = 1
-            nb_page: int = len(coms)//25
+            nb_page: int = len(coms) // 25
 
             embed.set_author(name=f'Liste des commandes {(page+"/"+nb_page) if nb_page > 1 else ""}')
 
