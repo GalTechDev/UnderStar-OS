@@ -12,7 +12,7 @@ LANGAGE = "fr"
 THEME = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
 chemin_fichier = pkg_resources.resource_filename(__name__, '.version')
 
-with open(os.path.join(chemin_fichier.removesuffix(os.path.join("system","lib",".version")),".version"), 'r', encoding="utf8") as f:
+with open(os.path.join(chemin_fichier.removesuffix(os.path.join("system", "lib", ".version")), ".version"), 'r', encoding="utf8") as f:
     BOT_VERSION = f.read()
 
 
@@ -98,7 +98,7 @@ class Task:
 class Guilds:
     """"""
     def __init__(self) -> None:
-        self.guilds_path = "save/system/guilds.json"
+        self.guilds_path = os.path.join("save", "system", "guilds.json")
 
     def get_app_guilds(self, app_name: str = None, guild=None):
         if not app_name is None and not guild is None:

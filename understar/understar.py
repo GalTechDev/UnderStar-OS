@@ -12,17 +12,16 @@ from .system import app as sys_app
 import asyncio
 import json
 
-print("DEV VERSION")
-
 DOWNLOAD_FOLDER: str = "download"
 SYS_FOLDER: str = "system"
 TOKEN_FOLDER: str = "token"
 SAVE_FOLDER: str = "save"
-SAVE_APP_FOLDER: str = "save/app"
-SAVE_SYS_FOLDER: str = "save/system"
+SAVE_APP_FOLDER: str = os.path.join("save", "app") 
+SAVE_SYS_FOLDER: str = os.path.join("save", "system")
 APP_FOLDER: str = "app"
-BOT_TOKEN_PATH: str = f"{TOKEN_FOLDER}/bot_token"
-UPDATE_FILE: str = f"{SYS_FOLDER}/app/update/update.pyw"
+BOT_TOKEN_PATH: str = os.path.join(f"{TOKEN_FOLDER}", "bot_token")
+UPDATE_FILE: str = os.path.join(f"{SYS_FOLDER}","app", "update", "update.pyw")
+GUILD_FILE: str = os.path.join(f"{SAVE_FOLDER}", f"{SYS_FOLDER}", "guilds.json")
 
 programmer = os.path.basename(sys.argv[0])
 
@@ -38,16 +37,16 @@ class OS:
     files: list = ["guilds.json", "app_store.json"]
 
     for file in files:
-        if not file in os.listdir("save/system"):
-            with open(os.path.join("save", "system", file), "w", encoding="utf8") as f:
+        if not file in os.listdir(SAVE_SYS_FOLDER):
+            with open(os.path.join(SAVE_SYS_FOLDER, file), "w", encoding="utf8") as f:
                 pass
 
         try:
-            with open(os.path.join("save", "system", file), "r", encoding="utf8") as f:
+            with open(os.path.join(SAVE_SYS_FOLDER, file), "r", encoding="utf8") as f:
                 json.loads(f.read())
 
         except json.JSONDecodeError:
-            with open(os.path.join("save", "system", file), "w", encoding="utf8") as f:
+            with open(os.path.join(SAVE_SYS_FOLDER, file), "w", encoding="utf8") as f:
                 f.write(json.dumps({} if file == "guilds.json" else {"rolemanager": "https://github.com/GalTechDev/rolemanager/archive/refs/heads/main.zip", "uno": "https://github.com/GalTechDev/uno/archive/refs/heads/main.zip", "welcome": "https://github.com/GalTechDev/welcome/archive/refs/heads/main.zip"}))
 
     BOT_TOKEN: str = ""
@@ -367,7 +366,7 @@ class OS:
 
             else:
                 try:
-                    await ctx.response.send_message(f"Data :\n{ctx.data}\nError :\n{error}", ephemeral = True)
+                    await ctx.response.send_message(content=f"Data :\n{ctx.data}\nError :\n{error}", ephemeral = True)
 
                 except:
                     print(f"Data :\n{ctx.data}\nError :\n{error}")
@@ -496,7 +495,7 @@ class OS:
 
             await client.tree.sync()
 
-            with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", encoding="utf8") as f:
+            with open(GUILD_FILE, encoding="utf8") as f:
                 data = json.load(f)
 
             for guild in client.guilds:
@@ -508,7 +507,7 @@ class OS:
                 if str(guild.id) not in data.keys():
                     data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
 
-                    with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w", encoding="utf8") as f:
+                    with open(GUILD_FILE, "w", encoding="utf8") as f:
                         json.dump(data, fp=f)
 
             if "sync" in sys.argv:
@@ -539,13 +538,13 @@ class OS:
 
         @client.event
         async def on_guild_join(guild):
-            with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", encoding="utf8") as f:
+            with open(GUILD_FILE, encoding="utf8") as f:
                 data = json.load(f)
 
             if str(guild.id) in data.keys():
                 data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
 
-                with open(f"{SAVE_FOLDER}/{SYS_FOLDER}/guilds.json", "w", encoding="utf8") as f:
+                with open(GUILD_FILE, "w", encoding="utf8") as f:
                     json.dump(data, fp=f)
 
             await manage_event("on_guild_join", guild)

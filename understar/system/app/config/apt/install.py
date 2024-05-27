@@ -2,7 +2,7 @@ from understar.system import lib
 import requests
 import mimetypes
 import uuid
-from os import mkdir, listdir,remove, rename
+import os
 from shutil import rmtree, move
 import zipfile as zip
 import discord
@@ -29,9 +29,9 @@ async def download(ctx:discord.Interaction, app_name: str, link: str = ""):
         folder = uuid.uuid4()
         content_type = response.headers['content-type']
         extension = mimetypes.guess_extension(content_type)
-        path_folder = f"download/{folder}"
-        mkdir(path_folder)
-        file_path = f"{path_folder}/file{extension}"
+        path_folder = os.path.join(f"download", f"{folder}")
+        os.mkdir(path_folder)
+        file_path = os.path.join(f"{path_folder}", f"file{extension}")
 
         with open(file_path, "wb") as f:
             f.write(response.content)
@@ -40,11 +40,11 @@ async def download(ctx:discord.Interaction, app_name: str, link: str = ""):
             with zip.ZipFile(file_path, 'r') as zip_ref:
                 zip_ref.extractall(path_folder)
 
-            if len(listdir(path_folder))==2:
-                remove(file_path)
-                old_name = listdir(path_folder)[0]
-                move(f"{path_folder}/{old_name}", "app")
-                rename(f"app/{old_name}", f'app/{app_name.replace("-", "_")}')
+            if len(os.listdir(path_folder))==2:
+                os.remove(file_path)
+                old_name = os.listdir(path_folder)[0]
+                move(os.path.join(f"{path_folder}", f"{old_name}"), "app")
+                os.rename(os.path.join(f"app", f"{old_name}"), os.path.join(f"app", app_name.replace("-", "_")))
 
                 rmtree(path_folder)
 
@@ -67,12 +67,12 @@ async def download(ctx:discord.Interaction, app_name: str, link: str = ""):
 #@discord.app_commands.check(Lib.is_in_staff)
 async def install(ctx:discord.Interaction,app_name:str):
     if Lib.store.is_downloaded(app_name):
-        with open("save/system/guilds.json") as file:
+        with open(os.path.join("save", f"system", "guilds.json")) as file:
             guilds = json.load(file)
 
         guilds[str(ctx.guild_id)]["apps"].append(app_name)
 
-        with open("save/system/guilds.json", "w") as file:
+        with open(os.path.join("save", "system", "guilds.json"), "w") as file:
             file.write(json.dumps(guilds))
 
         await ctx.response.send_message("Application installé", ephemeral=True)

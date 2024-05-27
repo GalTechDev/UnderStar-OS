@@ -12,7 +12,7 @@ from discord import Interaction
 import requests_html
 import json
 import asyncio
-
+import os
 
 class Lib_UsOS:
     """"""
@@ -30,7 +30,7 @@ class Lib_UsOS:
         """"""
         self.app_name = app_name
         self.save.app_name = app_name
-        self.app_path = f"app/{app_name}/"
+        self.app_path = os.path.join(f"app", f"{app_name}")
 
         if self.app.fusioned:
             for mod in self.app.fusioned_module:
@@ -78,7 +78,7 @@ class Lib_UsOS:
 
     def get_lang_name(self):
         """"""
-        with open("system/lang/ref.json", encoding="utf8") as file:
+        with open(os.path.join("system", "lang", "ref.json"), encoding="utf8") as file:
             data = json.load(file)
 
         return data
@@ -88,7 +88,7 @@ class Lib_UsOS:
         ref = self.get_lang_name()
         lang_txt = ref[lang]
 
-        with open(f"system/lang/{lang_txt}.txt", encoding="utf8") as file:
+        with open(os.path.join(f"system", "lang", f"{lang_txt}.txt"), encoding="utf8") as file:
             all_text = file.readlines()
 
         return all_text

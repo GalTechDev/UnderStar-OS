@@ -1,16 +1,17 @@
 import json
+import os
 
 class App_store:
     """"""
     def __init__(self, installed_app) -> None:
         self.installed_app = installed_app
-        self.app_store_path: str = "save/system/app_store.json"
-        self.guilds_path: str = "save/system/guilds.json"
+        self.app_store_path: str = os.path.join("save", "system", "app_store.json")
+        self.guilds_path: str = os.path.join("save", "system", "guilds.json")
 
     def get_apps(self) -> dict:
         """Give a dict object {"app_name":"app_link",}"""
 
-        with open("save/system/app_store.json", encoding="utf8") as file:
+        with open(self.app_store_path, encoding="utf8") as file:
             data = json.load(file)
 
         return data
