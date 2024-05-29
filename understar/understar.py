@@ -242,11 +242,11 @@ class OS:
                 with open(BOT_TOKEN_PATH, "r", encoding="utf8") as f:
                     token = f.readlines()[0].strip()
 
-            except FileNotFoundError:
+            except Exception:
                 with open(BOT_TOKEN_PATH, "w", encoding="utf8") as f:
-                    token = input("TOKEN not set !\nEnter your token : ")
-                    f.write(token)
-                    sys.exit(0)
+                    print("TOKEN not set, please set token at /token/bot_token file")
+                    f.write("TOKEN HERE")
+                sys.exit(0)
 
         self.BOT_TOKEN = token
 
