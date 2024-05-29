@@ -16,3 +16,4 @@ understar/system/app/update/.DS_Store
 understar/system/lib/.DS_Store
 .DS_Store
 pypi_update.py
+docker.py
