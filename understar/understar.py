@@ -244,8 +244,8 @@ class OS:
 
             except FileNotFoundError:
                 with open(BOT_TOKEN_PATH, "w", encoding="utf8") as f:
-                    f.write("TOKEN_HERE")
-                    input("please insert the bot token in the file token/bot_token")
+                    token = input("TOKEN not set !\nEnter your token : ")
+                    f.write(token)
                     sys.exit(0)
 
         self.BOT_TOKEN = token
