@@ -12,8 +12,5 @@ COPY LICENSE LICENSE
 # Installer les dépendances
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Définir le point d'entrée
-ENTRYPOINT ["python"]
-
 # Spécifier le script à exécuter
-CMD ["main.py"]
+CMD ["python", "-u", "main.py"]
