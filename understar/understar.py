@@ -130,7 +130,7 @@ class OS:
                 errors: int = 0
                 error_lst: list = []
 
-                app_groupe = discord.app_commands.Group(name=app_name, description=f"{len(app.Lib.app.slashs)} commands", guild_ids=self.Lib.store.get_guilds_installed(app_name) if not sys else None)
+                app_groupe = discord.app_commands.Group(name=app_name.lower(), description=f"{len(app.Lib.app.slashs)} commands", guild_ids=self.Lib.store.get_guilds_installed(app_name) if not sys else None)
 
                 dir_comm: list = []
                 ndir_comm: list = []
