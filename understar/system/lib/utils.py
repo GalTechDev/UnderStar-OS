@@ -24,20 +24,21 @@ async def valide_intaraction(interaction: discord.Interaction):
         pass
 
 
-def import_module(folder: str, log: bool = False, catch_error: bool = True, directory: str = None, found_sub_dir: bool = True):
+def import_module(folder: str, log: bool = False, catch_error: bool = False, directory: str = None, found_sub_dir: bool = True):
     """
     Import a module.
 
     The 'directory' argument is required when performing a relative import. It specifies the package to use as the anchor point from which to resolve the relative import to an absolute import.
     """
     # Parcours des apps dans le répertoire du package
+    log=True
     if log:
         print(" * Import Module Start :")
 
     modules: dict = {}
     path = os.path.join(folder.replace(".", "\\"), "*", "__init__.py") if found_sub_dir else os.path.join(folder.replace(".", "\\"), "*__init__.py")
 
-    # print(path, glob.glob(path, recursive=True, root_dir=directory))
+    print(path, glob.glob(path, recursive=True, root_dir=directory))
     for file_path in glob.glob(path, recursive=True, root_dir=directory):
 
         # Obtention du nom du module à partir du chemin de l'app

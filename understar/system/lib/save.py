@@ -36,8 +36,8 @@ class Save:
     def write(self, name, save_path: str = "", data: str = "", binary_mode: bool = False):
         return self.factorize_save(name=name, save_path=save_path, mode='wb' if binary_mode else 'w', data=data)
 
-    def json_read(self, name, save_path: str = ""):
-        return json.load(self.factorize_save(name=name, save_path=save_path, mode="r"))
+    def json_read(self, name, save_path: str = "") -> dict:
+        return json.loads(self.factorize_save(name=name, save_path=save_path, mode="r"))
 
     def get_files(self, save_path: str = ""):
         return os.listdir(os.path.join(f"{self.app_save_path}", f"{save_path}"))
@@ -53,7 +53,7 @@ class Save:
         try:
             os.mkdir(os.path.join(f"{self.app_save_path}", f"{save_path}"))
 
-        except:
+        except Exception:
             if not ignore_exception:
                 raise Exception(f"Path: {save_path} can't be create")
 
@@ -85,11 +85,11 @@ class Save:
 
         elif "r" in mode:
             with open(save_path, mode, encoding=encoding) as file:
-                return file
+                return file.read()
 
     def get_full_path(self, name: str , save_path: str = ""):
         if not save_path:
-            save_path = os.path.join(f"{self.app_save_path}", f"{save_path}")
+            save_path = os.path.join(f"{self.app_save_path}", f"{name}")
         else:
             save_path = os.path.join(f"{self.app_save_path}", f"{save_path}", f"{name}")
 

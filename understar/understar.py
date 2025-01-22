@@ -60,7 +60,7 @@ class OS:
 
     async def import_apps(self, sys: bool = False) -> None:
         """"""
-        # print((self.all_app.items() if not sys else sys_app.all_app.items()))*
+        print((self.all_app.items() if not sys else sys_app.all_app.items()))
 
         for app_name, app in (self.all_app.items() if not sys else sys_app.all_app.items()):
             print(f"\n * IMPORT {app_name}: ")
