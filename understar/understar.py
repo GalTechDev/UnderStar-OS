@@ -257,7 +257,7 @@ class OS:
         # -------------------------------- Slash Command -------------------
 
         @client.tree.command(name = "info", description = "Donne des infos sur le bot", guild=None)
-        async def info(ctx:discord.Interaction):
+        async def info_command(ctx:discord.Interaction):
             embed = discord.Embed(title="INFO")
             embed.add_field(name="Version  :", value=f"`{BOT_VERSION}`")
             embed.add_field(name="Ping  :", value=f"` {round(self.client.latency * 1000)} `")
@@ -485,17 +485,16 @@ class OS:
         @client.event
         async def on_ready():
             client.info = await client.application_info()
-
             change_status.start()
 
             #maintenance.start()
             await self.import_apps(True)
             await self.import_apps()
-
+            
             info(" * Bot Starting...")
-            info(" * version : ", programmer, BOT_VERSION)
-            info(" * Logged in as : ", client.user.name)
-            info(" * ID : ", client.user.id)
+            info(f" * version : {programmer} {BOT_VERSION}")
+            info(f" * Logged in as : {client.user.name}")
+            info(f" * ID : {client.user.id}")
 
             await client.tree.sync()
 
