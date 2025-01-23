@@ -11,6 +11,10 @@ from .system.lib import App, MISSING, BOT_VERSION, types, convert_time, import_m
 from .system import app as sys_app
 import asyncio
 import json
+import logging
+from logging import info, warning, error
+
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level = logging.INFO)
 
 DOWNLOAD_FOLDER: str = "download"
 SYS_FOLDER: str = "system"
@@ -60,10 +64,10 @@ class OS:
 
     async def import_apps(self, sys: bool = False) -> None:
         """"""
-        print((self.all_app.items() if not sys else sys_app.all_app.items()))
+        #print((self.all_app.items() if not sys else sys_app.all_app.items()))
 
         for app_name, app in (self.all_app.items() if not sys else sys_app.all_app.items()):
-            print(f"\n * IMPORT {app_name}: ")
+            info(f" * IMPORT {app_name}: ")
 
             app.Lib.init(self.client, discord_tasks, self.all_app)
             app.Lib.set_app_name(app_name)
@@ -98,9 +102,9 @@ class OS:
                         error_lst.append(error)
 
             except Exception as error:
-                print(error)
+                error(error)
 
-            print(f" * - Task : {loaded} loaded | {errors} error : {error_lst}")
+            info(f" * - Task : {loaded} loaded | {errors} error : {error_lst}")
 
             # Command & Slash
             if len(self.Lib.store.get_guilds_installed(app_name)) > 0 or sys:
@@ -122,7 +126,7 @@ class OS:
                         errors += 1
                         error_lst.append(error)
 
-                print(f" * - Command : {loaded} loaded | {errors} error : {error_lst}")
+                info(f" * - Command : {loaded} loaded | {errors} error : {error_lst}")
 
                 # Slash
 
@@ -161,13 +165,13 @@ class OS:
                     try:
                         self.client.tree.add_command(app_groupe, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
                     except Exception as e:
-                        print(e)
+                        error(e)
                         
-                print(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}")
+                info(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}\n")
 
             else:
-                print(" * - Command : Any guild have installed this app, not loaded")
-                print(" * - Slash : Any guild have installed this app, not loaded")
+                warning(" * - Command : Any guild have installed this app, not loaded")
+                warning(" * - Slash : Any guild have installed this app, not loaded")
 
     def get_help(self, ctx: discord_commands.context.Context) -> list:
         """"""
@@ -201,7 +205,7 @@ class OS:
                 embeds.append(embed)
 
         except Exception as error:
-            print(error)
+            error(error)
 
         return embeds
 
@@ -244,7 +248,7 @@ class OS:
 
             except Exception:
                 with open(BOT_TOKEN_PATH, "w", encoding="utf8") as f:
-                    print("TOKEN not set, please set token at /token/bot_token file")
+                    warning("TOKEN not set, please set token at /token/bot_token file")
                     f.write("TOKEN HERE")
                 sys.exit(0)
 
@@ -329,7 +333,7 @@ class OS:
                         await ctx.send(embed=embed)
 
                     except Exception as error:
-                        print(error)
+                        error(error)
 
         # ---------------------------------- EVENTS ------------------------------------
 
@@ -368,8 +372,8 @@ class OS:
                 try:
                     await ctx.response.send_message(content=f"Data :\n{ctx.data}\nError :\n{error}", ephemeral = True)
 
-                except:
-                    print(f"Data :\n{ctx.data}\nError :\n{error}")
+                except Exception:
+                    error(f"Data :\n{ctx.data}\nError :\n{error}")
 
                 await self.send_error(ctx, error)
 
@@ -488,10 +492,10 @@ class OS:
             await self.import_apps(True)
             await self.import_apps()
 
-            print("\n * Bot Starting...")
-            print(" * version : ", programmer, BOT_VERSION)
-            print(" * Logged in as : ", client.user.name)
-            print(" * ID : ", client.user.id)
+            info(" * Bot Starting...")
+            info(" * version : ", programmer, BOT_VERSION)
+            info(" * Logged in as : ", client.user.name)
+            info(" * ID : ", client.user.id)
 
             await client.tree.sync()
 
@@ -824,7 +828,6 @@ class OS:
             val = os.system(f"start {UPDATE_FILE}")
 
             await client.change_presence(activity=discord.Game("Back from updt !"), status=discord.Status.online)
-            print(val)
 
             if val == 0:
                 await ctx.send("Done")

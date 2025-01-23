@@ -6,7 +6,7 @@ import glob
 import os
 import pkg_resources
 import sys
-
+from logging import info, warning
 
 LANGAGE = "fr"
 THEME = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
@@ -18,7 +18,8 @@ with open(os.path.join(chemin_fichier.removesuffix(os.path.join("system", "lib",
 
 async def valide_intaraction(interaction: discord.Interaction):
     try:
-        await interaction.response.send_message()
+        await interaction.response.defer()
+        #await interaction.response.send_message()
 
     except Exception:
         pass
@@ -31,14 +32,14 @@ def import_module(folder: str, log: bool = False, catch_error: bool = False, dir
     The 'directory' argument is required when performing a relative import. It specifies the package to use as the anchor point from which to resolve the relative import to an absolute import.
     """
     # Parcours des apps dans le répertoire du package
-    log=True
+
     if log:
-        print(" * Import Module Start :")
+        info(" * Import Module Start :")
 
     modules: dict = {}
     path = os.path.join(folder.replace(".", "\\"), "*", "__init__.py") if found_sub_dir else os.path.join(folder.replace(".", "\\"), "*__init__.py")
 
-    print(path, glob.glob(path, recursive=True, root_dir=directory))
+    #print(path, glob.glob(path, recursive=True, root_dir=directory))
     for file_path in glob.glob(path, recursive=True, root_dir=directory):
 
         # Obtention du nom du module à partir du chemin de l'app
@@ -60,17 +61,17 @@ def import_module(folder: str, log: bool = False, catch_error: bool = False, dir
             modules.update({module_name:module})
 
             if log:
-                print(f" *  - imported {module_name}")
+                info(f" *  - imported {module_name}")
 
         except Exception as e:
             if log:
-                print(f" *  - failled importing {module_name} error : {e}")
+                warning(f" *  - failled importing {module_name} error : {e}")
 
             if not catch_error:
                 raise e
 
     if log:
-        print(" * Import Module Finish")
+        info(" * Import Module Finish")
 
     return modules
 
