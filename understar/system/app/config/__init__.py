@@ -352,8 +352,8 @@ async def update_menu(ctx: discord.Interaction):
     last = Lib.get_last_update_stats()
     update = last > float(lib.BOT_VERSION) if last else False
 
-    embed = discord.Embed(title=":gear:  Mise à jour", description=f"{'Vous êtes à jour.' if last <= float(lib.BOT_VERSION) else 'Nouvelle version disponible'}", color=lib.THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
-    embed.add_field(name=f"UnderStar OS v{last}", value='\u200b')
+    embed = discord.Embed(title=":gear:  Mise à jour", description=f"{'Vous êtes à jour.' if not update else f'Nouvelle version disponible : v{last}'}", color=lib.THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed.add_field(name=f"Version actuelle : UnderStar OS v{lib.BOT_VERSION}", value='\u200b')
 
     await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=update))
 

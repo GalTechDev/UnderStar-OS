@@ -102,7 +102,8 @@ class Lib_UsOS:
             try:
                 session = requests_html.HTMLSession()
                 r = session.get(url)
-                content = r.html.find('.blob-code', first=True)
+                content = r.html.find('.react-file-line.html-div', first=True)
+                
                 return float(content.text.strip())
             except Exception as e:
                 logging.error(f"Erreur lors de la récupération de la version sur GitHub : {e}")
