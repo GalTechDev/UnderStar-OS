@@ -13,6 +13,9 @@ import requests_html
 import json
 import asyncio
 import os
+import subprocess
+from sys import executable
+import logging
 
 class Lib_UsOS:
     """"""
@@ -67,14 +70,43 @@ class Lib_UsOS:
             if role in admins:
                 return True
 
+    def is_pip_installed(self):
+        """Vérifie si une bibliothèque est installée avec pip."""
+        try:
+            subprocess.check_output([executable, "-m", "pip", "show", "understar"])
+            return True
+        except subprocess.CalledProcessError:
+            return False
+
     def get_last_update_stats(self):
-        """"""
-        url: str = 'https://github.com/GalTechDev/UnderStar-OS/blob/master/understar/.version'
-        session = requests_html.HTMLSession()
-        r = session.get(url)
-        content = r.html.find('.blob-code', first=True)
-        #lines = [ligne.text for ligne in content]
-        return float(content.text)
+        """
+        Récupère la dernière version de la bibliothèque.
+        Si elle est installée via pip, récupère la version sur PyPI.
+        Sinon, récupère la version à partir du fichier versionné sur GitHub.
+        """
+        if self.is_pip_installed():
+            # Utilise l'API de PyPI pour obtenir la dernière version
+            url = "https://pypi.org/pypi/understar/json"
+            try:
+                response = requests_html.requests.get(url)
+                response.raise_for_status()  # Vérifie les erreurs HTTP
+                data = response.json()
+                latest_version = data['info']['version']
+                return float(latest_version)
+            except (requests_html.requests.RequestException, ValueError) as e:
+                logging.error(f"Erreur lors de la récupération de la version sur PyPI : {e}")
+                return None
+        else:
+            # Si la bibliothèque est locale, récupère la version depuis GitHub
+            url = 'https://github.com/GalTechDev/UnderStar-OS/blob/master/understar/.version'
+            try:
+                session = requests_html.HTMLSession()
+                r = session.get(url)
+                content = r.html.find('.blob-code', first=True)
+                return float(content.text.strip())
+            except Exception as e:
+                logging.error(f"Erreur lors de la récupération de la version sur GitHub : {e}")
+                return None
 
     def get_lang_name(self):
         """"""

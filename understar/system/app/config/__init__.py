@@ -3,7 +3,7 @@ from os import execv, path
 from sys import executable, argv
 import discord
 from .apt import install, uninstall
-
+import logging
 
 Lib = lib.App()
 Lib.app.fusion([install, uninstall])
@@ -350,7 +350,8 @@ async def update_menu(ctx: discord.Interaction):
     await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=False))
 
     last = Lib.get_last_update_stats()
-    update = last > float(lib.BOT_VERSION)
+    update = last > float(lib.BOT_VERSION) if last else False
+
     embed = discord.Embed(title=":gear:  Mise à jour", description=f"{'Vous êtes à jour.' if last <= float(lib.BOT_VERSION) else 'Nouvelle version disponible'}", color=lib.THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
     embed.add_field(name=f"UnderStar OS v{last}", value='\u200b')
 
@@ -370,8 +371,7 @@ async def main_menu(ctx: discord.Interaction):
         await ctx.edit_original_response(embed=embed, view=Config_view(ctx))
 
     except Exception as error:
-        pass
-        print(error)
+        logging.error(error)
 
 
 async def app_config_menu(ctx: discord.Interaction, app:str):

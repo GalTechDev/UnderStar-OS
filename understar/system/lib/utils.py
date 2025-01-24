@@ -6,7 +6,7 @@ import glob
 import os
 import pkg_resources
 import sys
-from logging import info, warning
+import logging
 
 LANGAGE = "fr"
 THEME = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
@@ -34,12 +34,11 @@ def import_module(folder: str, log: bool = False, catch_error: bool = False, dir
     # Parcours des apps dans le répertoire du package
 
     if log:
-        info(" * Import Module Start :")
+        logging.info(" * Import Module Start :")
 
     modules: dict = {}
     path = os.path.join(folder.replace(".", "\\"), "*", "__init__.py") if found_sub_dir else os.path.join(folder.replace(".", "\\"), "*__init__.py")
 
-    #print(path, glob.glob(path, recursive=True, root_dir=directory))
     for file_path in glob.glob(path, recursive=True, root_dir=directory):
 
         # Obtention du nom du module à partir du chemin de l'app
@@ -56,22 +55,22 @@ def import_module(folder: str, log: bool = False, catch_error: bool = False, dir
             # Importation dynamique du module
             module_path = file_path.replace("/", ".").replace("\\", ".")
             module = importlib.import_module(f'{module_path[:-3]}')
-            # print(module_path[:-3])
+            
             # Ajout du module au dictionnaire
             modules.update({module_name:module})
 
             if log:
-                info(f" *  - imported {module_name}")
+                logging.info(f" *  - imported {module_name}")
 
         except Exception as e:
             if log:
-                warning(f" *  - failled importing {module_name} error : {e}")
+                logging.warning(f" *  - failled importing {module_name} error : {e}")
 
             if not catch_error:
                 raise e
 
     if log:
-        info(" * Import Module Finish")
+        logging.info(" * Import Module Finish")
 
     return modules
 
