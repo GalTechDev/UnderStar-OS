@@ -163,7 +163,8 @@ class Update_view(Back_view):
             await lib.valide_intaraction(interaction)
             await self.ctx.delete_original_response()
             await Lib.change_presence(activity=discord.Game("Updating..."), status=discord.Status.dnd)
-            #execv(executable, ["None", "system/app/update/update.pyw"])
+
+            execv(executable, ["None", "understar/system/app/update/update.pyw", "pypi" if lib.utils.is_pip_installed() else "git"])
 
 
 

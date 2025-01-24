@@ -7,6 +7,8 @@ import os
 import pkg_resources
 import sys
 import logging
+import subprocess
+from sys import executable
 
 LANGAGE = "fr"
 THEME = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
@@ -15,6 +17,13 @@ chemin_fichier = pkg_resources.resource_filename(__name__, '.version')
 with open(os.path.join(chemin_fichier.removesuffix(os.path.join("system", "lib", ".version")), ".version"), 'r', encoding="utf8") as f:
     BOT_VERSION = f.read()
 
+def is_pip_installed():
+    """Vérifie si une bibliothèque est installée avec pip."""
+    try:
+        subprocess.check_output([executable, "-m", "pip", "show", "understar"])
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 async def valide_intaraction(interaction: discord.Interaction):
     try:
@@ -49,7 +58,7 @@ def import_module(folder: str, log: bool = False, catch_error: bool = False, dir
             module_name = folder
 
         try:
-            if directory not in sys.path and directory!=None:
+            if directory not in sys.path and directory is not None:
                 sys.path.append(os.path.join(directory))
 
             # Importation dynamique du module
@@ -102,13 +111,13 @@ class Guilds:
         self.guilds_path = os.path.join("save", "system", "guilds.json")
 
     def get_app_guilds(self, app_name: str = None, guild=None):
-        if not app_name is None and not guild is None:
+        if  app_name is not None and  guild is not None:
             raise Exception("app_name and guild cannot be mixed")
 
         with open(self.guilds_path, encoding="utf8") as file:
             data = json.load(file)
 
-        if app_name is None and not guild is None:
+        if app_name is None and  guild is not None:
             return data[str(guild)]["apps"]
 
         apps: dict = {}
@@ -131,13 +140,13 @@ class Guilds:
             return []
 
     def get_admin_guilds(self, admin_id=None, guild=None):
-        if not admin_id is None and not guild is None:
+        if  admin_id is not None and  guild is not None:
             raise Exception("admin_id and guild cannot be mixed")
 
         with open(self.guilds_path, encoding="utf8") as file:
             data = json.load(file)
 
-        if admin_id is None and not guild is None:
+        if admin_id is None and  guild is not None:
             return data[str(guild)]["admin"]
 
         apps: dict = {}
@@ -159,13 +168,13 @@ class Guilds:
         return []
 
     def get_theme_guilds(self, theme_color=None, guild=None):
-        if not theme_color is None and not guild is None:
+        if  theme_color is not None and  guild is not None:
             raise Exception("theme_color and guild cannot be mixed")
 
         with open(self.guilds_path, encoding="utf8") as file:
             data = json.load(file)
 
-        if theme_color is None and not guild is None:
+        if theme_color is None and  guild is not None:
             return data[str(guild)]["theme"]
 
         apps: dict = {}

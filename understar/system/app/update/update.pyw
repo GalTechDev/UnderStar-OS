@@ -1,6 +1,6 @@
 from shutil import move, rmtree
 import os
-from sys import executable
+from sys import executable, argv
 import git
 import subprocess
 import logging
@@ -22,22 +22,14 @@ def pypi_maj():
     """Met à jour une bibliothèque installée via pip."""
     subprocess.check_call([executable, "-m", "pip", "install", "--upgrade", "understar"])
 
-           
-def is_pip_installed():
-    """Vérifie si une bibliothèque est installée avec pip."""
-    try:
-        subprocess.check_output([executable, "-m", "pip", "show", "understar"])
-        return True
-    except subprocess.CalledProcessError:
-        return False
-
 if __name__=="__main__":
-    if is_pip_installed():
+    if "pypi" in argv:
         logging.warning("Pypi MAJ")
         pypi_maj()
-    else:
+    elif "git" in argv:
         logging.warning("Git MAJ")
         git_maj()
-        
+    else:
+        exit(0)
     os.execv(executable, ["None", "exemple.py"])
 
