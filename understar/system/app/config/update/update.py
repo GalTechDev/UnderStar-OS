@@ -31,5 +31,3 @@ if __name__=="__main__":
         git_maj()
     else:
         exit(0)
-    os.execv(executable, ["None", "exemple.py"])
-

@@ -3,6 +3,7 @@ from os import execv, path
 from sys import executable, argv
 import discord
 from .apt import install, uninstall
+from .update import pypi_maj, git_maj
 import logging
 
 Lib = lib.App()
@@ -164,7 +165,16 @@ class Update_view(Back_view):
             await self.ctx.delete_original_response()
             await Lib.change_presence(activity=discord.Game("Updating..."), status=discord.Status.dnd)
 
-            execv(executable, ["None", "understar/system/app/update/update.pyw", "pypi" if lib.utils.is_pip_installed() else "git"])
+            if lib.utils.is_pip_installed():
+                pass
+                #pypi_maj()
+            else:
+                pass
+                #git_maj()
+
+
+            print(argv[0])
+            execv(executable, ["None", path.basename(argv[0])])
 
 
 
