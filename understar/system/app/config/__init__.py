@@ -166,11 +166,9 @@ class Update_view(Back_view):
             await Lib.change_presence(activity=discord.Game("Updating..."), status=discord.Status.dnd)
 
             if lib.utils.is_pip_installed():
-                pass
-                #pypi_maj()
+                pypi_maj()
             else:
-                pass
-                #git_maj()
+                git_maj()
 
 
             print(argv[0])
