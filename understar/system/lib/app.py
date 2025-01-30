@@ -31,7 +31,7 @@ class Lib_UsOS:
         """"""
         self.app_name = app_name
         self.save.app_name = app_name
-        self.app_path = os.path.join(f"app", f"{app_name}")
+        self.app_path = os.path.join("app", f"{app_name}")
 
         if self.app.fusioned:
             for mod in self.app.fusioned_module:

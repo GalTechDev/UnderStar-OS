@@ -403,7 +403,3 @@ async def config(ctx: discord.Interaction):
     await main_menu(ctx)
 
 
-@Lib.event.event()
-async def on_ready():
-    install.Lib.init_client(Lib.client)
-    uninstall.Lib.init_client(Lib.client)

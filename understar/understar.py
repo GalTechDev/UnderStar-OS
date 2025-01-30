@@ -12,6 +12,7 @@ from .system import app as sys_app
 import asyncio
 import json
 import logging
+import traceback
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level = logging.INFO)
 
@@ -481,39 +482,42 @@ class OS:
         #Gateway
         @client.event
         async def on_ready():
-            client.info = await client.application_info()
-            change_status.start()
+            try:
+                client.info = await client.application_info()
+                change_status.start()
 
-            #maintenance.start()
-            await self.import_apps(True)
-            await self.import_apps()
-            
-            logging.info(" * Bot Starting...")
-            logging.info(f" * version : {programmer} {BOT_VERSION}")
-            logging.info(f" * Logged in as : {client.user.name}")
-            logging.info(f" * ID : {client.user.id}")
+                #maintenance.start()
+                await self.import_apps(True)
+                await self.import_apps()
+                
+                logging.info(" * Bot Starting...")
+                logging.info(f" * version : {programmer} {BOT_VERSION}")
+                logging.info(f" * Logged in as : {client.user.name}")
+                logging.info(f" * ID : {client.user.id}")
 
-            await client.tree.sync()
+                await client.tree.sync()
 
-            with open(GUILD_FILE, encoding="utf8") as f:
-                data = json.load(f)
+                with open(GUILD_FILE, encoding="utf8") as f:
+                    data = json.load(f)
 
-            for guild in client.guilds:
+                for guild in client.guilds:
+                    if "sync" in sys.argv:
+                        client.tree.copy_global_to(guild=discord.Object(id=guild.id))
+
+                    await client.tree.sync(guild=discord.Object(id=guild.id))
+
+                    if str(guild.id) not in data.keys():
+                        data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
+
+                        with open(GUILD_FILE, "w", encoding="utf8") as f:
+                            json.dump(data, fp=f)
+
                 if "sync" in sys.argv:
-                    client.tree.copy_global_to(guild=discord.Object(id=guild.id))
+                    os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
-                await client.tree.sync(guild=discord.Object(id=guild.id))
-
-                if str(guild.id) not in data.keys():
-                    data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
-
-                    with open(GUILD_FILE, "w", encoding="utf8") as f:
-                        json.dump(data, fp=f)
-
-            if "sync" in sys.argv:
-                os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
-
-            await manage_event("on_ready")
+                await manage_event("on_ready")
+            except Exception:
+                logging.error(traceback.format_exc())
 
         @client.event
         async def on_resumed():
