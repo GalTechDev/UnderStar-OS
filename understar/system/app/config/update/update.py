@@ -1,6 +1,6 @@
 from shutil import move, rmtree
 import os
-from sys import executable, argv
+from sys import argv
 import git
 import subprocess
 import logging
@@ -20,7 +20,7 @@ def git_maj():
 
 def pypi_maj():
     """Met à jour une bibliothèque installée via pip."""
-    subprocess.check_call([executable, "-m", "pip", "install", "--upgrade", "understar"])
+    subprocess.check_call(["pip", "install", "--upgrade", "understar"])
 
 if __name__=="__main__":
     if "pypi" in argv:

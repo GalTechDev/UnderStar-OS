@@ -8,7 +8,6 @@ import pkg_resources
 import sys
 import logging
 import subprocess
-from sys import executable
 
 LANGAGE = "fr"
 THEME = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
@@ -20,7 +19,7 @@ with open(os.path.join(chemin_fichier.removesuffix(os.path.join("system", "lib",
 def is_pip_installed():
     """Vérifie si une bibliothèque est installée avec pip."""
     try:
-        subprocess.check_output([executable, "-m", "pip", "show", "understar"])
+        subprocess.check_output(["pip", "show", "understar"])
         return True
     except subprocess.CalledProcessError:
         return False
