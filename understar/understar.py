@@ -341,11 +341,11 @@ class OS:
                 try:
                     if app:
                         data = getattr(app.Lib.event, command)
-                    	await data(*args, **kwargs)
-
-                    	if app.Lib.app.fusioned:
-                        	for sub_app in app.Lib.app.fusioned_module:
-                            	data = getattr(sub_app.Lib.event, command)
+                        await data(*args, **kwargs)
+                        
+                        if app.Lib.app.fusioned:
+                            for sub_app in app.Lib.app.fusioned_module:
+                                data = getattr(sub_app.Lib.event, command)
                                 await data(*args, **kwargs)
                 except Exception as e:
                     logging.warn(e)
