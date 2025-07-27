@@ -33,7 +33,7 @@ async def valide_intaraction(interaction: discord.Interaction):
         pass
 
 
-def import_module(folder: str, log: bool = False, catch_error: bool = False, directory: str = None, found_sub_dir: bool = True):
+def import_module(folder: str, log: bool = False, catch_error: bool = True, directory: str = None, found_sub_dir: bool = True):
     """
     Import a module.
 
