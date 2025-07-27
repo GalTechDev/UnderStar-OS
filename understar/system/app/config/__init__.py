@@ -141,7 +141,7 @@ class Update_view(Back_view):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
         self.update = update
-        self.update_button = self.Update_button(ctx=self.ctx, enabled=self.update, label="Mettre à jour")
+        self.update_button = self.Update_button(ctx=self.ctx, enabled=True, label="Mettre à jour" if self.update else "Forcer la MAJ")
         self.add_item(self.update_button)
 
     class Update_button(discord.ui.Button):
