@@ -14,15 +14,17 @@
     <header>
         <nav class="nav">
             <div class="nav-container">
-                <a href="index.html" class="nav-logo">
-                    <span>⚡</span> UnderStar-OS
-                </a>
+                <a href="index.html" class="nav-logo">UnderStar-OS</a>
                 <div class="nav-links">
-                    <a href="index.html">Home</a>
-                    <a href="get-started.html" class="active">Get Started</a>
-                    <a href="docs.html">Documentation</a>
+                    <a href="index.html" data-i18n="nav.home">Home</a>
+                    <a href="get-started.html" class="active" data-i18n="nav.getStarted">Get Started</a>
+                    <a href="docs.html" data-i18n="nav.documentation">Documentation</a>
                     <a href="https://github.com/GalTechDev/UnderStar-OS" class="btn btn-secondary"
-                        style="padding: 0.5rem 1rem; font-size: 0.9rem;">GitHub</a>
+                        style="padding: 0.5rem 1rem; font-size: 0.9rem;" data-i18n="nav.github">GitHub</a>
+                    <div class="lang-selector">
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+                        <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">FR</button>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -33,57 +35,193 @@
             <aside class="sidebar">
                 <h3>Getting Started</h3>
                 <ul>
-                    <li><a href="#installation" class="active">Installation</a></li>
+                    <li><a href="#understand">Comprendre</a></li>
+                    <li><a href="#installation">Installation</a></li>
                     <li><a href="#quick-start">Quick Start</a></li>
-                    <li><a href="#structure">Project Structure</a></li>
+                    <li><a href="#structure">Structure</a></li>
+                    <li><a href="#next-steps">Next Steps</a></li>
                 </ul>
             </aside>
 
             <article class="doc-content">
-                <h1>Get Started</h1>
-                <p>Learn how to install and start building with UnderStar-OS V2 in minutes.</p>
+                <h1 data-i18n="getStarted.title">Get Started</h1>
+                <p data-i18n="getStarted.subtitle">Before coding, understand how the framework works. You'll be more
+                    efficient and know how to debug.</p>
 
-                <h2 id="installation">Installation</h2>
-                <p>UnderStar-OS is available on PyPI. You can install it using pip:</p>
+                <!-- SECTION: COMPRENDRE L'ARCHITECTURE -->
+                <h2 id="understand" data-i18n="getStarted.understand.title">🧠 Understanding the Architecture</h2>
+
+                <div class="info-box why">
+                    <h4 data-i18n="getStarted.understand.whyPlugins.title">🤔 Why a plugin system?</h4>
+                    <p data-i18n="getStarted.understand.whyPlugins.content">A classic Discord bot quickly becomes a
+                        giant 2000+ line file impossible to maintain.
+                        With plugins, each feature is <strong>isolated</strong>: you can add, modify or remove
+                        a feature without touching the rest of the code.</p>
+                </div>
+
+                <h3 data-i18n="getStarted.understand.lifecycle.title">The Lifecycle</h3>
+                <p data-i18n="getStarted.understand.lifecycle.content">When you launch your bot, here's what happens
+                    behind the scenes:</p>
+
+                <div class="diagram">
+                    <div class="diagram-title" data-i18n="getStarted.understand.lifecycle.diagramTitle">Startup cycle
+                    </div>
+                    <div class="diagram-flow">
+                        <div class="diagram-node">
+                            <div class="icon">🚀</div>
+                            <div class="label" data-i18n="getStarted.understand.lifecycle.step1.label">OS.start()</div>
+                            <div class="sublabel" data-i18n="getStarted.understand.lifecycle.step1.sublabel">Entry point
+                            </div>
+                        </div>
+                        <span class="diagram-arrow">→</span>
+                        <div class="diagram-node">
+                            <div class="icon">🔍</div>
+                            <div class="label" data-i18n="getStarted.understand.lifecycle.step2.label">Scan plugins/
+                            </div>
+                            <div class="sublabel" data-i18n="getStarted.understand.lifecycle.step2.sublabel">Discovery
+                            </div>
+                        </div>
+                        <span class="diagram-arrow">→</span>
+                        <div class="diagram-node">
+                            <div class="icon">📦</div>
+                            <div class="label" data-i18n="getStarted.understand.lifecycle.step3.label">on_load()</div>
+                            <div class="sublabel" data-i18n="getStarted.understand.lifecycle.step3.sublabel">
+                                Initialization</div>
+                        </div>
+                        <span class="diagram-arrow">→</span>
+                        <div class="diagram-node active">
+                            <div class="icon">✅</div>
+                            <div class="label" data-i18n="getStarted.understand.lifecycle.step4.label">on_ready()</div>
+                            <div class="sublabel" data-i18n="getStarted.understand.lifecycle.step4.sublabel">Bot
+                                connected</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box understand">
+                    <h4 data-i18n="getStarted.understand.remember.title">💡 Remember</h4>
+                    <p data-i18n="getStarted.understand.remember.content"><code>on_load()</code> is called BEFORE the
+                        Discord connection (to prepare data),
+                        <code>on_ready()</code> is called AFTER (for actions that require the Discord API).
+                    </p>
+                </div>
+
+                <h3 data-i18n="getStarted.understand.concepts.title">Key Concepts</h3>
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h4 data-i18n="getStarted.understand.concepts.plugin.title">🧩 Plugin</h4>
+                        <p data-i18n="getStarted.understand.concepts.plugin.content">A Python class that inherits from
+                            <code>Plugin</code>. It has access to the logger, data manager, and can declare
+                            commands/events.
+                        </p>
+                    </div>
+                    <div class="concept-card">
+                        <h4 data-i18n="getStarted.understand.concepts.eventBus.title">⚡ Event Bus</h4>
+                        <p data-i18n="getStarted.understand.concepts.eventBus.content">Communication system between
+                            plugins. A plugin can emit an event, others can listen without direct dependency.</p>
+                    </div>
+                    <div class="concept-card">
+                        <h4 data-i18n="getStarted.understand.concepts.dataManager.title">💾 Data Manager</h4>
+                        <p data-i18n="getStarted.understand.concepts.dataManager.content">Automatic JSON storage. No
+                            file management needed, the framework scopes data by guild, user, or global.</p>
+                    </div>
+                </div>
+
+                <!-- SECTION: INSTALLATION -->
+                <h2 id="installation" data-i18n="getStarted.installation.title">📦 Installation</h2>
+
+                <div class="info-box tip">
+                    <h4 data-i18n="getStarted.installation.prerequisites.title">✅ Prerequisites</h4>
+                    <p data-i18n="getStarted.installation.prerequisites.content">Python 3.10+ and git installed on your
+                        machine. A Discord bot token (created on the <a
+                            href="https://discord.com/developers/applications" target="_blank">Developer Portal</a>).
+                    </p>
+                </div>
+
                 <pre><code>pip install understar</code></pre>
-                <p>You also need <strong>git</strong> installed on your system for plugin management features.</p>
 
-                <h2 id="quick-start">Quick Start</h2>
-                <p>Create a new file named <code>main.py</code> (or <code>exemple.py</code>) and add the following code:
-                </p>
+                <!-- SECTION: QUICK START -->
+                <h2 id="quick-start" data-i18n="getStarted.quickStart.title">⚡ Quick Start</h2>
+
+                <p data-i18n="getStarted.quickStart.createFile">Create a file named <code>main.py</code>:</p>
 
                 <pre><code>from understar import OS
 
 if __name__ == "__main__":
-    # Initialize the bot
     bot = OS()
-    
-    # Start the bot
-    # The token will be requested on the first run
-    # and saved in data/token/bot_token
     bot.start()</code></pre>
 
-                <p>Run the script:</p>
+                <div class="info-box understand">
+                    <h4 data-i18n="getStarted.quickStart.whatItDoes.title">💡 What does this code do?</h4>
+                    <p data-i18n="getStarted.quickStart.whatItDoes.content"><strong>Line 1</strong>: Imports the main
+                        class of the framework.<br>
+                        <strong>Line 4</strong>: Creates an instance of your bot's "operating system".<br>
+                        <strong>Line 5</strong>: Starts the main loop. On first launch, the token will be requested and
+                        saved automatically.
+                    </p>
+                </div>
+
+                <p data-i18n="getStarted.quickStart.runBot">Run the bot:</p>
                 <pre><code>python main.py</code></pre>
 
-                <h2 id="structure">Project Structure</h2>
-                <p>Once you run the bot, it will create the necessary directories for you:</p>
+                <!-- SECTION: STRUCTURE -->
+                <h2 id="structure" data-i18n="getStarted.structure.title">📁 Project Structure</h2>
+
+                <p data-i18n="getStarted.structure.content">After the first launch, the framework creates this
+                    structure:</p>
+
                 <pre><code>my-bot/
-├── main.py             # Your entry script
-├── data/               # Stores tokens, configs, and databases
-└── plugins/            # Place your custom plugins here
+├── main.py           # Your entry point
+├── data/             # Persistent data (auto-managed)
+│   ├── token/        # Discord token (don't commit!)
+│   └── plugins/      # Your plugins' data
+└── plugins/          # Your custom plugins
     └── my_plugin/
         └── __init__.py</code></pre>
 
-                <p>You are now ready to write your first plugin! Check out the <a href="docs.html">Documentation</a>.
+                <div class="info-box warning">
+                    <h4 data-i18n="getStarted.structure.warning.title">⚠️ Important</h4>
+                    <p data-i18n="getStarted.structure.warning.content">The <code>data/token/</code> folder contains
+                        your Discord token.
+                        <strong>Never commit it to Git!</strong> Add <code>data/</code> to your <code>.gitignore</code>.
+                    </p>
+                </div>
+
+                <!-- SECTION: NEXT STEPS -->
+                <h2 id="next-steps" data-i18n="getStarted.nextSteps.title">🎯 Next Steps</h2>
+
+                <ul class="step-list">
+                    <li>
+                        <strong data-i18n="getStarted.nextSteps.step1.title">Create your first plugin</strong>
+                        <span data-i18n="getStarted.nextSteps.step1.content">Read the <a
+                                href="docs.html#plugin-structure">Plugin Structure</a> section to understand how to
+                            create a plugin.</span>
+                    </li>
+                    <li>
+                        <strong data-i18n="getStarted.nextSteps.step2.title">Add a command</strong>
+                        <span data-i18n="getStarted.nextSteps.step2.content">Use the <code>@slash_command</code>
+                            decorator to create Discord slash commands.</span>
+                    </li>
+                    <li>
+                        <strong data-i18n="getStarted.nextSteps.step3.title">Listen to events</strong>
+                        <span data-i18n="getStarted.nextSteps.step3.content">React to messages, reactions, members
+                            joining with <code>@listen</code>.</span>
+                    </li>
+                </ul>
+
+                <p style="margin-top: 2rem;">
+                    <a href="docs.html" class="btn btn-primary" data-i18n="getStarted.nextSteps.readDocs">Read Full
+                        Documentation →</a>
                 </p>
             </article>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 GalTechDev. Released under the MIT License.</p>
+        <p data-i18n="footer.copyright">&copy; 2025 GalTechDev. Built for Developers.</p>
     </footer>
+
+    <script src="js/i18n.js"></script>
 </body>
 
 </html>

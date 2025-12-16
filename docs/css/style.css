@@ -155,6 +155,7 @@ a:hover {
 
 .nav-links {
     display: flex;
+    align-items: center;
     gap: var(--space-lg);
 }
 
@@ -166,6 +167,37 @@ a:hover {
 .nav-links a:hover,
 .nav-links a.active {
     color: var(--accent-primary);
+}
+
+/* Language Selector */
+.lang-selector {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: var(--space-md);
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-md);
+    padding: 0.25rem;
+}
+
+.lang-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    font-weight: 600;
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+}
+
+.lang-btn:hover {
+    color: var(--text-primary);
+}
+
+.lang-btn.active {
+    background: var(--accent-primary);
+    color: white;
 }
 
 .container {
@@ -228,6 +260,187 @@ a:hover {
     justify-content: center;
     gap: var(--space-md);
     margin-top: var(--space-xl);
+}
+
+/* Install Badges (PyPI / Docker) */
+.install-badges {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-top: var(--space-xl);
+    flex-wrap: wrap;
+}
+
+.install-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sm);
+    padding: var(--space-sm) var(--space-md);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-md);
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    transition: all var(--transition-fast);
+}
+
+.install-badge:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: rgba(255, 255, 255, 0.2);
+    color: var(--text-primary);
+    transform: translateY(-2px);
+}
+
+.install-badge.pypi:hover {
+    border-color: #3775a9;
+    box-shadow: 0 4px 15px rgba(55, 117, 169, 0.3);
+}
+
+.install-badge.docker:hover {
+    border-color: #2496ed;
+    box-shadow: 0 4px 15px rgba(36, 150, 237, 0.3);
+}
+
+.badge-icon {
+    font-size: 1.1rem;
+}
+
+.badge-text {
+    font-size: 0.8rem;
+}
+
+/* Install Section */
+.install-section {
+    padding: var(--space-3xl) 0;
+    background: linear-gradient(180deg, transparent 0%, rgba(99, 102, 241, 0.05) 50%, transparent 100%);
+    text-align: center;
+}
+
+.section-title {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+    margin-bottom: var(--space-sm);
+}
+
+.section-subtitle {
+    color: var(--text-muted);
+    margin-bottom: var(--space-xl);
+}
+
+.install-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: var(--space-xl);
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.install-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-xl);
+    text-decoration: none;
+    transition: all var(--transition-base);
+    display: block;
+}
+
+.install-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.install-card.pypi:hover {
+    border-color: #3775a9;
+    box-shadow: 0 8px 30px rgba(55, 117, 169, 0.25);
+}
+
+.install-card.docker:hover {
+    border-color: #2496ed;
+    box-shadow: 0 8px 30px rgba(36, 150, 237, 0.25);
+}
+
+.install-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+}
+
+.install-icon {
+    font-size: 2.5rem;
+}
+
+.install-platform {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+
+.install-command {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md);
+    margin-bottom: var(--space-md);
+}
+
+.install-command code {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    color: var(--accent-primary);
+}
+
+.install-footer {
+    text-align: right;
+}
+
+.install-link {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    transition: color var(--transition-fast);
+}
+
+.install-card:hover .install-link {
+    color: var(--accent-primary);
+}
+
+/* CTA Section */
+.cta-section {
+    padding: var(--space-3xl) 0;
+    margin-top: var(--space-3xl);
+    background: linear-gradient(180deg, transparent 0%, rgba(139, 92, 246, 0.08) 50%, transparent 100%);
+}
+
+/* Hero Subtitle */
+.hero-subtitle {
+    font-size: 1.15rem;
+    max-width: 600px;
+    margin: 0 auto var(--space-lg);
+}
+
+/* Button Large */
+.btn-lg {
+    padding: var(--space-md) var(--space-2xl);
+    font-size: 1.1rem;
+}
+
+/* Footer Links */
+.footer-links {
+    display: flex;
+    justify-content: center;
+    gap: var(--space-md);
+    margin-bottom: var(--space-lg);
+    flex-wrap: wrap;
+}
+
+.footer-links a {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+.footer-links span {
+    color: var(--text-muted);
+    opacity: 0.5;
 }
 
 /* Buttons */
@@ -374,6 +587,327 @@ pre {
 }
 
 /* Yellow */
+
+/* =====================================================
+   Educational Documentation Components
+   ===================================================== */
+
+/* Info Boxes */
+.info-box {
+    border-radius: var(--border-radius-md);
+    padding: var(--space-lg);
+    margin: var(--space-lg) 0;
+    border-left: 4px solid;
+}
+
+.info-box h4 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+    font-size: 1rem;
+}
+
+.info-box p {
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+.info-box.understand {
+    background: rgba(99, 102, 241, 0.1);
+    border-color: var(--accent-primary);
+}
+
+.info-box.understand h4 {
+    color: var(--accent-primary);
+}
+
+.info-box.warning {
+    background: rgba(245, 158, 11, 0.1);
+    border-color: var(--warning);
+}
+
+.info-box.warning h4 {
+    color: var(--warning);
+}
+
+.info-box.tip {
+    background: rgba(16, 185, 129, 0.1);
+    border-color: var(--success);
+}
+
+.info-box.tip h4 {
+    color: var(--success);
+}
+
+.info-box.why {
+    background: rgba(139, 92, 246, 0.1);
+    border-color: var(--accent-secondary);
+}
+
+.info-box.why h4 {
+    color: var(--accent-secondary);
+}
+
+/* Diagram Container */
+.diagram {
+    background: var(--bg-secondary);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-xl);
+    margin: var(--space-xl) 0;
+    text-align: center;
+}
+
+.diagram-title {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: var(--space-lg);
+}
+
+.diagram-flow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+}
+
+.diagram-node {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--border-radius-md);
+    padding: var(--space-md) var(--space-lg);
+    text-align: center;
+    min-width: 120px;
+}
+
+.diagram-node.active {
+    border-color: var(--accent-primary);
+    box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+}
+
+.diagram-node .icon {
+    font-size: 1.5rem;
+    margin-bottom: var(--space-xs);
+}
+
+.diagram-node .label {
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+.diagram-node .sublabel {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+}
+
+.diagram-arrow {
+    color: var(--accent-primary);
+    font-size: 1.25rem;
+}
+
+/* Step by Step */
+.step-list {
+    counter-reset: step-counter;
+    list-style: none;
+    padding: 0;
+    margin: var(--space-lg) 0;
+}
+
+.step-list li {
+    counter-increment: step-counter;
+    position: relative;
+    padding-left: 3rem;
+    margin-bottom: var(--space-lg);
+}
+
+.step-list li::before {
+    content: counter(step-counter);
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 2rem;
+    height: 2rem;
+    background: var(--gradient-primary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.step-list li strong {
+    display: block;
+    margin-bottom: var(--space-xs);
+    color: var(--text-primary);
+}
+
+/* Concept Cards */
+.concept-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: var(--space-lg);
+    margin: var(--space-xl) 0;
+}
+
+.concept-card {
+    background: var(--bg-card);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+}
+
+.concept-card h4 {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+    margin-bottom: var(--space-sm);
+}
+
+.concept-card p {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+}
+
+/* Table of Contents */
+.toc {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: var(--space-lg);
+    margin-bottom: var(--space-xl);
+}
+
+.toc h4 {
+    margin-bottom: var(--space-md);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+}
+
+.toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.toc li {
+    margin-bottom: var(--space-xs);
+}
+
+.toc a {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Documentation Layout */
+.docs-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 var(--space-lg);
+    padding-top: 100px;
+    /* Account for fixed navbar */
+    min-height: 100vh;
+    gap: var(--space-xl);
+}
+
+.sidebar {
+    position: sticky;
+    top: 100px;
+    width: 220px;
+    flex-shrink: 0;
+    height: fit-content;
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.sidebar h3 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text-muted);
+    margin-bottom: var(--space-md);
+}
+
+.sidebar ul {
+    list-style: none;
+}
+
+.sidebar li {
+    margin-bottom: var(--space-sm);
+}
+
+.sidebar a {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+    display: block;
+    padding: var(--space-xs) 0;
+    transition: color var(--transition-fast);
+}
+
+.sidebar a:hover {
+    color: var(--accent-primary);
+}
+
+.doc-content {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: var(--space-3xl);
+}
+
+.doc-content h1 {
+    margin-bottom: var(--space-sm);
+}
+
+.doc-content h2 {
+    margin-top: var(--space-3xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.doc-content h2:first-of-type {
+    margin-top: var(--space-xl);
+    border-top: none;
+    padding-top: 0;
+}
+
+.doc-content pre {
+    background: #0f172a;
+    border-radius: var(--border-radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: var(--space-lg);
+    overflow-x: auto;
+    margin: var(--space-md) 0 var(--space-lg);
+}
+
+.doc-content code {
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+}
+
+.doc-content p code {
+    background: rgba(99, 102, 241, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: var(--border-radius-sm);
+    color: var(--accent-primary);
+}
+
+/* Responsive Documentation */
+@media (max-width: 768px) {
+    .docs-container {
+        flex-direction: column;
+        padding-top: 80px;
+    }
+
+    .sidebar {
+        position: static;
+        width: 100%;
+    }
+}
 
 /* Footer */
 footer {

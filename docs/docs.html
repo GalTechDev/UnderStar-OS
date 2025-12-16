@@ -14,15 +14,17 @@
     <header>
         <nav class="nav">
             <div class="nav-container">
-                <a href="index.html" class="nav-logo">
-                    <span>⚡</span> UnderStar-OS
-                </a>
+                <a href="index.html" class="nav-logo">UnderStar-OS</a>
                 <div class="nav-links">
-                    <a href="index.html">Home</a>
-                    <a href="get-started.html">Get Started</a>
-                    <a href="docs.html" class="active">Documentation</a>
+                    <a href="index.html" data-i18n="nav.home">Home</a>
+                    <a href="get-started.html" data-i18n="nav.getStarted">Get Started</a>
+                    <a href="docs.html" class="active" data-i18n="nav.documentation">Documentation</a>
                     <a href="https://github.com/GalTechDev/UnderStar-OS" class="btn btn-secondary"
-                        style="padding: 0.5rem 1rem; font-size: 0.9rem;">GitHub</a>
+                        style="padding: 0.5rem 1rem; font-size: 0.9rem;" data-i18n="nav.github">GitHub</a>
+                    <div class="lang-selector">
+                        <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+                        <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">FR</button>
+                    </div>
                 </div>
             </div>
         </nav>
@@ -31,7 +33,7 @@
     <main>
         <div class="docs-container">
             <aside class="sidebar">
-                <h3>Core Concepts</h3>
+                <h3>API Reference</h3>
                 <ul>
                     <li><a href="#plugin-structure">Plugin Structure</a></li>
                     <li><a href="#commands">Slash Commands</a></li>
@@ -42,59 +44,314 @@
             </aside>
 
             <article class="doc-content">
-                <h1>Documentation</h1>
-                <p>Deep dive into the framework's API and features.</p>
+                <h1 data-i18n="docs.title">Documentation</h1>
+                <p data-i18n="docs.subtitle">Complete API reference. Each section explains the <strong>how</strong> and
+                    the <strong>why</strong>.</p>
 
-                <h2 id="plugin-structure">Plugin Structure</h2>
-                <p>A plugin is a folder inside <code>plugins/</code> containing an <code>__init__.py</code> with a class
-                    inheriting from <code>Plugin</code>.</p>
+                <!-- =====================================================
+                     PLUGIN STRUCTURE
+                     ===================================================== -->
+                <h2 id="plugin-structure" data-i18n="docs.pluginStructure.title">🧩 Plugin Structure</h2>
+
+                <div class="info-box understand">
+                    <h4 data-i18n="docs.pluginStructure.whatIs.title">💡 What is a Plugin?</h4>
+                    <p data-i18n="docs.pluginStructure.whatIs.content">A plugin is a <strong>Python class</strong> that
+                        represents a feature of your bot.
+                        By inheriting from <code>Plugin</code>, your class automatically gets access to the logger, data
+                        manager,
+                        and can declare commands and listeners.</p>
+                </div>
+
+                <p data-i18n="docs.pluginStructure.minimalStructure">Minimal plugin structure:</p>
+
                 <pre><code>from understar.core.plugin import Plugin
 
 class MyPlugin(Plugin):
-    def on_load(self):
-        self.logger.info("Plugin Loaded!")</code></pre>
+    async def on_load(self):
+        self.logger.info("Plugin loaded!")
+    
+    async def on_ready(self):
+        self.logger.info("Bot connected to Discord!")</code></pre>
 
-                <h2 id="commands">Slash Commands</h2>
-                <p>Use the <code>@slash_command</code> decorator to register commands.</p>
+                <h3 data-i18n="docs.pluginStructure.lifecycle.title">Plugin Lifecycle</h3>
+
+                <div class="diagram">
+                    <div class="diagram-title" data-i18n="docs.pluginStructure.lifecycle.diagramTitle">Lifecycle methods
+                    </div>
+                    <div class="diagram-flow">
+                        <div class="diagram-node">
+                            <div class="icon">📦</div>
+                            <div class="label" data-i18n="docs.pluginStructure.lifecycle.onLoad.label">on_load()</div>
+                            <div class="sublabel" data-i18n="docs.pluginStructure.lifecycle.onLoad.sublabel">Before
+                                connection</div>
+                        </div>
+                        <span class="diagram-arrow">→</span>
+                        <div class="diagram-node">
+                            <div class="icon">✅</div>
+                            <div class="label" data-i18n="docs.pluginStructure.lifecycle.onReady.label">on_ready()</div>
+                            <div class="sublabel" data-i18n="docs.pluginStructure.lifecycle.onReady.sublabel">After
+                                connection</div>
+                        </div>
+                        <span class="diagram-arrow">→</span>
+                        <div class="diagram-node">
+                            <div class="icon">🔄</div>
+                            <div class="label" data-i18n="docs.pluginStructure.lifecycle.onUnload.label">on_unload()
+                            </div>
+                            <div class="sublabel" data-i18n="docs.pluginStructure.lifecycle.onUnload.sublabel">Plugin
+                                stop</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-box why">
+                    <h4 data-i18n="docs.pluginStructure.whySeparate.title">🤔 Why separate on_load and on_ready?</h4>
+                    <p data-i18n="docs.pluginStructure.whySeparate.content"><code>on_load()</code> runs BEFORE Discord
+                        connection — use it to load configs,
+                        prepare data. <code>on_ready()</code> runs AFTER — use it to get guild info,
+                        send startup messages, etc.</p>
+                </div>
+
+                <h3 data-i18n="docs.pluginStructure.autoAccess">What you get automatically</h3>
+                <table style="width: 100%; margin: 1rem 0;">
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 0.5rem 0;"><code>self.logger</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);"
+                            data-i18n="docs.pluginStructure.logger">Pre-configured logger with your plugin name</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 0.5rem 0;"><code>self.data</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);"
+                            data-i18n="docs.pluginStructure.data">Data Manager for persistent data storage</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 0.5rem 0;"><code>self.bot</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);"
+                            data-i18n="docs.pluginStructure.bot">Discord client instance (after on_ready)</td>
+                    </tr>
+                </table>
+
+                <!-- =====================================================
+                     SLASH COMMANDS
+                     ===================================================== -->
+                <h2 id="commands" data-i18n="docs.commands.title">⚡ Slash Commands</h2>
+
+                <div class="info-box understand">
+                    <h4 data-i18n="docs.commands.howItWorks.title">💡 How does it work?</h4>
+                    <p data-i18n="docs.commands.howItWorks.content">The <code>@slash_command</code> decorator registers
+                        your function as a Discord command.
+                        At startup, the framework collects all commands and syncs them with the Discord API.
+                        When a user types <code>/your_command</code>, Discord calls your function with an
+                        <code>Interaction</code> object.
+                    </p>
+                </div>
+
                 <pre><code>from understar.core.plugin import slash_command
 import discord
 
-@slash_command(name="ping", description="Replies with Pong")
+@slash_command(name="ping", description="Replies Pong!")
 async def ping(self, interaction: discord.Interaction):
     await interaction.response.send_message("Pong! 🏓")</code></pre>
 
-                <h2 id="events">Event Listener</h2>
-                <p>Listen to Discord events strict typing using the <code>Event</code> enum.</p>
+                <h3 data-i18n="docs.commands.parameters">Command Parameters</h3>
+                <p data-i18n="docs.commands.parametersDesc">Add parameters by declaring them in the function signature:
+                </p>
+
+                <pre><code>@slash_command(name="say", description="Repeats a message")
+async def say(self, interaction: discord.Interaction, message: str):
+    await interaction.response.send_message(f"You said: {message}")</code></pre>
+
+                <div class="info-box warning">
+                    <h4 data-i18n="docs.commands.timeout.title">⚠️ 3 second timeout</h4>
+                    <p data-i18n="docs.commands.timeout.content">Discord expects a response within <strong>3
+                            seconds</strong>. If your processing is long,
+                        use <code>interaction.response.defer()</code> then <code>interaction.followup.send()</code>.</p>
+                </div>
+
+                <pre><code>@slash_command(name="slow", description="Long processing")
+async def slow(self, interaction: discord.Interaction):
+    await interaction.response.defer()  # Tell Discord "received, please wait"
+    
+    # ... long processing ...
+    await asyncio.sleep(5)
+    
+    await interaction.followup.send("Done!")</code></pre>
+
+                <!-- =====================================================
+                     EVENT LISTENER
+                     ===================================================== -->
+                <h2 id="events" data-i18n="docs.events.title">👂 Event Listener</h2>
+
+                <div class="info-box understand">
+                    <h4 data-i18n="docs.events.eventBus.title">💡 The Event Bus</h4>
+                    <p data-i18n="docs.events.eventBus.content">Discord sends "events" when something happens (message
+                        received, member joins, reaction added...).
+                        The <code>@listen</code> decorator tells the framework: "when this event arrives, call my
+                        function".</p>
+                </div>
+
                 <pre><code>from understar.core.plugin import listen
 from understar.core.events import Event
 
 @listen(Event.ON_MESSAGE)
 async def on_message(self, message):
-    if message.author.bot: return
-    print(message.content)</code></pre>
+    if message.author.bot:
+        return  # Ignore bots
+    print(f"Message received: {message.content}")</code></pre>
 
-                <h2 id="tasks">Scheduled Tasks</h2>
-                <p>Run background tasks at specific intervals.</p>
+                <h3 data-i18n="docs.events.availableEvents">Available Events</h3>
+                <table style="width: 100%; margin: 1rem 0;">
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 0.5rem 0;"><code>Event.ON_MESSAGE</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);" data-i18n="docs.events.onMessage">A
+                            message is sent</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 0.5rem 0;"><code>Event.ON_MEMBER_JOIN</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);"
+                            data-i18n="docs.events.onMemberJoin">A member joins a server</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 0.5rem 0;"><code>Event.ON_REACTION_ADD</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);"
+                            data-i18n="docs.events.onReactionAdd">A reaction is added</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem 0;"><code>Event.ON_VOICE_STATE</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);"
+                            data-i18n="docs.events.onVoiceState">Someone joins/leaves a voice channel</td>
+                    </tr>
+                </table>
+
+                <div class="info-box tip">
+                    <h4 data-i18n="docs.events.bestPractice.title">✅ Best Practice</h4>
+                    <p data-i18n="docs.events.bestPractice.content">Always check <code>message.author.bot</code> in
+                        <code>ON_MESSAGE</code> to avoid
+                        your bot responding to itself in an infinite loop!
+                    </p>
+                </div>
+
+                <!-- =====================================================
+                     SCHEDULED TASKS
+                     ===================================================== -->
+                <h2 id="tasks" data-i18n="docs.tasks.title">⏰ Scheduled Tasks</h2>
+
+                <div class="info-box understand">
+                    <h4 data-i18n="docs.tasks.background.title">💡 Background Tasks</h4>
+                    <p data-i18n="docs.tasks.background.content">Sometimes you want to run code at regular intervals
+                        (check an API, send a reminder...).
+                        The <code>@task</code> decorator creates a loop that runs automatically.</p>
+                </div>
+
                 <pre><code>from understar.core.plugin import task
 
 @task(minutes=5)
-async def background_task(self):
-    self.logger.info("Running task...")</code></pre>
+async def check_api(self):
+    self.logger.info("Checking API...")
+    # Your code here</code></pre>
 
-                <h2 id="data">Data Persistence</h2>
-                <p>Save and load data easily without a database.</p>
-                <pre><code># Save
-self.data.save({"coins": 10}, scope="user", id=123)
+                <h3 data-i18n="docs.tasks.timingOptions">Timing Options</h3>
+                <table style="width: 100%; margin: 1rem 0;">
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 0.5rem 0;"><code>seconds=30</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);" data-i18n="docs.tasks.seconds">
+                            Every 30 seconds</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                        <td style="padding: 0.5rem 0;"><code>minutes=5</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);" data-i18n="docs.tasks.minutes">
+                            Every 5 minutes</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 0.5rem 0;"><code>hours=1</code></td>
+                        <td style="padding: 0.5rem 0; color: var(--text-secondary);" data-i18n="docs.tasks.hours">Every
+                            hour</td>
+                    </tr>
+                </table>
 
-# Load
-coins = self.data.get(scope="user", id=123, default={})</code></pre>
+                <div class="info-box warning">
+                    <h4 data-i18n="docs.tasks.errorHandling.title">⚠️ Error Handling</h4>
+                    <p data-i18n="docs.tasks.errorHandling.content">If your task crashes, it stops! Wrap your code in a
+                        <code>try/except</code> to prevent
+                        an error from completely stopping the task.
+                    </p>
+                </div>
+
+                <pre><code>@task(minutes=10)
+async def safe_task(self):
+    try:
+        # Code that might fail
+        await self.check_something()
+    except Exception as e:
+        self.logger.error(f"Task error: {e}")</code></pre>
+
+                <!-- =====================================================
+                     DATA PERSISTENCE
+                     ===================================================== -->
+                <h2 id="data" data-i18n="docs.data.title">💾 Data Persistence</h2>
+
+                <div class="info-box understand">
+                    <h4 data-i18n="docs.data.autoStorage.title">💡 Automatic Storage</h4>
+                    <p data-i18n="docs.data.autoStorage.content">The Data Manager stores data in JSON without you
+                        managing files.
+                        Data is automatically organized by <strong>scope</strong>: global, per guild, or per user.</p>
+                </div>
+
+                <pre><code># Save user data
+self.data.save({"coins": 100, "level": 5}, scope="user", id=user.id)
+
+# Get data
+user_data = self.data.get(scope="user", id=user.id, default={"coins": 0})</code></pre>
+
+                <h3 data-i18n="docs.data.scopes">The 3 Scopes</h3>
+
+                <div class="concept-grid">
+                    <div class="concept-card">
+                        <h4 data-i18n="docs.data.global.title">🌍 Global</h4>
+                        <p data-i18n="docs.data.global.content">Data shared between all servers. Example: bot config,
+                            global blacklist.</p>
+                        <pre style="margin-top: 0.5rem;"><code>scope="global"</code></pre>
+                    </div>
+                    <div class="concept-card">
+                        <h4 data-i18n="docs.data.guild.title">🏠 Guild</h4>
+                        <p data-i18n="docs.data.guild.content">Server-specific data. Example: custom prefix, moderation
+                            settings.</p>
+                        <pre style="margin-top: 0.5rem;"><code>scope="guild", id=guild.id</code></pre>
+                    </div>
+                    <div class="concept-card">
+                        <h4 data-i18n="docs.data.user.title">👤 User</h4>
+                        <p data-i18n="docs.data.user.content">User-specific data. Example: XP, inventory, preferences.
+                        </p>
+                        <pre style="margin-top: 0.5rem;"><code>scope="user", id=user.id</code></pre>
+                    </div>
+                </div>
+
+                <div class="info-box why">
+                    <h4 data-i18n="docs.data.whyScopes.title">🤔 Why scopes?</h4>
+                    <p data-i18n="docs.data.whyScopes.content">Without scopes, you have to manage keys yourself:
+                        <code>data[f"guild_{guild_id}_user_{user_id}"]</code>.
+                        With scopes, the framework automatically organizes JSON files in separate folders.
+                    </p>
+                </div>
+
+                <h3 data-i18n="docs.data.fileStructure">Generated file structure</h3>
+                <pre><code>data/plugins/my_plugin/
+├── global.json         # Global data
+├── guilds/
+│   ├── 123456789.json  # Server 123456789 data
+│   └── 987654321.json  # Server 987654321 data
+└── users/
+    ├── 111111111.json  # User 111111111 data
+    └── 222222222.json  # User 222222222 data</code></pre>
+
             </article>
         </div>
     </main>
 
     <footer>
-        <p>&copy; 2025 GalTechDev. Released under the MIT License.</p>
+        <p data-i18n="footer.copyright">&copy; 2025 GalTechDev. Built for Developers.</p>
     </footer>
+
+    <script src="js/i18n.js"></script>
 </body>
 
 </html>

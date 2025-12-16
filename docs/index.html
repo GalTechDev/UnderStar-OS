@@ -4,9 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UnderStar-OS V2 | Next-Gen Discord Store</title>
+    <title>UnderStar-OS | Next-Gen Discord Bot Framework</title>
     <link rel="stylesheet" href="css/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Fira+Code&display=swap"
         rel="stylesheet">
 </head>
 
@@ -15,13 +15,17 @@
     <!-- Navigation -->
     <nav class="nav">
         <div class="nav-container">
-            <a href="#" class="nav-logo"><span>⚡</span> UnderStar-OS</a>
+            <a href="#" class="nav-logo">UnderStar-OS</a>
             <div class="nav-links">
-                <a href="index.html" class="active">Home</a>
-                <a href="get-started.html">Get Started</a>
-                <a href="docs.html">Documentation</a>
+                <a href="index.html" class="active" data-i18n="nav.home">Home</a>
+                <a href="get-started.html" data-i18n="nav.getStarted">Get Started</a>
+                <a href="docs.html" data-i18n="nav.documentation">Documentation</a>
                 <a href="https://github.com/GalTechDev/UnderStar-OS" class="btn btn-secondary"
-                    style="padding: 0.5rem 1rem; font-size: 0.9rem;">GitHub</a>
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem;" data-i18n="nav.github">GitHub</a>
+                <div class="lang-selector">
+                    <button class="lang-btn" data-lang="en" onclick="setLanguage('en')">EN</button>
+                    <button class="lang-btn" data-lang="fr" onclick="setLanguage('fr')">FR</button>
+                </div>
             </div>
         </div>
     </nav>
@@ -29,26 +33,69 @@
     <!-- Hero Section -->
     <section class="hero">
         <div class="hero-content">
-            <span class="hero-badge">🚀 Version 2.0 Now Available</span>
+            <span class="hero-badge" data-i18n="index.badge">🚀 Version 2.0 Now Available</span>
             <h1>
-                Build Advanced Bots <br>
-                <span class="gradient-text">Without The Chaos</span>
+                <span data-i18n="index.title">Build Advanced Bots</span> <br>
+                <span class="gradient-text" data-i18n="index.titleGradient">Without The Chaos</span>
             </h1>
-            <p>
+            <p class="hero-subtitle" data-i18n="index.subtitle">
                 A modular, strictly-typed Python framework for Discord.
                 Separate your logic into plugins, handle events with ease, and manage data like a pro.
             </p>
 
             <div class="hero-buttons">
-                <a href="get-started.html" class="btn btn-primary">Get Started</a>
-                <a href="docs.html" class="btn btn-secondary">Read Documentation</a>
+                <a href="get-started.html" class="btn btn-primary btn-lg" data-i18n="index.cta.getStarted">Get
+                    Started</a>
+                <a href="docs.html" class="btn btn-secondary btn-lg" data-i18n="index.cta.readDocs">Read
+                    Documentation</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Install Section - Prominent -->
+    <section class="install-section">
+        <div class="container">
+            <h2 class="section-title" data-i18n="index.install.title">📦 Install Now</h2>
+            <p class="section-subtitle" data-i18n="index.install.subtitle">Available on PyPI and Docker Hub</p>
+
+            <div class="install-cards">
+                <a href="https://pypi.org/project/understar/" target="_blank" class="install-card pypi">
+                    <div class="install-card-header">
+                        <span class="install-icon">🐍</span>
+                        <span class="install-platform">PyPI</span>
+                    </div>
+                    <div class="install-command">
+                        <code>pip install understar</code>
+                    </div>
+                    <div class="install-footer">
+                        <span class="install-link" data-i18n="index.install.viewPypi">View on pypi.org →</span>
+                    </div>
+                </a>
+
+                <a href="https://hub.docker.com/r/galteck/understar-os" target="_blank" class="install-card docker">
+                    <div class="install-card-header">
+                        <span class="install-icon">🐳</span>
+                        <span class="install-platform">Docker Hub</span>
+                    </div>
+                    <div class="install-command">
+                        <code>docker pull galteck/understar-os</code>
+                    </div>
+                    <div class="install-footer">
+                        <span class="install-link" data-i18n="index.install.viewDocker">View on hub.docker.com →</span>
+                    </div>
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Code Showcase -->
-    <div class="container">
-        <div class="code-viewer" style="max-width: 800px; margin: 0 auto; box-shadow: var(--shadow-glow);">
+    <section class="container" style="margin-top: var(--space-3xl); text-align: center;">
+        <span class="hero-badge" data-i18n="index.code.badge">💻 Simple & Clean</span>
+        <h2 data-i18n="index.code.title">Write Less, Do More</h2>
+        <p class="section-subtitle" data-i18n="index.code.subtitle">Create a complete plugin in just a few lines</p>
+
+        <div class="code-viewer"
+            style="max-width: 800px; margin: var(--space-xl) auto 0; box-shadow: var(--shadow-glow); text-align: left;">
             <div class="code-header">
                 <div class="code-dot red"></div>
                 <div class="code-dot yellow"></div>
@@ -62,79 +109,104 @@
 <span class="keyword">class</span> <span class="class">MyAwesomePlugin</span>(Plugin):
     <span class="decorator">@slash_command</span>(name=<span class="string">"hello"</span>, description=<span class="string">"Say hi!"</span>)
     <span class="keyword">async def</span> <span class="function">hello</span>(self, interaction):
-        <span class="keyword">await</span> interaction.response.send_message(<span class="string">"Hello World! ⚡"</span>)
+        <span class="keyword">await</span> interaction.response.send_message(<span class="string">"Hello World! 🌌"</span>)
 
     <span class="keyword">async def</span> <span class="function">on_load</span>(self):
         self.logger.info(<span class="string">"Plugin Loaded Successfully!"</span>)</code></pre>
             </div>
         </div>
-    </div>
+    </section>
 
     <!-- Features -->
-    <section class="container">
+    <section class="container" style="margin-top: var(--space-3xl);">
+        <h2 class="section-title" style="text-align: center;" data-i18n="index.features.title">Why UnderStar-OS?</h2>
         <div class="grid-3">
             <div class="card">
                 <div class="card-icon">🧩</div>
-                <h3>Modular By Design</h3>
-                <p>Don't write one massive file. Split your features into isolated plugins that can be installed,
+                <h3 data-i18n="index.features.modular.title">Modular By Design</h3>
+                <p data-i18n="index.features.modular.content">Don't write one massive file. Split your features into
+                    isolated plugins that can be installed,
                     updated, and removed independently.</p>
             </div>
             <div class="card">
                 <div class="card-icon">⚡</div>
-                <h3>Event Bus System</h3>
-                <p>Decoupled communication. Plugins can emit and listen to events without tight coupling, ensuring a
+                <h3 data-i18n="index.features.eventBus.title">Event Bus System</h3>
+                <p data-i18n="index.features.eventBus.content">Decoupled communication. Plugins can emit and listen to
+                    events without tight coupling, ensuring a
                     clean architecture.</p>
             </div>
             <div class="card">
                 <div class="card-icon">💾</div>
-                <h3>Smart Persistence</h3>
-                <p>No database setup hell. Built-in JSON storage manager that automatically scopes data by Guild or
+                <h3 data-i18n="index.features.persistence.title">Smart Persistence</h3>
+                <p data-i18n="index.features.persistence.content">No database setup hell. Built-in JSON storage manager
+                    that automatically scopes data by Guild or
                     User.</p>
             </div>
         </div>
     </section>
 
-    <!-- Architecture Diagram (Simplified Code-based Visual) -->
+    <!-- Architecture Diagram -->
     <section class="container" style="margin-top: var(--space-3xl); text-align: center;">
-        <span class="hero-badge">Architecture</span>
-        <h2>How It Works</h2>
+        <span class="hero-badge" data-i18n="index.architecture.badge">Architecture</span>
+        <h2 data-i18n="index.architecture.title">How It Works</h2>
 
         <div
             style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 2rem; margin-top: 2rem;">
-            <!-- Node 1 -->
             <div class="card" style="padding: 1.5rem; width: 200px;">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">👑</div>
-                <h4>OS Kernel</h4>
-                <p style="font-size: 0.9rem;">Manages Lifecycle</p>
+                <h4 data-i18n="index.architecture.kernel.title">OS Kernel</h4>
+                <p style="font-size: 0.9rem;" data-i18n="index.architecture.kernel.subtitle">Manages Lifecycle</p>
             </div>
 
             <div style="color: var(--accent-primary); font-size: 1.5rem;">→</div>
 
-            <!-- Node 2 -->
             <div class="card" style="padding: 1.5rem; width: 200px;">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔌</div>
-                <h4>Plugin Mgr</h4>
-                <p style="font-size: 0.9rem;">Loads Modules</p>
+                <h4 data-i18n="index.architecture.pluginMgr.title">Plugin Mgr</h4>
+                <p style="font-size: 0.9rem;" data-i18n="index.architecture.pluginMgr.subtitle">Loads Modules</p>
             </div>
 
             <div style="color: var(--accent-primary); font-size: 1.5rem;">→</div>
 
-            <!-- Node 3 -->
             <div class="card"
                 style="padding: 1.5rem; width: 200px; border-color: var(--accent-secondary); box-shadow: var(--shadow-glow);">
                 <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚀</div>
-                <h4>Your Code</h4>
-                <p style="font-size: 0.9rem;">Events & Commands</p>
+                <h4 data-i18n="index.architecture.yourCode.title">Your Code</h4>
+                <p style="font-size: 0.9rem;" data-i18n="index.architecture.yourCode.subtitle">Events & Commands</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container" style="text-align: center;">
+            <h2 data-i18n="index.ctaSection.title">Ready to Build Something Amazing?</h2>
+            <p style="max-width: 600px; margin: 0 auto var(--space-xl);" data-i18n="index.ctaSection.subtitle">
+                Join developers building production-ready Discord bots with UnderStar-OS.
+            </p>
+            <div class="hero-buttons">
+                <a href="get-started.html" class="btn btn-primary btn-lg" data-i18n="index.cta.startBuilding">Start
+                    Building →</a>
+                <a href="https://github.com/GalTechDev/UnderStar-OS" target="_blank" class="btn btn-secondary btn-lg"
+                    data-i18n="index.cta.starGithub">⭐ Star on GitHub</a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
     <footer>
-        <p>© 2025 GalTechDev. Built for Developers.</p>
-        <p style="font-size: 0.9rem; margin-top: 0.5rem;">MIT License</p>
+        <div class="footer-links">
+            <a href="https://pypi.org/project/understar/" target="_blank">PyPI</a>
+            <span>•</span>
+            <a href="https://hub.docker.com/r/galteck/understar-os" target="_blank">Docker Hub</a>
+            <span>•</span>
+            <a href="https://github.com/GalTechDev/UnderStar-OS" target="_blank">GitHub</a>
+        </div>
+        <p data-i18n="footer.copyright">© 2025 GalTechDev. Built for Developers.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;" data-i18n="footer.license">MIT License</p>
     </footer>
 
+    <script src="js/i18n.js"></script>
 </body>
 
 </html>
