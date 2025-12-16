@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UnderStar-OS V2 | Next-Gen Discord Store</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <nav class="nav">
+        <div class="nav-container">
+            <a href="#" class="nav-logo"><span>⚡</span> UnderStar-OS</a>
+            <div class="nav-links">
+                <a href="index.html" class="active">Home</a>
+                <a href="get-started.html">Get Started</a>
+                <a href="docs.html">Documentation</a>
+                <a href="https://github.com/GalTechDev/UnderStar-OS" class="btn btn-secondary"
+                    style="padding: 0.5rem 1rem; font-size: 0.9rem;">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <span class="hero-badge">🚀 Version 2.0 Now Available</span>
+            <h1>
+                Build Advanced Bots <br>
+                <span class="gradient-text">Without The Chaos</span>
+            </h1>
+            <p>
+                A modular, strictly-typed Python framework for Discord.
+                Separate your logic into plugins, handle events with ease, and manage data like a pro.
+            </p>
+
+            <div class="hero-buttons">
+                <a href="get-started.html" class="btn btn-primary">Get Started</a>
+                <a href="docs.html" class="btn btn-secondary">Read Documentation</a>
+            </div>
+        </div>
+    </section>
+
+    <!-- Code Showcase -->
+    <div class="container">
+        <div class="code-viewer" style="max-width: 800px; margin: 0 auto; box-shadow: var(--shadow-glow);">
+            <div class="code-header">
+                <div class="code-dot red"></div>
+                <div class="code-dot yellow"></div>
+                <div class="code-dot green"></div>
+                <span
+                    style="margin-left: 10px; font-size: 0.8rem; color: var(--text-muted);">plugins/my_plugin/__init__.py</span>
+            </div>
+            <div class="code-content">
+                <pre><code><span class="keyword">from</span> understar.core.plugin <span class="keyword">import</span> Plugin, slash_command
+
+<span class="keyword">class</span> <span class="class">MyAwesomePlugin</span>(Plugin):
+    <span class="decorator">@slash_command</span>(name=<span class="string">"hello"</span>, description=<span class="string">"Say hi!"</span>)
+    <span class="keyword">async def</span> <span class="function">hello</span>(self, interaction):
+        <span class="keyword">await</span> interaction.response.send_message(<span class="string">"Hello World! ⚡"</span>)
+
+    <span class="keyword">async def</span> <span class="function">on_load</span>(self):
+        self.logger.info(<span class="string">"Plugin Loaded Successfully!"</span>)</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <section class="container">
+        <div class="grid-3">
+            <div class="card">
+                <div class="card-icon">🧩</div>
+                <h3>Modular By Design</h3>
+                <p>Don't write one massive file. Split your features into isolated plugins that can be installed,
+                    updated, and removed independently.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">⚡</div>
+                <h3>Event Bus System</h3>
+                <p>Decoupled communication. Plugins can emit and listen to events without tight coupling, ensuring a
+                    clean architecture.</p>
+            </div>
+            <div class="card">
+                <div class="card-icon">💾</div>
+                <h3>Smart Persistence</h3>
+                <p>No database setup hell. Built-in JSON storage manager that automatically scopes data by Guild or
+                    User.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Architecture Diagram (Simplified Code-based Visual) -->
+    <section class="container" style="margin-top: var(--space-3xl); text-align: center;">
+        <span class="hero-badge">Architecture</span>
+        <h2>How It Works</h2>
+
+        <div
+            style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 2rem; margin-top: 2rem;">
+            <!-- Node 1 -->
+            <div class="card" style="padding: 1.5rem; width: 200px;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">👑</div>
+                <h4>OS Kernel</h4>
+                <p style="font-size: 0.9rem;">Manages Lifecycle</p>
+            </div>
+
+            <div style="color: var(--accent-primary); font-size: 1.5rem;">→</div>
+
+            <!-- Node 2 -->
+            <div class="card" style="padding: 1.5rem; width: 200px;">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🔌</div>
+                <h4>Plugin Mgr</h4>
+                <p style="font-size: 0.9rem;">Loads Modules</p>
+            </div>
+
+            <div style="color: var(--accent-primary); font-size: 1.5rem;">→</div>
+
+            <!-- Node 3 -->
+            <div class="card"
+                style="padding: 1.5rem; width: 200px; border-color: var(--accent-secondary); box-shadow: var(--shadow-glow);">
+                <div style="font-size: 2rem; margin-bottom: 0.5rem;">🚀</div>
+                <h4>Your Code</h4>
+                <p style="font-size: 0.9rem;">Events & Commands</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>© 2025 GalTechDev. Built for Developers.</p>
+        <p style="font-size: 0.9rem; margin-top: 0.5rem;">MIT License</p>
+    </footer>
+
+</body>
+
+</html>

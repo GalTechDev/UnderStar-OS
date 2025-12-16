@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Documentation - UnderStar-OS V2</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav class="nav">
+            <div class="nav-container">
+                <a href="index.html" class="nav-logo">
+                    <span>⚡</span> UnderStar-OS
+                </a>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="get-started.html">Get Started</a>
+                    <a href="docs.html" class="active">Documentation</a>
+                    <a href="https://github.com/GalTechDev/UnderStar-OS" class="btn btn-secondary"
+                        style="padding: 0.5rem 1rem; font-size: 0.9rem;">GitHub</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="docs-container">
+            <aside class="sidebar">
+                <h3>Core Concepts</h3>
+                <ul>
+                    <li><a href="#plugin-structure">Plugin Structure</a></li>
+                    <li><a href="#commands">Slash Commands</a></li>
+                    <li><a href="#events">Event Listener</a></li>
+                    <li><a href="#tasks">Scheduled Tasks</a></li>
+                    <li><a href="#data">Data Manager</a></li>
+                </ul>
+            </aside>
+
+            <article class="doc-content">
+                <h1>Documentation</h1>
+                <p>Deep dive into the framework's API and features.</p>
+
+                <h2 id="plugin-structure">Plugin Structure</h2>
+                <p>A plugin is a folder inside <code>plugins/</code> containing an <code>__init__.py</code> with a class
+                    inheriting from <code>Plugin</code>.</p>
+                <pre><code>from understar.core.plugin import Plugin
+
+class MyPlugin(Plugin):
+    def on_load(self):
+        self.logger.info("Plugin Loaded!")</code></pre>
+
+                <h2 id="commands">Slash Commands</h2>
+                <p>Use the <code>@slash_command</code> decorator to register commands.</p>
+                <pre><code>from understar.core.plugin import slash_command
+import discord
+
+@slash_command(name="ping", description="Replies with Pong")
+async def ping(self, interaction: discord.Interaction):
+    await interaction.response.send_message("Pong! 🏓")</code></pre>
+
+                <h2 id="events">Event Listener</h2>
+                <p>Listen to Discord events strict typing using the <code>Event</code> enum.</p>
+                <pre><code>from understar.core.plugin import listen
+from understar.core.events import Event
+
+@listen(Event.ON_MESSAGE)
+async def on_message(self, message):
+    if message.author.bot: return
+    print(message.content)</code></pre>
+
+                <h2 id="tasks">Scheduled Tasks</h2>
+                <p>Run background tasks at specific intervals.</p>
+                <pre><code>from understar.core.plugin import task
+
+@task(minutes=5)
+async def background_task(self):
+    self.logger.info("Running task...")</code></pre>
+
+                <h2 id="data">Data Persistence</h2>
+                <p>Save and load data easily without a database.</p>
+                <pre><code># Save
+self.data.save({"coins": 10}, scope="user", id=123)
+
+# Load
+coins = self.data.get(scope="user", id=123, default={})</code></pre>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 GalTechDev. Released under the MIT License.</p>
+    </footer>
+</body>
+
+</html>

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Get Started - UnderStar-OS V2</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav class="nav">
+            <div class="nav-container">
+                <a href="index.html" class="nav-logo">
+                    <span>⚡</span> UnderStar-OS
+                </a>
+                <div class="nav-links">
+                    <a href="index.html">Home</a>
+                    <a href="get-started.html" class="active">Get Started</a>
+                    <a href="docs.html">Documentation</a>
+                    <a href="https://github.com/GalTechDev/UnderStar-OS" class="btn btn-secondary"
+                        style="padding: 0.5rem 1rem; font-size: 0.9rem;">GitHub</a>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="docs-container">
+            <aside class="sidebar">
+                <h3>Getting Started</h3>
+                <ul>
+                    <li><a href="#installation" class="active">Installation</a></li>
+                    <li><a href="#quick-start">Quick Start</a></li>
+                    <li><a href="#structure">Project Structure</a></li>
+                </ul>
+            </aside>
+
+            <article class="doc-content">
+                <h1>Get Started</h1>
+                <p>Learn how to install and start building with UnderStar-OS V2 in minutes.</p>
+
+                <h2 id="installation">Installation</h2>
+                <p>UnderStar-OS is available on PyPI. You can install it using pip:</p>
+                <pre><code>pip install understar</code></pre>
+                <p>You also need <strong>git</strong> installed on your system for plugin management features.</p>
+
+                <h2 id="quick-start">Quick Start</h2>
+                <p>Create a new file named <code>main.py</code> (or <code>exemple.py</code>) and add the following code:
+                </p>
+
+                <pre><code>from understar import OS
+
+if __name__ == "__main__":
+    # Initialize the bot
+    bot = OS()
+    
+    # Start the bot
+    # The token will be requested on the first run
+    # and saved in data/token/bot_token
+    bot.start()</code></pre>
+
+                <p>Run the script:</p>
+                <pre><code>python main.py</code></pre>
+
+                <h2 id="structure">Project Structure</h2>
+                <p>Once you run the bot, it will create the necessary directories for you:</p>
+                <pre><code>my-bot/
+├── main.py             # Your entry script
+├── data/               # Stores tokens, configs, and databases
+└── plugins/            # Place your custom plugins here
+    └── my_plugin/
+        └── __init__.py</code></pre>
+
+                <p>You are now ready to write your first plugin! Check out the <a href="docs.html">Documentation</a>.
+                </p>
+            </article>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 GalTechDev. Released under the MIT License.</p>
+    </footer>
+</body>
+
+</html>

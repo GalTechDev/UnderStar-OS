@@ -1,0 +1,3 @@
+
+recursive-include understar/plugins *
+recursive-include understar/data *

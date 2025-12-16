@@ -1,0 +1,14 @@
+[
+    {
+        "mesure_name": "colis 10kg GC",
+        "gc_weight_kg": 10.0,
+        "duration_plateau_m": 3681.0,
+        "speed_remontee_Cs": 0.24
+    },
+    {
+        "mesure_name": "colis 6100g GC",
+        "gc_weight_kg": 6.1,
+        "duration_plateau_m": 2220.0,
+        "speed_remontee_Cs": 0.23
+    }
+]

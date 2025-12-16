@@ -1,1 +1,0 @@
-from .update import pypi_maj, git_maj
