@@ -194,7 +194,7 @@ const i18n = {
                 }
             },
             index: {
-                badge: "🚀 Version 2.0 Now Available",
+                badge: "🚀 Version 3.0 Now Available",
                 title: "Build Advanced Bots",
                 titleGradient: "Without The Chaos",
                 subtitle: "A modular, strictly-typed Python framework for Discord. Separate your logic into plugins, handle events with ease, and manage data like a pro.",
@@ -430,7 +430,7 @@ const i18n = {
                 }
             },
             index: {
-                badge: "🚀 Version 2.0 Disponible",
+                badge: "🚀 Version 3.0 Disponible",
                 title: "Créez des Bots Avancés",
                 titleGradient: "Sans le Chaos",
                 subtitle: "Un framework Python modulaire et strictement typé pour Discord. Séparez votre logique en plugins, gérez les events facilement, et stockez vos données comme un pro.",
