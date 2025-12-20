@@ -3,7 +3,8 @@ from os import execv, path
 from sys import executable, argv
 import discord
 from .apt import install, uninstall
-
+from .update import pypi_maj, git_maj
+import logging
 
 Lib = lib.App()
 Lib.app.fusion([install, uninstall])
@@ -140,7 +141,7 @@ class Update_view(Back_view):
         super().__init__(ctx=ctx, back_menu=back, timeout=timeout)
         self.ctx = ctx
         self.update = update
-        self.update_button = self.Update_button(ctx=self.ctx, enabled=self.update, label="Mettre à jour")
+        self.update_button = self.Update_button(ctx=self.ctx, enabled=True, label="Mettre à jour" if self.update else "Forcer la MAJ")
         self.add_item(self.update_button)
 
     class Update_button(discord.ui.Button):
@@ -163,7 +164,15 @@ class Update_view(Back_view):
             await lib.valide_intaraction(interaction)
             await self.ctx.delete_original_response()
             await Lib.change_presence(activity=discord.Game("Updating..."), status=discord.Status.dnd)
-            #execv(executable, ["None", "system/app/update/update.pyw"])
+
+            if lib.utils.is_pip_installed():
+                pypi_maj()
+            else:
+                git_maj()
+
+
+            print(argv[0])
+            execv(executable, ["None", path.basename(argv[0])])
 
 
 
@@ -350,9 +359,10 @@ async def update_menu(ctx: discord.Interaction):
     await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=False))
 
     last = Lib.get_last_update_stats()
-    update = last > float(lib.BOT_VERSION)
-    embed = discord.Embed(title=":gear:  Mise à jour", description=f"{'Vous êtes à jour.' if last <= float(lib.BOT_VERSION) else 'Nouvelle version disponible'}", color=lib.THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
-    embed.add_field(name=f"UnderStar OS v{last}", value='\u200b')
+    update = last > float(lib.BOT_VERSION) if last else False
+
+    embed = discord.Embed(title=":gear:  Mise à jour", description=f"{'Vous êtes à jour.' if not update else f'Nouvelle version disponible : v{last}'}", color=lib.THEME[Lib.guilds.get_theme_guilds(guild = ctx.guild_id)]())
+    embed.add_field(name=f"Version actuelle : UnderStar OS v{lib.BOT_VERSION}", value='\u200b')
 
     await ctx.edit_original_response(embed=embed, view=Update_view(ctx=ctx, back=main_menu, update=update))
 
@@ -370,8 +380,7 @@ async def main_menu(ctx: discord.Interaction):
         await ctx.edit_original_response(embed=embed, view=Config_view(ctx))
 
     except Exception as error:
-        pass
-        print(error)
+        logging.error(error)
 
 
 async def app_config_menu(ctx: discord.Interaction, app:str):
@@ -394,7 +403,3 @@ async def config(ctx: discord.Interaction):
     await main_menu(ctx)
 
 
-@Lib.event.event()
-async def on_ready():
-    install.Lib.init_client(Lib.client)
-    uninstall.Lib.init_client(Lib.client)

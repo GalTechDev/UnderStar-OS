@@ -12,7 +12,7 @@ from .system import app as sys_app
 import asyncio
 import json
 import logging
-from logging import info, warning, error
+import traceback
 
 logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%Y-%m-%d %H:%M:%S', level = logging.INFO)
 
@@ -64,10 +64,9 @@ class OS:
 
     async def import_apps(self, sys: bool = False) -> None:
         """"""
-        #print((self.all_app.items() if not sys else sys_app.all_app.items()))
 
         for app_name, app in (self.all_app.items() if not sys else sys_app.all_app.items()):
-            info(f" * IMPORT {app_name}: ")
+            logging.info(f" * IMPORT {app_name}: ")
 
             app.Lib.init(self.client, discord_tasks, self.all_app)
             app.Lib.set_app_name(app_name)
@@ -102,9 +101,9 @@ class OS:
                         error_lst.append(error)
 
             except Exception as error:
-                error(error)
+                logging.error(error)
 
-            info(f" * - Task : {loaded} loaded | {errors} error : {error_lst}")
+            logging.info(f" * - Task : {loaded} loaded | {errors} error : {error_lst}")
 
             # Command & Slash
             if len(self.Lib.store.get_guilds_installed(app_name)) > 0 or sys:
@@ -126,7 +125,7 @@ class OS:
                         errors += 1
                         error_lst.append(error)
 
-                info(f" * - Command : {loaded} loaded | {errors} error : {error_lst}")
+                logging.info(f" * - Command : {loaded} loaded | {errors} error : {error_lst}")
 
                 # Slash
 
@@ -165,13 +164,13 @@ class OS:
                     try:
                         self.client.tree.add_command(app_groupe, guilds=([self.client.get_guild(guild_id) for guild_id in self.Lib.store.get_guilds_installed(app_name) if self.client.get_guild(guild_id)!=None]) if not sys else MISSING)
                     except Exception as e:
-                        error(e)
+                        logging.error(e)
                         
-                info(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}\n")
+                logging.info(f" * - Slash : {loaded} loaded | {errors} error : {error_lst}\n")
 
             else:
-                warning(" * - Command : Any guild have installed this app, not loaded")
-                warning(" * - Slash : Any guild have installed this app, not loaded")
+                logging.warning(" * - Command : Any guild have installed this app, not loaded")
+                logging.warning(" * - Slash : Any guild have installed this app, not loaded")
 
     def get_help(self, ctx: discord_commands.context.Context) -> list:
         """"""
@@ -189,7 +188,6 @@ class OS:
             embed.set_author(name=f'Liste des commandes {(page+"/"+nb_page) if nb_page > 1 else ""}')
 
             for com in coms:
-                #print(com)
                 if all([check(ctx) for check in self.client.all_commands[com].checks] + [True]):
                     embed.add_field(name=f"**{com}**", value=f'{self.client.all_commands[com].help if self.client.all_commands[com].help != None else "Aucune aide disponible"}')
                     nb += 1
@@ -205,7 +203,7 @@ class OS:
                 embeds.append(embed)
 
         except Exception as error:
-            error(error)
+            logging.error(error)
 
         return embeds
 
@@ -248,7 +246,7 @@ class OS:
 
             except Exception:
                 with open(BOT_TOKEN_PATH, "w", encoding="utf8") as f:
-                    warning("TOKEN not set, please set token at /token/bot_token file")
+                    logging.warning("TOKEN not set, please set token at /token/bot_token file")
                     f.write("TOKEN HERE")
                 sys.exit(0)
 
@@ -333,21 +331,24 @@ class OS:
                         await ctx.send(embed=embed)
 
                     except Exception as error:
-                        error(error)
+                        logging.error(error)
 
         # ---------------------------------- EVENTS ------------------------------------
 
         #@terminal()
         async def manage_event(command, *args, **kwargs):
             for app in list(self.all_app.values()) + list(sys_app.all_app.values()):
-                if app:
-                    data = getattr(app.Lib.event, command)
-                    await data(*args, **kwargs)
-
-                    if app.Lib.app.fusioned:
-                        for sub_app in app.Lib.app.fusioned_module:
-                            data = getattr(sub_app.Lib.event, command)
-                            await data(*args, **kwargs)
+                try:
+                    if app:
+                        data = getattr(app.Lib.event, command)
+                        await data(*args, **kwargs)
+                        
+                        if app.Lib.app.fusioned:
+                            for sub_app in app.Lib.app.fusioned_module:
+                                data = getattr(sub_app.Lib.event, command)
+                                await data(*args, **kwargs)
+                except Exception as e:
+                    logging.warn(e)
 
         #App Commands
         @client.event
@@ -373,7 +374,7 @@ class OS:
                     await ctx.response.send_message(content=f"Data :\n{ctx.data}\nError :\n{error}", ephemeral = True)
 
                 except Exception:
-                    error(f"Data :\n{ctx.data}\nError :\n{error}")
+                    logging.error(f"Data :\n{ctx.data}\nError :\n{error}")
 
                 await self.send_error(ctx, error)
 
@@ -484,39 +485,42 @@ class OS:
         #Gateway
         @client.event
         async def on_ready():
-            client.info = await client.application_info()
-            change_status.start()
+            try:
+                client.info = await client.application_info()
+                change_status.start()
 
-            #maintenance.start()
-            await self.import_apps(True)
-            await self.import_apps()
-            
-            info(" * Bot Starting...")
-            info(f" * version : {programmer} {BOT_VERSION}")
-            info(f" * Logged in as : {client.user.name}")
-            info(f" * ID : {client.user.id}")
+                #maintenance.start()
+                await self.import_apps(True)
+                await self.import_apps()
+                
+                logging.info(" * Bot Starting...")
+                logging.info(f" * version : {programmer} {BOT_VERSION}")
+                logging.info(f" * Logged in as : {client.user.name}")
+                logging.info(f" * ID : {client.user.id}")
 
-            await client.tree.sync()
+                await client.tree.sync()
 
-            with open(GUILD_FILE, encoding="utf8") as f:
-                data = json.load(f)
+                with open(GUILD_FILE, encoding="utf8") as f:
+                    data = json.load(f)
 
-            for guild in client.guilds:
+                for guild in client.guilds:
+                    if "sync" in sys.argv:
+                        client.tree.copy_global_to(guild=discord.Object(id=guild.id))
+
+                    await client.tree.sync(guild=discord.Object(id=guild.id))
+
+                    if str(guild.id) not in data.keys():
+                        data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
+
+                        with open(GUILD_FILE, "w", encoding="utf8") as f:
+                            json.dump(data, fp=f)
+
                 if "sync" in sys.argv:
-                    client.tree.copy_global_to(guild=discord.Object(id=guild.id))
+                    os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
 
-                await client.tree.sync(guild=discord.Object(id=guild.id))
-
-                if str(guild.id) not in data.keys():
-                    data.update({str(guild.id):{"apps":[], "admin":[guild.owner.id], "password":None, "theme":"bleu"}})
-
-                    with open(GUILD_FILE, "w", encoding="utf8") as f:
-                        json.dump(data, fp=f)
-
-            if "sync" in sys.argv:
-                os.execv(sys.executable, ["None", os.path.basename(sys.argv[0])])
-
-            await manage_event("on_ready")
+                await manage_event("on_ready")
+            except Exception:
+                logging.error(traceback.format_exc())
 
         @client.event
         async def on_resumed():

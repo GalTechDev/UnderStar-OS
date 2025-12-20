@@ -1,5 +1,6 @@
 from understar.system import lib
 import discord
+import logging
 
 
 Lib = lib.App()
@@ -26,4 +27,4 @@ async def clear(ctx:discord.Interaction, nombre:int = 1):
             await ctx.edit_original_response(content='Le bot ne peut pas executer cette commande car il lui manque des autorisations. Merci de contacter le STAFF')
 
         except Exception as error:
-            print(error)
+            logging.error(error)

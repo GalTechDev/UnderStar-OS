@@ -7,6 +7,7 @@ from shutil import rmtree, move
 import zipfile as zip
 import discord
 import json
+import logging
 
 Lib = lib.App()
 
@@ -60,14 +61,14 @@ async def download(ctx:discord.Interaction, app_name: str, link: str = ""):
 
     except Exception as error:
         await ctx.response.send_message(f"Une erreur s'est produite : {error}", ephemeral=True)
-        print(error)
+        logging.error(error)
 
 
 #@Lib.app.slash(name="install", description="install", guilds=None)
 #@discord.app_commands.check(Lib.is_in_staff)
 async def install(ctx:discord.Interaction,app_name:str):
     if Lib.store.is_downloaded(app_name):
-        with open(os.path.join("save", f"system", "guilds.json")) as file:
+        with open(os.path.join("save", "system", "guilds.json")) as file:
             guilds = json.load(file)
 
         guilds[str(ctx.guild_id)]["apps"].append(app_name)

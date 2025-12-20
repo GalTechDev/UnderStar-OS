@@ -6,7 +6,8 @@ import glob
 import os
 import pkg_resources
 import sys
-from logging import info, warning
+import logging
+import subprocess
 
 LANGAGE = "fr"
 THEME = {"gris": discord.Color.dark_grey, "bleu": discord.Color.blue, "rouge": discord.Color.red, "vert": discord.Color.green, "jaune":discord.Color.yellow}
@@ -15,6 +16,13 @@ chemin_fichier = pkg_resources.resource_filename(__name__, '.version')
 with open(os.path.join(chemin_fichier.removesuffix(os.path.join("system", "lib", ".version")), ".version"), 'r', encoding="utf8") as f:
     BOT_VERSION = f.read()
 
+def is_pip_installed():
+    """Vérifie si une bibliothèque est installée avec pip."""
+    try:
+        subprocess.check_output(["pip", "show", "understar"])
+        return True
+    except subprocess.CalledProcessError:
+        return False
 
 async def valide_intaraction(interaction: discord.Interaction):
     try:
@@ -25,7 +33,7 @@ async def valide_intaraction(interaction: discord.Interaction):
         pass
 
 
-def import_module(folder: str, log: bool = False, catch_error: bool = False, directory: str = None, found_sub_dir: bool = True):
+def import_module(folder: str, log: bool = False, catch_error: bool = True, directory: str = None, found_sub_dir: bool = True):
     """
     Import a module.
 
@@ -34,12 +42,11 @@ def import_module(folder: str, log: bool = False, catch_error: bool = False, dir
     # Parcours des apps dans le répertoire du package
 
     if log:
-        info(" * Import Module Start :")
+        logging.info(" * Import Module Start :")
 
     modules: dict = {}
     path = os.path.join(folder.replace(".", "\\"), "*", "__init__.py") if found_sub_dir else os.path.join(folder.replace(".", "\\"), "*__init__.py")
 
-    #print(path, glob.glob(path, recursive=True, root_dir=directory))
     for file_path in glob.glob(path, recursive=True, root_dir=directory):
 
         # Obtention du nom du module à partir du chemin de l'app
@@ -50,28 +57,28 @@ def import_module(folder: str, log: bool = False, catch_error: bool = False, dir
             module_name = folder
 
         try:
-            if directory not in sys.path and directory!=None:
+            if directory not in sys.path and directory is not None:
                 sys.path.append(os.path.join(directory))
 
             # Importation dynamique du module
             module_path = file_path.replace("/", ".").replace("\\", ".")
             module = importlib.import_module(f'{module_path[:-3]}')
-            # print(module_path[:-3])
+            
             # Ajout du module au dictionnaire
             modules.update({module_name:module})
 
             if log:
-                info(f" *  - imported {module_name}")
+                logging.info(f" *  - imported {module_name}")
 
         except Exception as e:
             if log:
-                warning(f" *  - failled importing {module_name} error : {e}")
+                logging.warning(f" *  - failled importing {module_name} error : {e}")
 
             if not catch_error:
                 raise e
 
     if log:
-        info(" * Import Module Finish")
+        logging.info(" * Import Module Finish")
 
     return modules
 
@@ -103,13 +110,13 @@ class Guilds:
         self.guilds_path = os.path.join("save", "system", "guilds.json")
 
     def get_app_guilds(self, app_name: str = None, guild=None):
-        if not app_name is None and not guild is None:
+        if  app_name is not None and  guild is not None:
             raise Exception("app_name and guild cannot be mixed")
 
         with open(self.guilds_path, encoding="utf8") as file:
             data = json.load(file)
 
-        if app_name is None and not guild is None:
+        if app_name is None and  guild is not None:
             return data[str(guild)]["apps"]
 
         apps: dict = {}
@@ -132,13 +139,13 @@ class Guilds:
             return []
 
     def get_admin_guilds(self, admin_id=None, guild=None):
-        if not admin_id is None and not guild is None:
+        if  admin_id is not None and  guild is not None:
             raise Exception("admin_id and guild cannot be mixed")
 
         with open(self.guilds_path, encoding="utf8") as file:
             data = json.load(file)
 
-        if admin_id is None and not guild is None:
+        if admin_id is None and  guild is not None:
             return data[str(guild)]["admin"]
 
         apps: dict = {}
@@ -160,13 +167,13 @@ class Guilds:
         return []
 
     def get_theme_guilds(self, theme_color=None, guild=None):
-        if not theme_color is None and not guild is None:
+        if  theme_color is not None and  guild is not None:
             raise Exception("theme_color and guild cannot be mixed")
 
         with open(self.guilds_path, encoding="utf8") as file:
             data = json.load(file)
 
-        if theme_color is None and not guild is None:
+        if theme_color is None and  guild is not None:
             return data[str(guild)]["theme"]
 
         apps: dict = {}
